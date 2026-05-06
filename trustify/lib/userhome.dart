@@ -1240,11 +1240,6 @@ class _State extends State<Homepage> with TickerProviderStateMixin {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _buildHomeHeader(),
-            const SizedBox(height: 24),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: _buildQuickStats(),
-            ),
             const SizedBox(height: 28),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -1403,69 +1398,6 @@ class _State extends State<Homepage> with TickerProviderStateMixin {
                 fontSize: 11,
                 fontWeight: FontWeight.w500,
               ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // ── QUICK STATS ROW ──────────────────────────────────────────
-  Widget _buildQuickStats() {
-    return Row(
-      children: [
-        Expanded(child: _buildStatCard('Income', '\$12,340', Icons.trending_up_rounded, const Color(0xFF00C26F))),
-        const SizedBox(width: 12),
-        Expanded(child: _buildStatCard('Expense', '\$4,820', Icons.trending_down_rounded, const Color(0xFFFF4466))),
-        const SizedBox(width: 12),
-        Expanded(child: _buildStatCard('Loans', '2 Active', Icons.account_balance_rounded, const Color(0xFF1A1AFF))),
-      ],
-    );
-  }
-
-  Widget _buildStatCard(String label, String value, IconData icon, Color color) {
-    return Container(
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            width: 30,
-            height: 30,
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Icon(icon, size: 15, color: color),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            value,
-            style: const TextStyle(
-              fontSize: 13,
-              fontWeight: FontWeight.w800,
-              color: Color(0xFF0A0A0A),
-              height: 1,
-            ),
-          ),
-          const SizedBox(height: 3),
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 9,
-              color: Color(0xFFAAAAAA),
-              fontWeight: FontWeight.w500,
             ),
           ),
         ],
