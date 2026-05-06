@@ -245,7 +245,7 @@
               <div class="inp-wrap">
                 <span class="inp-ic">👤</span>
                 <input type="text" name="username" id="username"
-                  placeholder="admin_user" required oninput="liveSync()"/>
+                  placeholder="user name" required oninput="liveSync()"/>
               </div>
               <div class="f-err" id="err-username">⚠ Username is required</div>
             </div>
@@ -321,11 +321,7 @@
             </div>
           </div>
 
-          <!-- Save checkbox -->
-          <div class="check-row">
-            <input class="form-check-input" type="checkbox" id="saveData" name="saveData" checked/>
-            <label for="saveData">Save institution record to the registry</label>
-          </div>
+
 
           <!-- Submit row -->
           <div class="submit-row">
@@ -388,7 +384,7 @@
                           {% for i in b %}
                           <tr>
                             <td style="font-size:11px;color:var(--ink3);font-weight:700">{{ forloop.counter }}</td>
-                            <td  class="bank-name"><div class="u-cell"><div class="av ab" style="width:26px;height:26px;font-size:8px">PS</div>{{ i.name }}</div></td>
+                            <td  class="bank-name"><div class="u-cell">{{ i.name }}</div></td>
                             <td><span class="badge-branch">{{ i.branch }}</span></td>
                             <td class="email-cell">{{ i.email }}</td>
                             <td class="phone-cell">{{ i.phone }}</td>

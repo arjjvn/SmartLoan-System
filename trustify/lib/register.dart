@@ -366,21 +366,7 @@ class _RegistrationPageState extends State<RegistrationPage>
                         ),
                         const SizedBox(height: 22),
 
-                        // ── Employment ────────────────────
-                        _sectionLabel('Employment Details'),
-                        const SizedBox(height: 12),
-                        _TRUSTIFYDropdown(
-                          value: _selectedEmployment,
-                          items: _employmentTypes,
-                          hint: 'Employment Type',
-                          icon: Icons.work_outline_rounded,
-                          onChanged: (val) {
-                            if (val != null) {
-                              setState(() => _selectedEmployment = val);
-                            }
-                          },
-                        ),
-                        const SizedBox(height: 22),
+
 
                         // ── Account ───────────────────────
                         _sectionLabel('Account Credentials'),
@@ -440,10 +426,7 @@ class _RegistrationPageState extends State<RegistrationPage>
                           ),
                         ),
                         const SizedBox(height: 20),
-
-                        // ── Terms ──────────────────────────
-                        _buildTermsRow(),
-                        const SizedBox(height: 28),
+                        
 
                         // ── Register button ────────────────
                         SizedBox(

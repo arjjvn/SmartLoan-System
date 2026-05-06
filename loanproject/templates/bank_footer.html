@@ -8,12 +8,42 @@
     const html = document.documentElement;
     html.setAttribute('data-theme', html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
 }
-function toggleSub(id, el) {
-    const sub = document.getElementById(id);
-    if (sub) sub.classList.toggle('open');
-    if (el)  el.classList.toggle('sub-open');
-}
 
+
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    const links = document.querySelectorAll(".nav-link");
+
+    // 🔹 Highlight based on current URL
+    const currentPath = window.location.pathname;
+
+    links.forEach(link => {
+        if (link.getAttribute("href") === currentPath) {
+            link.classList.add("active");
+        }
+
+        // 🔹 Click event for manual selection
+        link.addEventListener("click", function () {
+            links.forEach(l => l.classList.remove("active"));
+            this.classList.add("active");
+
+            // Optional: store in localStorage
+            localStorage.setItem("activeLink", this.getAttribute("href"));
+        });
+    });
+
+    // 🔹 Restore active from localStorage (optional)
+    const saved = localStorage.getItem("activeLink");
+    if (saved) {
+        links.forEach(link => {
+            if (link.getAttribute("href") === saved) {
+                link.classList.add("active");
+            }
+        });
+    }
+
+});
 </script>
 </body>
 </html>

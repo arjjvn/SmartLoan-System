@@ -14,6 +14,7 @@
   justify-content:center;
   padding:20px;
   z-index:2000;
+  overflow-y:auto;                /* overlay itself scrolls on tiny screens */
 }
 
 .reply-overlay.on{
@@ -23,6 +24,9 @@
 .reply-card{
   width:100%;
   max-width:560px;
+  max-height:90vh;                /* never taller than viewport */
+  display:flex;
+  flex-direction:column;          /* head / form / foot stack */
   background:var(--card);
   border:1px solid var(--b1);
   border-radius:16px;
@@ -31,6 +35,7 @@
 }
 
 .reply-head{
+  flex-shrink:0;                  /* always visible */
   display:flex;
   justify-content:space-between;
   align-items:center;
@@ -69,7 +74,10 @@
   color:var(--red);
 }
 
+/* scrollable body area */
 .reply-form{
+  flex:1 1 auto;
+  overflow-y:auto;                /* THIS makes the content area scroll */
   padding:18px 20px;
 }
 
@@ -96,6 +104,7 @@
   color:var(--ink);
   outline:none;
   transition:.2s;
+  box-sizing:border-box;
 }
 
 .reply-textarea:focus{
@@ -103,7 +112,26 @@
   box-shadow:0 0 0 3px rgba(48,209,88,.15);
 }
 
+/* validation error state */
+.reply-textarea.input-error{
+  border-color:#ff453a;
+  box-shadow:0 0 0 3px rgba(255,69,58,.15);
+}
+
+.reply-error-msg{
+  display:none;
+  font-size:11px;
+  color:#ff453a;
+  margin-top:6px;
+  font-weight:500;
+}
+
+.reply-error-msg.visible{
+  display:block;
+}
+
 .reply-foot{
+  flex-shrink:0;                  /* always visible */
   display:flex;
   justify-content:flex-end;
   gap:8px;
@@ -112,122 +140,188 @@
   background:var(--card2);
 }
 
+/* scrollable table wrapper */
+.table-scroll{
+  width:100%;
+  overflow-x:auto;
+  overflow-y:auto;
+  max-height:520px;               /* vertical scroll after this height */
+  border-radius:10px;
+  border:1px solid var(--b1);
+}
+
+/* sticky header while table scrolls */
+.table-scroll thead th{
+  position:sticky;
+  top:0;
+  z-index:10;
+  background:var(--card2, #f5f5f7);
+}
 
 </style>
 
-<br>
-<br>
-<br>
-<br>
-<div class="table-wrap">
-        <div class="tw-header">
-         <span class="tw-title">All Complaints</span>
-        </div>
-  <table class="table table-bordered text-center w-75">
-    <thead>
-      <tr>
-        <th>#</th>
-        <th>Complaint</th>
-        <th>Submitted Date</th>
-        <th>Replied Date</th>
-        <th>Reply</th>
-        <th>Status</th>
-        <th>Action</th>
-      </tr>
-    </thead>
-    <div>
-{% for i in C %}
 
-      <tr>
-        <td>{{ forloop.counter }}</td>
-        <td>{{ i.message }}</td>
-        <td>{{ i.date }}</td>
-        <td>{{ i.replied_date }}</td>
-        <td>{{ i.reply }}</td>
-        <td>
-                {% if c.status == "Open" %}
-                  <span class="badge b-red">{{ i.status }}</span>
-                {% elif c.status == "In Review" %}
-                  <span class="badge b-amber">{{ i.status }}</span>
-                {% else %}
-                  <span class="badge b-green">{{ i.status }}</span>
-                {% endif %}
-              </td>
-        <td>
+<div class="table-wrap">
+  <div class="tw-header">
+    <span class="tw-title">All Complaints</span>
+  </div>
+
+  <!-- scrollable wrapper -->
+  <div class="table-scroll">
+    <table class="table table-bordered text-center w-75">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Complaint</th>
+          <th>Submitted Date</th>
+          <th>Replied Date</th>
+          <th>Reply</th>
+          <th>Status</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for i in C %}
+        <tr>
+          <td>{{ forloop.counter }}</td>
+          <td>{{ i.message }}</td>
+          <td>{{ i.date }}</td>
+          <td>{{ i.replied_date }}</td>
+          <td>{{ i.reply }}</td>
+          <td>
+            {% if i.status == "Open" %}
+              <span class="badge b-red">{{ i.status }}</span>
+            {% elif i.status == "In Review" %}
+              <span class="badge b-amber">{{ i.status }}</span>
+            {% else %}
+              <span class="badge b-green">{{ i.status }}</span>
+            {% endif %}
+          </td>
+          <td>
             <button
               class="btn btn-sm btn-light edit-btn"
               onclick="openReplyModal('{{ i.id }}')">
               Reply
             </button>
-        </td>
-      </tr>
-    </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
 
+<!-- ═══ REPLY MODAL (single instance, outside loop) ═══ -->
 <div class="reply-overlay" id="complaintReply">
-    <div class="reply-card">
+  <div class="reply-card">
+    <form id="replyForm" method="POST" onsubmit="return validateReply()">
+      {% csrf_token %}
 
-    <form id="replyForm" method="POST">
-        {% csrf_token %}
+      <!-- Header -->
+      <div class="reply-head">
+        <div>
+          <div class="reply-title">Complaint Response</div>
+          <div class="reply-ref">
+            Please review the complaint details and send your response.
+          </div>
+        </div>
+        <div class="reply-close"
+             onclick="closeReplyModal()">
+          ✕
+        </div>
+      </div>
 
-            <!-- Header -->
-            <div class="reply-head">
-                <div>
-                    <div class="reply-title">Complaint Response</div>
-                    <div class="reply-ref">
-                        Please review the complaint details and send your response.
-                    </div>
-                </div>
-                <div class="reply-close"
-                     onclick="document.getElementById('complaintReply').classList.remove('on')">
-                    ✕
-                </div>
-            </div>
+      <!-- Scrollable body -->
+      <div class="reply-form">
+        <label class="reply-label">Your Response</label>
 
-            <!-- Body -->
-            <div class="reply-form">
-                <label class="reply-label">
-                    Your Response
-                </label>
+        <textarea id="replyTextarea"
+                  name="Reply"
+                  rows="10"
+                  cols="80"
+                  class="reply-textarea"
+                  placeholder="Write your response here..."></textarea>
 
-                <textarea name="Reply"
-                          rows="10"
-                          cols="80"
-                          class="reply-textarea"
-                          placeholder="Write your response here..."></textarea>
-            </div>
+        <div class="reply-error-msg" id="replyError">
+          ⚠ Response cannot be empty. Please write a reply before sending.
+        </div>
+      </div>
 
-            <!-- Footer -->
-            <div class="reply-foot">
-                <button type="button"
-                        class="bsm bout"
-                        onclick="document.getElementById('complaintReply').classList.remove('on')">
-                    Cancel
-                </button>
+      <!-- Footer -->
+      <div class="reply-foot">
+        <button type="button"
+                class="bsm bout"
+                onclick="closeReplyModal()">
+          Cancel
+        </button>
 
-                <button type="submit" name="submit" class="bsm bgrn">
-                    Send Response
-                </button>
-            </div>
+        <button type="submit" name="submit" class="bsm bgrn">
+          Send Response
+        </button>
+      </div>
 
-        </form>
-    </div>
+    </form>
+  </div>
 </div>
 
-
-     {% endfor %}
-    </tbody>
-  </table>
-</div>
 
 <script>
-function openReplyModal(id){
-    const modal = document.getElementById('complaintReply');
-    const form = document.getElementById('replyForm');
+function openReplyModal(id) {
+  const modal = document.getElementById('complaintReply');
+  const form  = document.getElementById('replyForm');
 
-    // Set correct form action dynamically
-    form.action = "/admin_reply/" + id;   // adjust URL if needed
+  // Reset form and clear any previous validation state
+  form.reset();
+  clearReplyError();
 
-    modal.classList.add('on');
+  // Set correct form action dynamically
+  form.action = "/admin_reply/" + id;   // adjust URL if needed
+
+  modal.classList.add('on');
 }
+
+function closeReplyModal() {
+  document.getElementById('complaintReply').classList.remove('on');
+  clearReplyError();
+}
+
+function validateReply() {
+  const textarea = document.getElementById('replyTextarea');
+  const val = textarea.value.trim();
+
+  if (!val) {
+    textarea.classList.add('input-error');
+    document.getElementById('replyError').classList.add('visible');
+    textarea.focus();
+    return false;   // block form submission
+  }
+
+  if (val.length < 5) {
+    textarea.classList.add('input-error');
+    document.getElementById('replyError').textContent =
+      '⚠ Response is too short. Please write at least 5 characters.';
+    document.getElementById('replyError').classList.add('visible');
+    textarea.focus();
+    return false;
+  }
+
+  return true;  // allow submission
+}
+
+function clearReplyError() {
+  const textarea = document.getElementById('replyTextarea');
+  textarea.classList.remove('input-error');
+  const err = document.getElementById('replyError');
+  err.classList.remove('visible');
+  err.textContent = '⚠ Response cannot be empty. Please write a reply before sending.';
+}
+
+// Clear error as soon as user starts typing
+document.getElementById('replyTextarea').addEventListener('input', clearReplyError);
+
+// Close modal when clicking outside the card
+document.getElementById('complaintReply').addEventListener('click', function(e) {
+  if (e.target === this) closeReplyModal();
+});
 </script>
 {% include 'admin_footer.html' %}
