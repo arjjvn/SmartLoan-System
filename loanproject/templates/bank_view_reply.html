@@ -1,0 +1,236 @@
+{% include 'bank_header.html' %}
+
+
+<style>
+
+.page { padding:28px; flex:1; }
+
+    /* ══ CARD ══ */
+    .card {
+      background:var(--surface); border:1px solid var(--border);
+      border-radius:var(--r-xl); overflow:hidden;
+      animation:fadeUp .4s ease both;
+    }
+    .card-head {
+      padding:18px 24px; border-bottom:1px solid var(--border);
+      display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap;
+    }
+    .card-head-left { display:flex; align-items:center; gap:14px; }
+    .card-icon {
+      width:42px; height:42px; border-radius:11px;
+      background:var(--blue-100); color:var(--blue-400);
+      display:flex; align-items:center; justify-content:center; flex-shrink:0;
+    }
+    .card-title { font-size:.95rem; font-weight:700; color:var(--txt-1); letter-spacing:-.01em; }
+    .card-sub   { font-size:.7rem; color:var(--txt-3); margin-top:2px; }
+
+    /* search */
+    .tbl-search {
+      display:flex; align-items:center; gap:8px;
+      background:var(--surface-2); border:1px solid var(--border);
+      border-radius:9px; padding:7px 13px;
+      transition:border-color var(--transition);
+    }
+    .tbl-search:focus-within { border-color:var(--blue-500); }
+    .tbl-search input {
+      border:none; background:transparent;
+      font-family:'Plus Jakarta Sans', sans-serif;
+      font-size:.8rem; color:var(--txt-1); outline:none; width:170px;
+    }
+    .tbl-search input::placeholder { color:var(--txt-3); }
+
+    /* ══ TABLE ══ */
+    .tbl-wrap { overflow-x:auto; }
+    table { width:100%; border-collapse:collapse; font-size:.83rem; }
+    thead th {
+      padding:12px 18px; text-align:left;
+      font-size:.67rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase;
+      color:var(--txt-3); background:var(--surface-2);
+      border-bottom:1px solid var(--border); white-space:nowrap;
+    }
+    tbody td {
+      padding:15px 18px; border-bottom:1px solid var(--border);
+      color:var(--txt-1); vertical-align:top;
+      transition:background var(--transition);
+    }
+    tbody tr:last-child td { border-bottom:none; }
+    tbody tr:hover td { background:var(--surface-2); }
+
+    /* ID pill */
+    .id-pill {
+      display:inline-flex; align-items:center; justify-content:center;
+      width:28px; height:28px; border-radius:8px;
+      background:var(--blue-100); color:var(--blue-400);
+      font-size:.72rem; font-weight:800;
+    }
+
+    /* message cell */
+    .msg-cell {
+      max-width:220px; font-size:.81rem; color:var(--txt-2);
+      line-height:1.5; white-space:normal;
+    }
+
+    /* reply cell */
+    .reply-cell {
+      max-width:240px; font-size:.81rem; color:var(--txt-1);
+      line-height:1.5; white-space:normal;
+    }
+    .reply-empty {
+      font-size:.75rem; color:var(--txt-3); font-style:italic;
+    }
+
+    /* date cell */
+    .date-cell { font-size:.78rem; color:var(--txt-3); white-space:nowrap; }
+
+    /* ── STATUS BADGES ── */
+    .badge {
+      display:inline-flex; align-items:center; gap:5px;
+      padding:4px 10px; border-radius:20px;
+      font-size:.68rem; font-weight:700; white-space:nowrap;
+    }
+    .badge::before {
+      content:''; width:6px; height:6px; border-radius:50%;
+    }
+    .b-green  { background:var(--green-dim);  color:var(--green);  }
+    .b-green::before  { background:var(--green);  }
+    .b-amber  { background:var(--amber-dim);  color:var(--amber);  }
+    .b-amber::before  { background:var(--amber);  }
+    .b-red    { background:var(--red-dim);    color:var(--red);    }
+    .b-red::before    { background:var(--red);    }
+    .b-blue   { background:var(--blue-100);   color:var(--blue-400); }
+    .b-blue::before   { background:var(--blue-400); }
+    .b-purple { background:var(--purple-dim); color:var(--purple); }
+    .b-purple::before { background:var(--purple); }
+
+    /* ── TABLE FOOTER ── */
+    .tbl-foot {
+      padding:13px 20px; border-top:1px solid var(--border);
+      display:flex; align-items:center; justify-content:space-between;
+    }
+    .tbl-count { font-size:.73rem; color:var(--txt-3); }
+
+    /* ── EMPTY STATE ── */
+    .empty-state {
+      display:flex; flex-direction:column; align-items:center;
+      gap:12px; padding:56px 24px; color:var(--txt-3);
+    }
+    .empty-state svg { opacity:.25; }
+    .empty-state p { font-size:.82rem; }
+
+
+</style>
+ <!-- TOPBAR -->
+  <header class="topbar">
+    <div>
+      <div class="page-title">Complaint Replies</div>
+      <div class="page-subtitle">Track the status and responses to your submitted complaints</div>
+    </div>
+    <div class="topbar-right">
+      <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme" aria-label="Toggle theme">
+        <span class="theme-icon icon-moon">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+        </span>
+        <span class="theme-icon icon-sun">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+        </span>
+      </button>
+    </div>
+  </header>
+
+  <div class="page">
+    <div class="card">
+
+      <!-- Card header -->
+      <div class="card-head">
+        <div class="card-head-left">
+          <div class="card-icon">
+            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 00-4-4H4"/></svg>
+          </div>
+          <div>
+            <div class="card-title">Complaint Replies</div>
+            <div class="card-sub">All complaints you have submitted and their current status</div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Table -->
+      <div class="tbl-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Complaint ID</th>
+              <th>Complaint Message</th>
+              <th>Reply</th>
+              <th>Reply Date</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for i in complaint %}
+            <tr>
+              <td><span class="id-pill">{{ forloop.counter }}</span></td>
+              <td><div class="msg-cell">{{ i.message }}</div></td>
+              <td>
+                {% if i.reply %}
+                  <div class="reply-cell">{{ i.reply }}</div>
+                {% else %}
+                  <span class="reply-empty">Awaiting reply…</span>
+                {% endif %}
+              </td>
+              <td>
+                <div class="date-cell">
+                  {% if i.replied_date %}
+                    {{ i.replied_date }}
+                  {% else %}
+                    <span style="color:var(--txt-3);font-style:italic;">—</span>
+                  {% endif %}
+                </div>
+              </td>
+              <td>
+                {% if i.status == "Resolved" %}
+                  <span class="badge b-green">Resolved</span>
+                {% elif i.status == "Pending" %}
+                  <span class="badge b-amber">Pending</span>
+                {% elif i.status == "Rejected" %}
+                  <span class="badge b-red">Rejected</span>
+                {% elif i.status == "In Progress" %}
+                  <span class="badge b-blue">In Progress</span>
+                {% else %}
+                  <span class="badge b-purple">{{ i.status }}</span>
+                {% endif %}
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="5" style="padding:0;border:none;">
+                <div class="empty-state">
+                  <svg width="52" height="52" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 00-4-4H4"/></svg>
+                  <p>No complaints found. Your submitted complaints will appear here.</p>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Table footer -->
+      <div class="tbl-foot">
+        <span class="tbl-count">
+          {% if complaint %}
+            Showing {{ complaint|length }} complaint{{ complaint|length|pluralize }}
+          {% else %}
+            No records to display
+          {% endif %}
+        </span>
+        <a href="/sent_complaint" style="display:inline-flex;align-items:center;gap:6px;font-size:.78rem;font-weight:600;color:var(--blue-400);text-decoration:none;padding:6px 14px;border-radius:8px;border:1px solid var(--border);background:var(--surface-2);transition:all var(--transition);">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          New Complaint
+        </a>
+      </div>
+
+    </div>
+  </div>
+
+{% include 'bank_footer.html' %}

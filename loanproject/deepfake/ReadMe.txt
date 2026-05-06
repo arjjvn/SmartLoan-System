@@ -1,0 +1,4 @@
+Dataset : https://www.kaggle.com/datasets/xdxd003/ff-c23
+
+
+Python : 3.12.12

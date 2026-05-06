@@ -1,0 +1,122 @@
+<!-- ══════════════ MAIN ══════════════ -->
+{% include 'bank_header.html' %}
+
+<header class="topbar">
+        <div>
+            <div class="page-title">DASHBOARD</div>
+        </div>
+        <div class="topbar-right">
+
+            <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme" aria-label="Toggle theme">
+                <span class="theme-icon icon-moon"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg></span>
+                <span class="theme-icon icon-sun"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></span>
+            </button>
+        </div>
+    </header>
+
+    <div class="page">
+
+        <!-- STAT CARDS -->
+        <div class="stats">
+            <div class="stat stat-featured">
+                <div class="s-head">
+                    <div class="s-icon ic-white"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="9" width="18" height="12" rx="2"/><path d="M3 9l9-6 9 6"/></svg></div>
+                </div>
+                <div class="s-value">{{ total_loan_types }}</div>
+                <div class="s-label"> Loan Types</div>
+                <div class="s-change">All currently available</div>
+            </div>
+            <div class="stat stat-green">
+                <div class="s-head">
+                    <div class="s-icon ic-green"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
+                </div>
+                <div class="s-value">{{ total_replied_complaints }}</div>
+                <div class="s-label">Resolved Complaints</div>
+            </div>
+
+        </div>
+
+        <div class="grid-main">
+            <div class="col-flex">
+
+                <!-- LOAN TYPES -->
+                <div class="card">
+                    <div class="card-head">
+                        <div class="card-title">Loan Types</div>
+                        <span class="badge b-blue">{{ total_loan_types }}</span>
+                    </div>
+                    <div class="card-body" style="padding:10px 20px 18px">
+                        {% for loan in loan_types %}
+
+                        <div class="lt-item">
+                            <div style="flex:1"><div class="lt-name">{{ loan.loan_type_name }}</div><div class="lt-meta">Up to {{ loan.duration }} yrs · {{ loan.interest_rate }}% p.a.</div><div class="lt-desc">{{ loan.details }}</div></div>
+                        </div>
+                        {% empty %}
+                    <p style="margin: 0; color: var(--text-muted);">No loan types available.</p>
+                    {% endfor %}
+                    </div>
+                </div>
+
+                <!-- COMPLAINTS -->
+                <div class="card">
+                    <div class="card-head">
+                        <div class="card-title">Complaints</div>
+                    </div>
+                    <div class="tbl-wrap">
+                        <table>
+                            <thead><tr><th>Ref</th><th>User</th><th>Complaint</th><th>Reply</th><th>Replied Date</th><th>Status</th></tr></thead>
+                            <tbody>
+                            {% for complaint in not_seen_complaints %}
+                                <tr>
+                                    <td style="font-size:0.72rem;font-weight:700;color:var(--txt-3)">{{ complaint.id|stringformat:"03d" }}</td>
+                                    <td style="font-weight:600">{{ complaint.user }}</td>
+                                    <td style="font-weight:600;max-width:240px;white-space:normal;line-height:1.5">{{ complaint.message }}</td>
+                                    <td style="color:var(--txt-2);font-size:0.78rem;max-width:240px;white-space:normal;line-height:1.5">{{ complaint.reply }}</td>
+                                    <td style="color:var(--txt-3);font-size:0.75rem">{{ complaint.replied_date }}</td>
+                                    <td style="color:var(--txt-3);font-size:0.75rem">{{ complaint.status }}</td>
+                                </tr>
+                            {% empty %}
+                            <tr>
+                                <td colspan="4" style="text-align: center;">No open complaints.</td>
+                            </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="tbl-foot">
+                    </div>
+                </div>
+
+            </div>
+
+
+            <!-- RIGHT COLUMN: Recently Added Loan Types -->
+        <div class="col-flex">
+            <div class="card">
+                <div class="card-head">
+                    <div class="card-title">Recently Added Loan Types</div>
+                    <a class="card-link" href="/bank_loan_types">View all →</a>
+                </div>
+                <div class="card-body" style="padding: 4px 20px 16px;">
+                    {% for i in loan_types %}
+                    <div class="fb-item">
+                        <div class="fb-top">
+                            <div class="fb-name">{{ i.loan_type_name }}</div>
+                            <div class="fb-date">{{ i.interest_rate }}% p.a.</div>
+                        </div>
+                        <div class="fb-loan">{{ i.duration }} Months</div>
+                        <div class="fb-q">{{ i.details }}</div>
+                    </div>
+                    {% empty %}
+                    <p style="margin: 0; color: var(--text-muted);">No loans available yet.</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+
+
+
+
+{% include 'bank_footer.html' %}

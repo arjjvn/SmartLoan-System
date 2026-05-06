@@ -1,0 +1,139 @@
+
+
+</div>
+<script>
+
+
+function toggleTheme() {
+  const html = document.documentElement;
+  const dark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', dark ? 'light' : 'dark');
+  document.getElementById('tglLbl').textContent = dark ? 'Dark Mode' : 'Light Mode';
+  localStorage.setItem('sl-theme', dark ? 'light' : 'dark');
+}
+
+(function() {
+  const saved = localStorage.getItem('sl-theme');
+  if (saved) {
+    document.documentElement.setAttribute('data-theme', saved);
+    document.getElementById('tglLbl').textContent = saved === 'dark' ? 'Dark Mode' : 'Light Mode';
+  }
+})();
+
+// Start on dashboard
+
+
+function closeModal() { document.getElementById('modal').classList.remove('open'); }
+document.getElementById('modal').addEventListener('click', function(e) { if (e.target === this) closeModal(); });
+
+
+function togglePw(){
+  const pw=document.getElementById('password'),eye=document.querySelector('.pw-eye');
+  pw.type=pw.type==='password'?'text':'password';
+  eye.textContent=pw.type==='password'?'👁':'🙈';
+}
+
+/* ── Live preview ── */
+const COLS=['#ff453a','#0a84ff','#30d158','#ff9f0a','#bf5af2','#32ade6'];
+let ci=0,lastInit='';
+function dk(hex){const n=parseInt(hex.slice(1),16),p=v=>Math.max(0,v-45).toString(16).padStart(2,'0');return '#'+p((n>>16)&255)+p((n>>8)&255)+p(n&255)}
+
+function liveSync(){
+  const name  =(document.getElementById('bankName').value||'').trim();
+  const addr  =(document.getElementById('address').value||'').trim();
+  const branch=(document.getElementById('branch').value||'').trim();
+  const un    =(document.getElementById('username').value||'').trim();
+  const pw    =(document.getElementById('password').value||'').trim();
+  const em    =(document.getElementById('email').value||'').trim();
+
+  const lg=document.getElementById('prevLogo');
+  if(name){
+    const words=name.split(' ').filter(Boolean);
+    const init=(words.length>=2?words[0][0]+words[1][0]:name.slice(0,2)).toUpperCase();
+    if(init!==lastInit){ci=(ci+1)%COLS.length;lastInit=init;}
+    lg.textContent=init;
+    lg.style.background=`linear-gradient(135deg,${COLS[ci]},${dk(COLS[ci])})`;
+    lg.style.boxShadow=`0 4px 14px ${COLS[ci]}55`;
+  } else {
+    lg.textContent='?';lg.style.background='linear-gradient(135deg,var(--red),#c0392b)';
+    lg.style.boxShadow='0 4px 14px rgba(255,59,48,.4)';lastInit='';
+  }
+  document.getElementById('prevName').textContent=name||'Bank Name';
+  const parts=[];if(addr)parts.push(addr);if(branch)parts.push(branch);
+  document.getElementById('prevLoc').textContent=parts.join(' · ')||'Location · Branch';
+  document.getElementById('prevBranch').textContent=branch||'—';
+
+  /* step indicators */
+  stepSet(1,!!(un&&pw));
+  stepSet(2,!!name);
+  stepSet(3,!!(em||addr));
+}
+function stepSet(n,done){
+  const el=document.getElementById('st'+n);
+  el.classList.remove('on','done');
+  el.classList.add(done?'done':'on');
+  if(!done) for(let i=n+1;i<=3;i++)document.getElementById('st'+i).classList.remove('done','on');
+}
+
+/* ── Validate ── */
+function validate(){
+  let ok=true;
+  [{id:'username'},{id:'password'},{id:'email'}].forEach(f=>{
+    const el=document.getElementById(f.id);
+    const bad=!el.value.trim()||(f.id==='email'&&!/\S+@\S+\.\S+/.test(el.value));
+    el.classList.toggle('err',bad);
+    const e=document.getElementById('err-'+f.id);
+    if(e)e.classList.toggle('show',bad);
+    if(bad)ok=false;
+  });
+  return ok;
+}
+
+/* ── Submit (demo; remove onsubmit attr for real Django POST) ── */
+function doSubmit(e){
+  e.preventDefault();
+  if(!validate())return false;
+  const name  =document.getElementById('bankName').value.trim();
+  const addr  =document.getElementById('address').value.trim();
+  const branch=document.getElementById('branch').value.trim();
+  const init  =(name.split(' ').filter(Boolean).slice(0,2).map(w=>w[0]).join('')||'?').toUpperCase();
+  const parts=[];if(addr)parts.push(addr);if(branch)parts.push(branch);
+  document.getElementById('sucLogo').textContent=init;
+  document.getElementById('sucName').textContent=name||'—';
+  document.getElementById('sucLoc').textContent=parts.join(' · ')||'—';
+  document.getElementById('sucOverlay').classList.add('show');
+  return false;
+}
+function closeSuc(){
+  document.getElementById('sucOverlay').classList.remove('show');
+  resetAll();
+  const t=document.getElementById('toast');t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+function resetAll(){
+  document.getElementById('regForm').querySelectorAll('input').forEach(el=>{
+    if(el.type==='checkbox')el.checked=true;else el.value='';
+    el.classList.remove('err');
+  });
+  document.querySelectorAll('.f-err').forEach(e=>e.classList.remove('show'));
+  const lg=document.getElementById('prevLogo');
+  lg.textContent='?';lg.style.background='linear-gradient(135deg,var(--red),#c0392b)';
+  lg.style.boxShadow='0 4px 14px rgba(255,59,48,.4)';
+  document.getElementById('prevName').textContent='Bank Name';
+  document.getElementById('prevLoc').textContent='Location · Branch';
+  document.getElementById('prevBranch').textContent='—';
+  lastInit='';ci=0;
+  for(let i=1;i<=3;i++){const el=document.getElementById('st'+i);el.classList.remove('done','on');if(i===1)el.classList.add('on');}
+}
+document.querySelectorAll('input').forEach(el=>{
+  el.addEventListener('input',function(){
+    this.classList.remove('err');
+    const e=document.getElementById('err-'+this.id);
+    if(e)e.classList.remove('show');
+  });
+});
+
+
+</script>
+</body>
+</html>

@@ -1,0 +1,511 @@
+{% include 'public_header.html' %}
+
+<br>
+<br>
+<br>
+<br>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In - LoanSight | Smart Loan Predictions</title>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #1B4B7F;
+            --primary-dark: #133A63;
+            --accent: #2E7D32;
+            --accent-light: #43A047;
+            --gold: #D4AF37;
+            --bg: #F8FAFB;
+            --surface: #FFFFFF;
+            --text: #1A2332;
+            --text-secondary: #5F6C7B;
+            --border: #E0E6ED;
+            --success: #2E7D32;
+            --shadow: rgba(27, 75, 127, 0.08);
+        }
+
+        body {
+            font-family: 'DM Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+
+
+        /* Main Content */
+        main {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 20px;
+            background: linear-gradient(135deg, rgba(27, 75, 127, 0.02) 0%, rgba(46, 125, 50, 0.02) 100%);
+        }
+
+        .login-wrapper {
+            width: 100%;
+            max-width: 1200px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 80px;
+            align-items: center;
+        }
+
+        /* Left side - Information */
+        .login-info {
+            animation: fadeInLeft 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes fadeInLeft {
+            from {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .login-info h1 {
+            font-family: 'Manrope', sans-serif;
+            font-size: 48px;
+            font-weight: 800;
+            color: #2558c1;
+            line-height: 1.2;
+            margin-bottom: 24px;
+            letter-spacing: -1px;
+        }
+
+        .login-info h1 .highlight {
+            color: var(--primary);
+            position: relative;
+        }
+
+        .login-info p {
+            font-size: 18px;
+            color: var(--text-secondary);
+            line-height: 1.7;
+            margin-bottom: 40px;
+        }
+
+        .features-list {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+        }
+
+        .feature-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(27, 75, 127, 0.2);
+        }
+
+        .feature-content h3 {
+            font-family: 'Manrope', sans-serif;
+            font-size: 18px;
+            font-weight: 700;
+            color: #0b5ed7;
+            margin-bottom: 6px;
+        }
+
+        .feature-content p {
+            font-size: 15px;
+            color: #51585e;
+            line-height: 1.5;
+            margin: 0;
+        }
+
+        /* Right side - Login form */
+        .login-container {
+            background: var(--surface);
+            border-radius: 24px;
+            padding: 48px;
+            box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
+            border: 1px solid var(--border);
+            animation: fadeInRight 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        @keyframes fadeInRight {
+            from {
+                opacity: 0;
+                transform: translateX(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .login-header {
+            margin-bottom: 32px;
+            text-align: center;
+        }
+
+        .login-header h2 {
+            font-family: 'Manrope', sans-serif;
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--text);
+            margin-bottom: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .login-header p {
+            font-size: 15px;
+            color: var(--text-secondary);
+        }
+
+        .form-group {
+            margin-bottom: 24px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text);
+            letter-spacing: 0.2px;
+        }
+
+        .input-wrapper {
+            position: relative;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-secondary);
+            pointer-events: none;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px 16px 14px 46px;
+            background: var(--bg);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            color: var(--text);
+            font-family: 'DM Sans', sans-serif;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        input:focus {
+            border-color: var(--primary);
+            background: var(--surface);
+            box-shadow: 0 0 0 4px rgba(27, 75, 127, 0.08);
+        }
+
+        input::placeholder {
+            color: var(--text-secondary);
+            opacity: 0.6;
+        }
+
+        .password-wrapper {
+            position: relative;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            padding: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: color 0.2s;
+        }
+
+        .password-toggle:hover {
+            color: var(--primary);
+        }
+
+        .form-options {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 28px;
+            font-size: 14px;
+        }
+
+        .checkbox-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .checkbox-wrapper input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            padding: 0;
+            cursor: pointer;
+            accent-color: var(--primary);
+        }
+
+        .checkbox-wrapper label {
+            margin: 0;
+            cursor: pointer;
+            color: var(--text);
+            font-weight: 500;
+        }
+
+        .forgot-link {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+
+        .forgot-link:hover {
+            color: var(--primary-dark);
+            text-decoration: underline;
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 16px rgba(27, 75, 127, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .btn-primary:hover::before {
+            left: 100%;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(27, 75, 127, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+
+        .divider span {
+            padding: 0 16px;
+            font-weight: 500;
+        }
+
+
+        .signup-prompt {
+            text-align: center;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .signup-prompt a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 700;
+            transition: color 0.2s;
+        }
+
+        .signup-prompt a:hover {
+            color: var(--primary-dark);
+            text-decoration: underline;
+        }
+
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+
+
+            .login-wrapper {
+                grid-template-columns: 1fr;
+                gap: 40px;
+                max-width: 600px;
+            }
+
+            .login-info {
+                text-align: center;
+            }
+
+            .login-info h1 {
+                font-size: 36px;
+            }
+
+            .features-list {
+                max-width: 500px;
+                margin: 0 auto;
+            }
+
+        }
+
+
+            main {
+                padding: 40px 20px;
+            }
+
+            .login-container {
+                padding: 32px 24px;
+            }
+
+            .login-header h2 {
+                font-size: 26px;
+            }
+
+    </style>
+</head>
+<body>
+
+    <!-- Main Content -->
+    <main>
+        <div class="login-wrapper">
+            <!-- Left side - Information -->
+            <div class="login-info">
+                <h1>Predict Your <span class="highlight">Loan Approval</span> in Seconds</h1>
+                <p>Access our AI-powered platform to analyze your loan application and get instant predictions with 99.2% accuracy. Make informed financial decisions backed by advanced machine learning.</p>
+
+                <div class="features-list">
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+  <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18.5A2.493 2.493 0 0 1 7.51 20H7.5a2.468 2.468 0 0 1-2.4-3.154 2.98 2.98 0 0 1-.85-5.274 2.468 2.468 0 0 1 .92-3.182 2.477 2.477 0 0 1 1.876-3.344 2.5 2.5 0 0 1 3.41-1.856A2.5 2.5 0 0 1 12 5.5m0 13v-13m0 13a2.493 2.493 0 0 0 4.49 1.5h.01a2.468 2.468 0 0 0 2.403-3.154 2.98 2.98 0 0 0 .847-5.274 2.468 2.468 0 0 0-.921-3.182 2.477 2.477 0 0 0-1.875-3.344A2.5 2.5 0 0 0 14.5 3 2.5 2.5 0 0 0 12 5.5m-8 5a2.5 2.5 0 0 1 3.48-2.3m-.28 8.551a3 3 0 0 1-2.953-5.185M20 10.5a2.5 2.5 0 0 0-3.481-2.3m.28 8.551a3 3 0 0 0 2.954-5.185"/>
+</svg>
+
+                        </div>
+                        <div class="feature-content">
+                            <h3>AI based Report</h3>
+                            <p>Get AI report on your daily and monthly expense</p>
+                        </div>
+                    </div>
+
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2.5">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                            </svg>
+                        </div>
+                        <div class="feature-content">
+                            <h3>Document security</h3>
+                            <p>keep your documents and data safe using blockchain technology</p>
+                        </div>
+                    </div>
+
+                    <div class="feature-item">
+                        <div class="feature-icon">
+                           <svg class="w-6 h-6 text-gray-800 dark:text-white" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" viewBox="0 0 24 24">
+  <path stroke="currentColor" stroke-linecap="round" stroke-width="2" d="M9 8h10M9 12h10M9 16h10M4.99 8H5m-.02 4h.01m0 4H5"/>
+</svg>
+
+
+                        </div>
+                        <div class="feature-content">
+                            <h3>Document summerization</h3>
+                            <p>summarize important files and informations.Making it simpler for understanding </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right side - Login Form -->
+            <div class="login-container">
+                <div class="login-header">
+                    <h2>Welcome</h2>
+                    <p>Sign in to access your dashboard</p>
+                </div>
+
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="form-group">
+                        <label for="Username">User Name</label>
+                        <div class="input-wrapper">
+                            <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                <polyline points="22,6 12,13 2,6"></polyline>
+                            </svg>
+                            <input type="text" name="username" placeholder="Enter your User name"  required>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <div class="input-wrapper password-wrapper">
+                            <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                            </svg>
+                            <input type="password" id="password" name="password" placeholder="Enter your password" autocomplete="current-password" required>
+                            <button type="button" class="password-toggle" onclick="togglePassword()">
+                                <svg id="eye-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                    <circle cx="12" cy="12" r="3"></circle>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-options">
+                        <div class="checkbox-wrapper">
+                            <input type="checkbox" id="remember"  onclick="handleRememberMe()">
+                            <label for="remember">Remember me</label>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn-primary">Sign In</button>
+                </form>
+
+            </div>
+        </div>
+    </main>
+<br>
+<br>
+<br>
+<br>
+{% include 'public_footer.html' %}

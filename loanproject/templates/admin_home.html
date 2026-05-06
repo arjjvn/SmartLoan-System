@@ -1,0 +1,225 @@
+
+{% include 'admin_header.html' %}
+
+
+
+<!-- ══════════════════ MAIN ══════════════════ -->
+
+
+
+    <!-- ─────── DASHBOARD ─────── -->
+    <div class="sect active" id="sect-dashboard">
+
+      <!-- ══════ MANAGE BANKS ══════ -->
+         <!-- Stats (Django: {{ bank|length }}) -->
+      <div class="stat-row">
+        <div class="stat-card"><div class="s-lbl">Total Banks</div><div class="s-val">{{ banks|length }}</div></div>
+        <div class="stat-card"><div class="s-lbl">Total Loans</div><div class="s-val">{{ loan_types|length }}</div></div>
+      </div>
+
+      <span class="s-h-lbl">All Banks</span>
+
+      <div class="bank-grid">
+
+ {% for bank in banks %}
+<div class="bank-card">
+  <div class="bk-name">{{ bank.name }}</div>
+  <div class="bk-loc">{{ bank.branch }}</div>
+
+  <div class="bk-stats">
+    <div class="bk-s">
+      <div class="bk-sl">Loan Types</div>
+      <div class="bk-sv">
+        {{ bank.loantype_set.count }}
+      </div>
+    </div>
+  </div>
+</div>
+{% empty %}
+<p>No banks available.</p>
+{% endfor %}
+
+  <!-- Add Bank Card -->
+  <a href="/admin_manage_bank" class="bank-card add-bank" style="text-decoration:none">
+    <div style="font-size:26px;opacity:.4;margin-bottom:6px">＋</div>
+    <div style="font-size:12px;font-weight:600;color:var(--ink3)">
+      Register New Bank
+    </div>
+</a>
+
+</div>
+
+      <!-- ══════ VIEW USERS ══════ -->
+      <div class="stat-row" style="margin-top:10px">
+        <div class="stat-card"><div class="s-lbl">Total Users</div><div class="s-val">{{ user|length}}</div></div>
+
+      </div>
+      <div class="table-wrap">
+        <div class="tw-header">
+          <span class="tw-title">All Registered Users</span>
+        </div>
+        <table>
+          <thead>
+            <tr><th>#</th><th>User</th><th>Phone</th><th>Place</th><th>Joined</th></tr>
+          </thead>
+          <tbody>
+        <tbody>
+        {% for u in users %}
+        <tr>
+          <td style="color:var(--ink3);font-size:11px">
+            {{ forloop.counter|stringformat:"03d" }}
+          </td>
+
+          <td>
+            <div class="u-name">{{ u.first_name }} {{ u.last_name }}</div>
+            <div class="u-email">{{ u.email }}</div>
+          </td>
+
+          <td style="color:var(--ink3);font-size:12px">
+            {{ u.phone }}
+          </td>
+
+          <td style="font-size:12px;color:var(--ink2)">
+            {{ u.place }}
+          </td>
+
+          <td style="color:var(--ink3);font-size:11px">
+            {{ u.user.date_joined|date:"M d, Y" }}
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="5">No users found.</td>
+        </tr>
+        {% endfor %}
+        </tbody>
+        </table>
+      </div>
+
+      <!-- ══════ VIEW COMPLAINTS ══════ -->
+      <div class="stat-row" style="margin-top:10px">
+        <div class="stat-card"><div class="s-lbl">Complaints</div><div class="s-change dn">{{ complaints|length }}</div></div>
+        <div class="stat-card"><div class="s-lbl">Feedbacks</div><div class="s-change" style="color:var(--amber)">{{ feedback|length }}</div></div>
+
+      </div>
+      <div class="table-wrap">
+        <div class="tw-header">
+          <span class="tw-title">All Complaints</span>
+        </div>
+        <table>
+          <thead>
+            <tr><th>Ref</th><th>User</th><th>Complaint</th><th>Date</th><th>Replyed Date</th><th>Status</th></tr>
+          </thead>
+          <tbody>
+            {% for c in complaints %}
+            <tr>
+              <td style="font-size:11px;color:var(--ink3);font-weight:700">
+                C-{{ forloop.counter|stringformat:"03d" }}
+              </td>
+
+              <td>
+                <div class="u-name">{{ c.user.username }}</div>
+              </td>
+
+              <td class="c-subj">{{ c.message }}</td>
+
+              <td>
+                <div class="c-text">{{ c.date }}</div>
+              </td>
+
+              <td style="font-size:11px;color:var(--ink3)">
+                {{ c.replied_date }}
+              </td>
+
+              <td>
+                {% if c.status == "Open" %}
+                  <span class="badge b-red">{{ c.status }}</span>
+                {% elif c.status == "In Review" %}
+                  <span class="badge b-amber">{{ c.status }}</span>
+                {% else %}
+                  <span class="badge b-green">{{ c.status }}</span>
+                {% endif %}
+              </td>
+            </tr>
+            {% empty %}
+            <tr>
+              <td colspan="6">No complaints found.</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+      </div>
+
+      <!-- ══════ VIEW FEEDBACK ══════ -->
+      <div class="two-col" style="margin-top:10px">
+        <div>
+    <div class="s-head" style="margin-bottom:10px">
+      <span class="s-h-lbl">Customer Feedback</span>
+      <span class="badge b-green">{{ total_feedback }} reviews</span>
+    </div>
+
+    <div class="fb-grid">
+      {% if feedbacks %}
+        {% for fb in feedbacks %}
+          <div class="fb-card">
+
+            <div class="fb-q">{{ fb.message }}</div>
+
+            <div class="fb-from">
+              <div class="fb-av">
+                {{ fb.user.first_name|slice:":1" }}{{ fb.user.last_name|slice:":1" }}
+              </div>
+              <div>
+                <div class="fb-name">{{ fb.user.first_name }} {{ fb.user.last_name }}</div>
+                <div class="fb-date">{{ fb.date|date:"M d, Y" }}</div>
+              </div>
+            </div>
+
+          </div>
+        {% endfor %}
+      {% else %}
+        <p style="padding:10px; color:var(--ink3); font-size:14px;">No feedback available.</p>
+      {% endif %}
+          </div>
+        </div>
+
+        <div class="side-col">
+          <div class="side-card" style="text-align:center">
+            <div class="sc-title" style="text-align:left">Overall Feedbacks reported</div>
+            <div style="font-size:48px;font-weight:800;color:var(--ink);letter-spacing:-.04em;margin:8px 0 4px">
+  {{ feedbacks|length }}
+</div>
+<div style="font-size:11.5px;color:var(--ink3)">
+  Total Feedback Submitted
+</div>
+          </div>
+          <div class="side-card">
+  <div class="sc-title">Loan Types</div>
+
+  {% for loan in loan_types %}
+    <div class="cap-row">
+      <div>
+        <div class="cap-name">
+          {{ loan.loan_type_name }}
+        </div>
+
+        <div style="font-size:11px;color:var(--ink3)">
+          {{ loan.bank.name }} · {{ loan.interest_rate }}% · {{ loan.duration }} months
+        </div>
+      </div>
+    </div>
+  {% empty %}
+    <p>No loan types available.</p>
+  {% endfor %}
+</div>
+        </div>
+      </div>
+
+    </div><!-- /sect-dashboard -->
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+
+
+{% include 'admin_footer.html' %}

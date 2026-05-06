@@ -1,0 +1,39 @@
+{% include 'admin_header.html' %}
+
+
+<br>
+<br>
+<br>
+<br>
+
+<div class="table-wrap">
+        <div class="tw-header">
+         <span class="tw-title">All Feedbacks</span>
+        </div>
+  <table class="table table-bordered text-center w-75">
+    <thead>
+      <tr>
+        <th>SL.no</th>
+        <th>Message</th>
+        <th>Date</th>
+
+
+      </tr>
+    </thead>
+    <tbody>
+    {% for i in F %}
+
+      <tr>
+        <td>{{ forloop.counter }}</td>
+        <td>{{ i.message }}</td>
+        <td>{{ i.date }}</td>
+
+      </tr>
+
+     {% endfor %}
+
+    </tbody>
+  </table>
+</div>
+
+{% include 'admin_footer.html' %}

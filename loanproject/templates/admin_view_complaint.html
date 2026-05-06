@@ -1,0 +1,233 @@
+{% include 'admin_header.html' %}
+
+
+<style>
+
+/* ═══════════════ REPLY OVERLAY ═══════════════ */
+.reply-overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.65);
+  backdrop-filter:blur(0.2px);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  z-index:2000;
+}
+
+.reply-overlay.on{
+  display:flex;
+}
+
+.reply-card{
+  width:100%;
+  max-width:560px;
+  background:var(--card);
+  border:1px solid var(--b1);
+  border-radius:16px;
+  box-shadow:var(--sh2);
+  overflow:hidden;
+}
+
+.reply-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:16px 20px;
+  border-bottom:1px solid var(--b1);
+}
+
+.reply-title{
+  font-size:15px;
+  font-weight:700;
+  color:var(--ink);
+}
+
+.reply-ref{
+  font-size:12px;
+  color:var(--ink3);
+  margin-top:4px;
+}
+
+.reply-close{
+  width:28px;
+  height:28px;
+  border-radius:8px;
+  background:var(--item);
+  border:1px solid var(--b1);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  color:var(--ink3);
+  transition:.2s;
+}
+
+.reply-close:hover{
+  background:var(--red-b);
+  color:var(--red);
+}
+
+.reply-form{
+  padding:18px 20px;
+}
+
+.reply-label{
+  font-size:11px;
+  font-weight:600;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  color:var(--ink3);
+  display:block;
+  margin-bottom:8px;
+}
+
+.reply-textarea{
+  width:100%;
+  min-height:150px;
+  resize:vertical;
+  background:var(--inp);
+  border:1.5px solid var(--b1);
+  border-radius:10px;
+  padding:12px 14px;
+  font-family:'Inter',sans-serif;
+  font-size:13px;
+  color:var(--ink);
+  outline:none;
+  transition:.2s;
+}
+
+.reply-textarea:focus{
+  border-color:var(--grn);
+  box-shadow:0 0 0 3px rgba(48,209,88,.15);
+}
+
+.reply-foot{
+  display:flex;
+  justify-content:flex-end;
+  gap:8px;
+  padding:14px 20px;
+  border-top:1px solid var(--b1);
+  background:var(--card2);
+}
+
+
+</style>
+
+<br>
+<br>
+<br>
+<br>
+<div class="table-wrap">
+        <div class="tw-header">
+         <span class="tw-title">All Complaints</span>
+        </div>
+  <table class="table table-bordered text-center w-75">
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>Complaint</th>
+        <th>Submitted Date</th>
+        <th>Replied Date</th>
+        <th>Reply</th>
+        <th>Status</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <div>
+{% for i in C %}
+
+      <tr>
+        <td>{{ forloop.counter }}</td>
+        <td>{{ i.message }}</td>
+        <td>{{ i.date }}</td>
+        <td>{{ i.replied_date }}</td>
+        <td>{{ i.reply }}</td>
+        <td>
+                {% if c.status == "Open" %}
+                  <span class="badge b-red">{{ i.status }}</span>
+                {% elif c.status == "In Review" %}
+                  <span class="badge b-amber">{{ i.status }}</span>
+                {% else %}
+                  <span class="badge b-green">{{ i.status }}</span>
+                {% endif %}
+              </td>
+        <td>
+            <button
+              class="btn btn-sm btn-light edit-btn"
+              onclick="openReplyModal('{{ i.id }}')">
+              Reply
+            </button>
+        </td>
+      </tr>
+    </div>
+
+<div class="reply-overlay" id="complaintReply">
+    <div class="reply-card">
+
+    <form id="replyForm" method="POST">
+        {% csrf_token %}
+
+            <!-- Header -->
+            <div class="reply-head">
+                <div>
+                    <div class="reply-title">Complaint Response</div>
+                    <div class="reply-ref">
+                        Please review the complaint details and send your response.
+                    </div>
+                </div>
+                <div class="reply-close"
+                     onclick="document.getElementById('complaintReply').classList.remove('on')">
+                    ✕
+                </div>
+            </div>
+
+            <!-- Body -->
+            <div class="reply-form">
+                <label class="reply-label">
+                    Your Response
+                </label>
+
+                <textarea name="Reply"
+                          rows="10"
+                          cols="80"
+                          class="reply-textarea"
+                          placeholder="Write your response here..."></textarea>
+            </div>
+
+            <!-- Footer -->
+            <div class="reply-foot">
+                <button type="button"
+                        class="bsm bout"
+                        onclick="document.getElementById('complaintReply').classList.remove('on')">
+                    Cancel
+                </button>
+
+                <button type="submit" name="submit" class="bsm bgrn">
+                    Send Response
+                </button>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+
+     {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<script>
+function openReplyModal(id){
+    const modal = document.getElementById('complaintReply');
+    const form = document.getElementById('replyForm');
+
+    // Set correct form action dynamically
+    form.action = "/admin_reply/" + id;   // adjust URL if needed
+
+    modal.classList.add('on');
+}
+</script>
+{% include 'admin_footer.html' %}

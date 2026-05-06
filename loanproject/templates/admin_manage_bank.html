@@ -1,0 +1,415 @@
+{% include 'admin_header.html' %}
+
+<style>
+/* ── STATS ZONE ── */
+.stats-zone{max-width:1200px;margin:24px auto 0;padding:0 26px;width:100%}
+.page-eyebrow{font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--red);margin-bottom:6px}
+.page-title{font-size:22px;font-weight:800;color:var(--ink);letter-spacing:-.03em;margin-bottom:4px}
+.page-sub{font-size:12.5px;color:var(--ink3);margin-bottom:18px}
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:24px}
+.stat-card{
+  background:var(--card);border:1px solid var(--b1);border-radius:12px;
+  padding:16px 18px;box-shadow:var(--sh);
+  transition:transform .2s,box-shadow .2s,background .3s;
+}
+{#.stat-card:hover{transform:translateY(-2px);box-shadow:var(--sh2)}#}
+{#.stat-label{font-size:11px;font-weight:500;color:var(--ink3);margin-bottom:8px}#}
+{#.stat-value{font-size:28px;font-weight:800;color:var(--ink);letter-spacing:-.03em;line-height:1}#}
+
+/* ── PAGE LAYOUT ── */
+.page{display:flex;gap:24px;max-width:1200px;margin:0 auto;padding:0 26px 32px;width:100%}
+
+/* ── TABLE-WRAP / FORM-CARD ── */
+.table-wrap{flex:1;min-width:0}
+.form-card{
+  background:var(--card);border:1px solid var(--b1);border-radius:16px;
+  box-shadow:var(--sh);overflow:hidden;
+  animation:cardUp .4s cubic-bezier(.34,1.2,.64,1);
+  transition:background .3s,border-color .3s;
+}
+@keyframes cardUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+
+/* form-card-header */
+.form-card-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:17px 22px 15px;background:var(--card2);border-bottom:1px solid var(--b1);
+  transition:background .3s,border-color .3s;
+}
+.fch-left{display:flex;align-items:center;gap:11px}
+.fch-icon{
+  width:38px;height:38px;background:var(--red-b);border:1px solid rgba(255,69,58,.25);
+  border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;
+}
+.fch-title{font-size:15px;font-weight:700;color:var(--ink);letter-spacing:-.02em}
+.fch-sub{font-size:11.5px;color:var(--ink3);margin-top:2px}
+.step-badge{
+  font-size:10px;font-weight:700;letter-spacing:.07em;
+  background:var(--red-b);color:var(--red);border:1px solid rgba(255,69,58,.2);
+  border-radius:20px;padding:3px 10px;
+}
+
+/* step strip */
+.steps-strip{
+  display:flex;align-items:center;padding:11px 22px;
+  border-bottom:1px solid var(--b1);background:var(--card);
+  transition:background .3s,border-color .3s;
+}
+.step-it{display:flex;align-items:center;gap:6px;font-size:11.5px;font-weight:500;color:var(--ink3)}
+.step-it.on{color:var(--ink)}.step-it.done{color:var(--grn)}
+.step-num{
+  width:21px;height:21px;border-radius:50%;background:var(--item);border:1px solid var(--b1);
+  display:flex;align-items:center;justify-content:center;
+  font-size:10px;font-weight:700;flex-shrink:0;transition:all .3s;
+}
+.step-it.on .step-num{background:var(--red);border-color:var(--red);color:#fff;box-shadow:0 0 10px rgba(255,59,48,.35)}
+.step-it.done .step-num{background:var(--grn);border-color:var(--grn);color:#fff}
+.step-sep{flex:1;height:1px;background:var(--b1);margin:0 10px}
+
+/* form-card-body */
+.form-card-body{padding:22px}
+
+/* section-divider */
+.section-divider{display:flex;align-items:center;gap:10px;margin:18px 0 14px}
+.section-divider span{font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);white-space:nowrap}
+.section-divider::before,.section-divider::after{content:'';flex:1;height:1px;background:var(--b1)}
+
+/* field-group */
+.field-group{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-bottom:11px}
+.field-group.full{grid-template-columns:1fr}
+
+/* form-field */
+.form-field{display:flex;flex-direction:column;gap:5px}
+.form-field label{font-size:11.5px;font-weight:600;color:var(--ink2)}
+
+/* inputs */
+.inp-wrap{position:relative}
+.inp-ic{position:absolute;left:11px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--ink3);pointer-events:none;line-height:1}
+.form-field input{
+  width:100%;background:var(--inp);border:1.5px solid var(--b1);border-radius:9px;
+  padding:9px 12px 9px 34px;font-family:'Inter',sans-serif;font-size:13px;color:var(--ink);
+  outline:none;transition:border-color .2s,background .2s,box-shadow .2s;
+}
+.form-field input::placeholder{color:var(--ph)}
+.form-field input:focus{border-color:var(--red);background:var(--inp-f);box-shadow:0 0 0 3px rgba(255,69,58,.1)}
+.form-field input.err{border-color:var(--red)!important;box-shadow:0 0 0 3px rgba(255,69,58,.1)!important}
+.pw-eye{position:absolute;right:11px;top:50%;transform:translateY(-50%);font-size:13px;color:var(--ink3);cursor:pointer;user-select:none;transition:color .2s}
+.pw-eye:hover{color:var(--ink)}
+.f-err{font-size:11px;color:var(--red);display:none;align-items:center;gap:3px;margin-top:1px}
+.f-err.show{display:flex}
+
+/* check-row */
+.check-row{display:flex;align-items:center;gap:9px;margin:16px 0 20px;cursor:pointer}
+.form-check-input{width:16px;height:16px;accent-color:var(--red);cursor:pointer;flex-shrink:0}
+.check-row label{font-size:12.5px;color:var(--ink2);cursor:pointer;user-select:none;line-height:1.4}
+
+/* submit-row */
+.submit-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:15px 0 0;border-top:1px solid var(--b1);
+}
+.submit-note{font-size:11.5px;color:var(--ink3);display:flex;align-items:center;gap:5px}
+.btn-actions{display:flex;align-items:center;gap:8px}
+.btn-reset{
+  background:var(--item);border:1px solid var(--b1);color:var(--ink2);border-radius:9px;
+  padding:8px 16px;font-size:12.5px;font-weight:600;cursor:pointer;
+  font-family:'Inter',sans-serif;transition:all .2s;
+}
+.btn-reset:hover{background:var(--hover);color:var(--ink)}
+.btn-register{
+  background:var(--red);color:#fff;border:none;border-radius:9px;padding:8px 22px;
+  font-size:12.5px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;
+  transition:all .2s;letter-spacing:-.01em;display:flex;align-items:center;gap:6px;
+  box-shadow:0 2px 10px rgba(255,59,48,.35);
+}
+.btn-register:hover{opacity:.88;transform:translateY(-1px);box-shadow:0 4px 18px rgba(255,59,48,.45)}
+.btn-register:active{transform:translateY(0)}
+
+/* ── PREVIEW COLUMN ── */
+.preview-col{
+  width:252px;flex-shrink:0;display:flex;flex-direction:column;gap:12px;
+  animation:cardUp .4s .1s cubic-bezier(.34,1.2,.64,1) both;
+}
+.bank-preview-card{
+  background:var(--card);border:1px solid var(--b1);border-radius:16px;
+  padding:18px;box-shadow:var(--sh);position:relative;overflow:hidden;
+  transition:background .3s,border-color .3s;
+}
+.bank-preview-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2.5px;background:linear-gradient(90deg,var(--red),transparent)}
+.prev-label{font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);margin-bottom:14px}
+.prev-logo{
+  width:44px;height:44px;border-radius:11px;
+  display:flex;align-items:center;justify-content:center;
+  font-weight:800;font-size:13px;color:#fff;margin-bottom:12px;
+  background:linear-gradient(135deg,var(--red),#c0392b);
+  transition:all .35s;box-shadow:0 4px 14px rgba(255,59,48,.4);
+}
+.prev-name{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:3px;letter-spacing:-.01em;min-height:18px}
+.prev-loc{font-size:11px;color:var(--ink3);margin-bottom:14px;min-height:14px}
+.prev-stats{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.ps-box{background:var(--item);border-radius:8px;padding:8px 10px}
+.ps-lbl{font-size:9.5px;color:var(--ink3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:3px}
+.ps-val{font-size:14px;font-weight:700;color:var(--ink)}
+.prev-status{display:inline-flex;align-items:center;gap:4px;background:var(--grn-b);color:var(--grn);border:1px solid rgba(48,209,88,.2);border-radius:20px;padding:3px 9px;font-size:10.5px;font-weight:700}
+.status-dot{width:5px;height:5px;border-radius:50%;background:var(--grn);box-shadow:0 0 6px var(--grn);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+.info-card{background:var(--card);border:1px solid var(--b1);border-radius:14px;padding:15px;box-shadow:var(--sh);transition:background .3s,border-color .3s}
+.info-title{font-size:12px;font-weight:700;color:var(--ink);margin-bottom:11px}
+.info-item{display:flex;align-items:flex-start;gap:8px;padding:6px 0;border-bottom:1px solid var(--b2);font-size:11.5px;color:var(--ink3);line-height:1.45}
+.info-item:last-child{border-bottom:none;padding-bottom:0}
+.info-ic{flex-shrink:0}
+.tags-wrap{display:flex;flex-wrap:wrap;gap:6px;padding-top:2px}
+.tag{font-size:10.5px;font-weight:600;padding:3px 8px;border-radius:6px;border:1px solid transparent}
+.tg{background:var(--grn-b);color:var(--grn);border-color:rgba(48,209,88,.2)}
+.tr{background:var(--red-b);color:var(--red);border-color:rgba(255,69,58,.2)}
+.ta{background:var(--amb-b);color:var(--amb);border-color:rgba(255,159,10,.2)}
+.tb{background:var(--blu-b);color:var(--blu);border-color:rgba(10,132,255,.2)}
+
+/* ── SUCCESS ── */
+.success-overlay{position:fixed;inset:0;background:rgba(0,0,0,.72);backdrop-filter:blur(12px);z-index:500;display:none;align-items:center;justify-content:center;padding:20px}
+.success-overlay.show{display:flex;animation:fadeIn .3s ease}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+.suc-card{background:var(--card);border:1px solid var(--b1);border-radius:20px;padding:38px 34px;text-align:center;box-shadow:var(--sh2);max-width:340px;width:100%;animation:popIn .4s cubic-bezier(.34,1.56,.64,1)}
+@keyframes popIn{from{opacity:0;transform:scale(.85) translateY(20px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.suc-icon{width:62px;height:62px;background:var(--grn-b);border:2px solid rgba(48,209,88,.3);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:26px;margin:0 auto 16px;box-shadow:0 0 0 8px rgba(48,209,88,.07)}
+.suc-title{font-size:18px;font-weight:800;color:var(--ink);letter-spacing:-.02em;margin-bottom:7px}
+.suc-sub{font-size:12.5px;color:var(--ink3);line-height:1.6;margin-bottom:20px}
+.suc-preview{background:var(--item);border-radius:11px;padding:13px;margin-bottom:20px;text-align:left;border:1px solid var(--b1)}
+.spr-row{display:flex;align-items:center;gap:10px}
+.spr-logo{width:38px;height:38px;border-radius:9px;background:linear-gradient(135deg,var(--red),#c0392b);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:12px;color:#fff;flex-shrink:0}
+.spr-name{font-size:13px;font-weight:700;color:var(--ink)}.spr-loc{font-size:11px;color:var(--ink3)}
+.btn-suc{background:var(--red);color:#fff;border:none;border-radius:10px;padding:10px;font-family:'Inter',sans-serif;font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;width:100%;box-shadow:0 3px 12px rgba(255,59,48,.35)}
+.btn-suc:hover{opacity:.88}
+
+
+</style>
+
+
+
+
+<!-- ══ STATS ZONE — matches Django template exactly ══ -->
+<div class="stats-zone">
+
+  <div class="page-eyebrow">Institution Management</div>
+  <h1 class="page-title">Register your bank</h1>
+  <p class="page-sub">Add a new banking institution to the loan management network.</p>
+
+  <!-- Stats (Django: {{ b|length }}) -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-label">Registered Banks</div>
+      <div class="stat-value">{{ b|length }}</div>
+    </div>
+
+  </div>
+
+</div>
+
+<!-- ══ PAGE (table-wrap + preview col) ══ -->
+<div class="page">
+
+  <!-- table-wrap > form-card -->
+  <div class="table-wrap">
+    <div class="form-card">
+
+      <!-- form-card-header -->
+      <div class="form-card-header">
+        <div class="fch-left">
+          <div class="fch-icon">🏦</div>
+          <div>
+            <div class="fch-title">Bank Registration</div>
+            <div class="fch-sub">Complete all fields to register the institution</div>
+          </div>
+        </div>
+        <span class="step-badge">NEW ENTRY</span>
+      </div>
+
+      <!-- Step indicator -->
+      <div class="steps-strip">
+        <div class="step-it on" id="st1"><div class="step-num">1</div>Credentials</div>
+        <div class="step-sep"></div>
+        <div class="step-it" id="st2"><div class="step-num">2</div>Institution Details</div>
+        <div class="step-sep"></div>
+        <div class="step-it" id="st3"><div class="step-num">3</div>Contact &amp; Location</div>
+      </div>
+
+      <!-- form-card-body -->
+      <div class="form-card-body">
+        <form method="POST" id="regForm" onsubmit="return ">
+          {% csrf_token %}
+
+          <!-- Credentials -->
+          <div class="field-group">
+            <div class="form-field">
+              <label for="username">Username</label>
+              <div class="inp-wrap">
+                <span class="inp-ic">👤</span>
+                <input type="text" name="username" id="username"
+                  placeholder="admin_user" required oninput="liveSync()"/>
+              </div>
+              <div class="f-err" id="err-username">⚠ Username is required</div>
+            </div>
+            <div class="form-field">
+              <label for="password">Password</label>
+              <div class="inp-wrap">
+                <span class="inp-ic">🔑</span>
+                <input type="password" name="password" id="password"
+                  placeholder="••••••••" required
+                  style="padding-right:34px" oninput="liveSync()"/>
+                <span class="pw-eye" onclick="togglePw()">👁</span>
+              </div>
+              <div class="f-err" id="err-password">⚠ Password is required</div>
+            </div>
+          </div>
+
+          <div class="section-divider"><span>Institution Details</span></div>
+
+          <!-- Bank Name -->
+          <div class="field-group full">
+            <div class="form-field">
+              <label for="bankName">Bank Name</label>
+              <div class="inp-wrap">
+                <span class="inp-ic">🏛️</span>
+                <input type="text" name="name" id="bankName"
+                  placeholder="e.g. National Credit Bank" oninput="liveSync()"/>
+              </div>
+            </div>
+          </div>
+
+          <!-- Email -->
+          <div class="field-group full">
+            <div class="form-field">
+              <label for="email">Email</label>
+              <div class="inp-wrap">
+                <span class="inp-ic">✉️</span>
+                <input type="email" name="email" id="email"
+                  placeholder="contact@bank.com" oninput="liveSync()"/>
+              </div>
+              <div class="f-err" id="err-email">⚠ Valid email is required</div>
+            </div>
+          </div>
+
+          <!-- Branch + Phone -->
+          <div class="field-group">
+            <div class="form-field">
+              <label for="branch">Branch</label>
+              <div class="inp-wrap">
+                <span class="inp-ic">🏢</span>
+                <input type="text" name="branch" id="branch"
+                  placeholder="e.g. Main Branch" oninput="liveSync()"/>
+              </div>
+            </div>
+            <div class="form-field">
+              <label for="phone">Phone Number</label>
+              <div class="inp-wrap">
+                <span class="inp-ic">📞</span>
+                <input type="tel" name="phone" id="phone"
+                  placeholder="+91 00000 00000"/>
+              </div>
+            </div>
+          </div>
+
+          <!-- Address -->
+          <div class="field-group full">
+            <div class="form-field">
+              <label for="address">Address</label>
+              <div class="inp-wrap">
+                <span class="inp-ic">📍</span>
+                <input type="text" name="place" id="address"
+                  placeholder="Street, City, State" oninput="liveSync()"/>
+              </div>
+            </div>
+          </div>
+
+          <!-- Save checkbox -->
+          <div class="check-row">
+            <input class="form-check-input" type="checkbox" id="saveData" name="saveData" checked/>
+            <label for="saveData">Save institution record to the registry</label>
+          </div>
+
+          <!-- Submit row -->
+          <div class="submit-row">
+            <span class="submit-note">📋 Entry will appear in the table below</span>
+            <div class="btn-actions">
+              <button type="button" class="btn-reset" onclick="resetAll()">Reset</button>
+              <button type="submit" class="btn-register">Register &nbsp;→</button>
+            </div>
+          </div>
+
+        </form>
+      </div><!-- /form-card-body -->
+    </div><!-- /form-card -->
+  </div><!-- /table-wrap -->
+
+  <!-- ── LIVE PREVIEW ── -->
+  <div class="preview-col">
+
+    <div class="info-card">
+      <div class="info-title">📋 Registration Guide</div>
+      <div class="info-item"><span class="info-ic">✅</span>Credentials provide bank-level portal access</div>
+      <div class="info-item"><span class="info-ic">📩</span>Confirmation email sent after registration</div>
+      <div class="info-item"><span class="info-ic">📋</span>Entry appears in the registry table below</div>
+      <div class="info-item"><span class="info-ic">🔒</span>All data is securely encrypted</div>
+    </div>
+
+
+
+  </div>
+
+
+
+</div><!-- /page -->
+
+<div class="stats-zone">
+    <!-- ── Records Table ── -->
+        <div class="table-bank-header">
+              <h2>Registered Institutions</h2>
+{#              <span class="record-count">{{ a|length }} record(s) found</span>#}
+            </div>
+<br>
+<br>
+             <div class="table-wrap">
+                <div class="tw-header">
+                  <span class="tw-title">All Banks Registerd</span>
+                </div>
+                    {% if b %}
+                    <table class="data-table">
+                        <thead>
+                          <tr>
+                            <th>#</th>
+                            <th>Name</th>
+                            <th>Branch</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Place</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {% for i in b %}
+                          <tr>
+                            <td style="font-size:11px;color:var(--ink3);font-weight:700">{{ forloop.counter }}</td>
+                            <td  class="bank-name"><div class="u-cell"><div class="av ab" style="width:26px;height:26px;font-size:8px">PS</div>{{ i.name }}</div></td>
+                            <td><span class="badge-branch">{{ i.branch }}</span></td>
+                            <td class="email-cell">{{ i.email }}</td>
+                            <td class="phone-cell">{{ i.phone }}</td>
+                            <td>{{ i.place }}</td>
+                          </tr>
+                          {% endfor %}
+                        </tbody>
+                      </table>
+              </div>
+
+                    {% else %}
+              <div class="empty-state">
+                <div class="empty-icon">🏦</div>
+                <p>No institutions registered yet</p>
+              </div>
+              {% endif %}
+            </div>
+
+          </main>
+        </div>
+</div>
+<br>
+<br>
+{% include 'admin_footer.html' %}

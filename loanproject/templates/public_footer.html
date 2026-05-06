@@ -1,0 +1,105 @@
+  </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-50 dark:bg-slate-900 border-t border-slate-200 dark:border-slate-800 py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row justify-between items-center gap-4">
+            <div class="flex items-center gap-2 text-slate-500 dark:text-slate-400">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <span class="font-semibold">Trustify</span> &copy; 2024
+            </div>
+            <div class="flex gap-6 text-sm text-slate-500 dark:text-slate-400">
+                <a href="#" class="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Privacy Policy</a>
+                <a href="#" class="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Terms of Service</a>
+                <a href="#" class="hover:text-primary-600 dark:hover:text-primary-400 transition-colors">Contact Support</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Custom Toast Notification (used instead of alert) -->
+
+
+  <!-- Scripts -->
+    <script>
+        // --- Dark Mode Logic ---
+        const themeToggleBtn = document.getElementById('theme-toggle');
+        const sunIcon = document.getElementById('sun-icon');
+        const moonIcon = document.getElementById('moon-icon');
+
+        // Check initial theme
+        if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            document.documentElement.classList.add('dark');
+            sunIcon.classList.remove('hidden');
+            moonIcon.classList.add('hidden');
+        } else {
+            document.documentElement.classList.remove('dark');
+            sunIcon.classList.add('hidden');
+            moonIcon.classList.remove('hidden');
+        }
+
+        // Toggle theme listener
+        themeToggleBtn.addEventListener('click', function() {
+            // Toggle icons
+            sunIcon.classList.toggle('hidden');
+            moonIcon.classList.toggle('hidden');
+
+            // Toggle document class & save preference
+            if (document.documentElement.classList.contains('dark')) {
+                document.documentElement.classList.remove('dark');
+                localStorage.setItem('color-theme', 'light');
+            } else {
+                document.documentElement.classList.add('dark');
+                localStorage.setItem('color-theme', 'dark');
+            }
+        });
+
+        // --- Mock Login Redirect Logic ---
+        function simulateLoginRedirect() {
+            const toast = document.getElementById('toast');
+            
+            // Show toast
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            toast.classList.add('translate-y-0', 'opacity-100');
+            
+            // Hide toast after a few seconds (Simulating the redirect delay)
+            setTimeout(() => {
+                toast.classList.remove('translate-y-0', 'opacity-100');
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+        // Save checkbox state when changed
+    function handleRememberMe() {
+        const checkbox = document.getElementById("remember");
+        localStorage.setItem("rememberMe", checkbox.checked);
+    }
+
+    // Load saved state when page loads
+    function loadRememberMe() {
+        const savedState = localStorage.getItem("rememberMe");
+        if (savedState === "true") {
+            document.getElementById("remember").checked = true;
+        }
+    }
+
+    // Run when page loads
+    window.onload = loadRememberMe;
+
+    function togglePassword() {
+    const passwordInput = document.getElementById("password");
+    const eyeIcon = document.getElementById("eye-icon");
+
+    if (passwordInput.type === "password") {
+        passwordInput.type = "text";
+        eyeIcon.innerHTML = `
+            <path d="M17.94 17.94A10.94 10.94 0 0112 20C5 20 1 12 1 12a21.77 21.77 0 015.06-7.94M9.9 4.24A10.94 10.94 0 0112 4c7 0 11 8 11 8a21.77 21.77 0 01-4.35 5.94M1 1l22 22"></path>
+        `;
+    } else {
+        passwordInput.type = "password";
+        eyeIcon.innerHTML = `
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+            <circle cx="12" cy="12" r="3"></circle>
+        `;
+    }
+}
+    </script>
+</body>
+</html>

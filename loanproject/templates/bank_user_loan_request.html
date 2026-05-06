@@ -1,0 +1,1054 @@
+
+
+
+{% include 'bank_header.html' %}
+
+<style>
+    .page {
+        padding: 24px 28px;
+        flex: 1;
+    }
+
+    /* STATS */
+    .stats-row {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 14px;
+        margin-bottom: 26px;
+    }
+
+    .stat-mini {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--r-md);
+        padding: 16px 18px;
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        transition: all var(--transition);
+        animation: fadeUp 0.4s ease both;
+    }
+
+    .stat-mini:nth-child(1) { animation-delay: 0.05s; }
+    .stat-mini:nth-child(2) { animation-delay: 0.10s; }
+    .stat-mini:nth-child(3) { animation-delay: 0.15s; }
+
+    .stat-mini:hover {
+        transform: translateY(-2px);
+        border-color: var(--border-2);
+    }
+
+    .sm-icon {
+        width: 40px; height: 40px; border-radius: 10px;
+        display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+    }
+    .ic-blue  { background: var(--blue-100);  color: var(--blue-400); }
+    .ic-green { background: var(--green-dim); color: var(--green); }
+    .ic-amber { background: var(--amber-dim); color: var(--amber); }
+
+    .sm-val { font-size: 1.4rem; font-weight: 800; color: var(--txt-1); letter-spacing: -0.03em; line-height: 1; }
+    .sm-lbl { font-size: 0.72rem; color: var(--txt-3); margin-top: 2px; }
+
+    /* TOOLBAR */
+    .table-toolbar {
+        display: flex; align-items: center; justify-content: space-between;
+        margin-bottom: 20px; gap: 12px; flex-wrap: wrap;
+    }
+
+    .tb-search {
+        display: flex; align-items: center; gap: 8px;
+        background: var(--surface); border: 1px solid var(--border);
+        border-radius: 10px; padding: 9px 14px; flex: 1; max-width: 300px;
+        transition: border-color var(--transition);
+    }
+    .tb-search:focus-within { border-color: var(--blue-500); }
+    .tb-search input {
+        border: none; background: transparent;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 0.82rem; color: var(--txt-1); outline: none; width: 100%;
+    }
+    .tb-search input::placeholder { color: var(--txt-3); }
+    .tb-search svg { color: var(--txt-3); flex-shrink: 0; }
+
+    .filter-tabs { display: flex; gap: 6px; flex-wrap: wrap; }
+    .ftab {
+        font-size: 0.73rem; font-weight: 600; padding: 7px 16px;
+        border-radius: 9px; border: 1px solid var(--border);
+        background: transparent; color: var(--txt-3); cursor: pointer;
+        transition: all var(--transition); font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .ftab.active, .ftab:hover {
+        background: var(--blue-100); color: var(--blue-400); border-color: var(--blue-500);
+    }
+
+    /* CARD GRID */
+    .cards-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+        gap: 18px;
+    }
+
+    .loan-card {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        overflow: hidden;
+        animation: fadeUp 0.4s ease both;
+        transition: box-shadow 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+        display: flex; flex-direction: column;
+    }
+    .loan-card:hover {
+        box-shadow: 0 8px 30px rgba(0,0,0,0.1);
+        border-color: var(--border-2);
+        transform: translateY(-2px);
+    }
+
+    /* Card hero */
+    .card-hero {
+        background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
+        padding: 22px 22px 20px;
+        display: flex; align-items: center; gap: 16px; position: relative;
+    }
+
+    .card-status-badge {
+        position: absolute; top: 14px; right: 14px;
+        display: inline-flex; align-items: center; gap: 4px;
+        padding: 4px 10px; border-radius: 20px;
+        font-size: 0.65rem; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase;
+    }
+    .csb-pending  { background: rgba(251,191,36,0.2);  color: #fbbf24; border: 1px solid rgba(251,191,36,0.3); }
+    .csb-approved { background: rgba(34,197,94,0.2);   color: #4ade80; border: 1px solid rgba(74,222,128,0.3); }
+    .csb-rejected { background: rgba(239,68,68,0.2);   color: #f87171; border: 1px solid rgba(248,113,113,0.3); }
+
+    .card-av-wrap {
+        width: 58px; height: 58px; border-radius: 14px; overflow: hidden;
+        flex-shrink: 0; cursor: pointer;
+        border: 2px solid rgba(255,255,255,0.15);
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .card-av-wrap:hover { transform: scale(1.06); box-shadow: 0 6px 20px rgba(0,0,0,0.35); }
+    .card-av-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .card-av-placeholder {
+        width: 100%; height: 100%;
+        background: linear-gradient(135deg, #3b82f6, #6366f1);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 1.3rem; font-weight: 800; color: #fff;
+    }
+
+    .card-hero-info { flex: 1; min-width: 0; }
+    .card-hero-name  { font-size: 0.95rem; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .card-hero-email { font-size: 0.7rem;  color: rgba(255,255,255,0.45); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .card-hero-date  { font-size: 0.68rem; color: rgba(255,255,255,0.35); margin-top: 6px; }
+
+    /* Card body */
+    .card-body { padding: 18px 20px; flex: 1; display: flex; flex-direction: column; gap: 14px; }
+
+    .card-loan-row {
+        display: flex; align-items: center; justify-content: space-between;
+        background: var(--surface-2); border: 1px solid var(--border);
+        border-radius: 12px; padding: 12px 14px;
+    }
+    .card-loan-type { font-size: 0.82rem; font-weight: 700; color: var(--txt-1); }
+    .card-loan-sub  { font-size: 0.68rem; color: var(--txt-3); margin-top: 2px; }
+    .card-amount    { font-size: 1.2rem;  font-weight: 800; color: var(--txt-1); letter-spacing: -0.03em; }
+
+    /* Card footer */
+    .card-footer { padding: 0 20px 18px; display: flex; flex-direction: column; gap: 8px; }
+    .card-btn-row { display: flex; gap: 8px; }
+
+    /* Action buttons */
+    .btn-card {
+        flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+        padding: 10px 14px; border-radius: 11px; border: none;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 0.78rem; font-weight: 700; cursor: pointer;
+        transition: all 0.18s ease; text-decoration: none; white-space: nowrap;
+    }
+    .btn-card svg { width: 13px; height: 13px; flex-shrink: 0; }
+
+    .btn-approve {
+        background: #dcfce7; color: #15803d;
+        box-shadow: inset 0 0 0 1.5px #bbf7d0;
+    }
+    .btn-approve:hover {
+        background: #16a34a; color: #fff;
+        box-shadow: 0 4px 14px rgba(22,163,74,0.4); transform: translateY(-1px);
+    }
+
+    .btn-reject {
+        background: #fee2e2; color: #dc2626;
+        box-shadow: inset 0 0 0 1.5px #fecaca;
+    }
+    .btn-reject:hover {
+        background: #dc2626; color: #fff;
+        box-shadow: 0 4px 14px rgba(220,38,38,0.4); transform: translateY(-1px);
+    }
+
+    .btn-financial {
+        width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+        padding: 10px 14px; border-radius: 11px; border: none;
+        background: #fef3c7; color: #b45309;
+        box-shadow: inset 0 0 0 1.5px #fde68a;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 0.78rem; font-weight: 700; cursor: pointer;
+        transition: all 0.18s ease; white-space: nowrap;
+    }
+    .btn-financial svg { width: 13px; height: 13px; flex-shrink: 0; }
+    .btn-financial:hover {
+        background: #d97706; color: #fff;
+        box-shadow: 0 4px 14px rgba(217,119,6,0.4); transform: translateY(-1px);
+    }
+
+    .btn-doc-card {
+        width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+        padding: 10px 14px; border-radius: 11px; border: none;
+        background: #ede9fe; color: #7c3aed;
+        box-shadow: inset 0 0 0 1.5px #ddd6fe;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 0.78rem; font-weight: 700; cursor: pointer;
+        transition: all 0.18s ease; text-decoration: none; white-space: nowrap;
+    }
+    .btn-doc-card svg { width: 13px; height: 13px; flex-shrink: 0; }
+    .btn-doc-card:hover {
+        background: #7c3aed; color: #fff;
+        box-shadow: 0 4px 14px rgba(124,58,237,0.4); transform: translateY(-1px);
+    }
+
+    .btn-deepfake-card {
+        width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+        padding: 10px 14px; border-radius: 11px; border: none;
+        background: #e0e7ff; color: #4338ca;
+        box-shadow: inset 0 0 0 1.5px #c7d2fe;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 0.78rem; font-weight: 700; cursor: pointer;
+        transition: all 0.18s ease; white-space: nowrap;
+    }
+    .btn-deepfake-card svg { width: 13px; height: 13px; flex-shrink: 0; }
+    .btn-deepfake-card:hover {
+        background: #4338ca; color: #fff;
+        box-shadow: 0 4px 14px rgba(67,56,202,0.4); transform: translateY(-1px);
+    }
+
+    /* Empty state */
+    .empty-state { text-align: center; padding: 60px 20px; color: var(--txt-3); }
+    .empty-state svg { width: 40px; height: 40px; margin-bottom: 12px; opacity: 0.3; }
+    .empty-state p { font-size: 0.85rem; margin-top: 6px; }
+    .empty-title { font-size: 0.95rem; font-weight: 600; color: var(--txt-2); }
+
+    /* IMAGE VIEWER MODAL */
+    .img-modal {
+        display: none; position: fixed; z-index: 1100; inset: 0;
+        background: rgba(0,0,0,0.88); backdrop-filter: blur(14px);
+        align-items: center; justify-content: center;
+    }
+    .img-modal.active { display: flex; animation: fadeIn 0.2s ease; }
+
+    .img-modal-inner {
+        position: relative; width: 340px;
+        animation: zoomIn 0.22s ease;
+        display: flex; flex-direction: column; align-items: center; gap: 0;
+    }
+
+    .img-modal-inner img {
+        width: 340px; height: 340px;
+        border-radius: 18px; object-fit: cover; display: block;
+        box-shadow: 0 24px 70px rgba(0,0,0,0.7);
+    }
+    .img-modal-placeholder {
+        width: 340px; height: 340px; border-radius: 18px;
+        background: linear-gradient(135deg, #3b82f6, #6366f1);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 5rem; font-weight: 800; color: #fff;
+        box-shadow: 0 24px 70px rgba(0,0,0,0.7);
+    }
+
+    .img-modal-close {
+        position: absolute; top: -14px; right: -14px;
+        width: 36px; height: 36px; border-radius: 50%;
+        background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.25);
+        cursor: pointer; display: flex; align-items: center; justify-content: center;
+        color: #fff; font-size: 20px; line-height: 1; transition: background 0.15s;
+    }
+    .img-modal-close:hover { background: rgba(255,255,255,0.32); }
+
+    .img-modal-caption {
+        width: 100%;
+        display: flex; flex-direction: column; align-items: center; gap: 10px;
+        margin-top: 18px;
+    }
+    .img-modal-name-label { font-size: 0.88rem; font-weight: 700; color: #fff; letter-spacing: -0.01em; }
+
+    .btn-run-detect {
+        display: inline-flex; align-items: center; gap: 8px;
+        padding: 11px 24px; border-radius: 12px; border: none;
+        background: linear-gradient(135deg, #3b82f6, #6366f1);
+        color: #fff; font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 0.82rem; font-weight: 700; cursor: pointer;
+        box-shadow: 0 6px 22px rgba(99,102,241,0.45);
+        transition: all 0.2s ease; width: 100%; justify-content: center;
+    }
+    .btn-run-detect:hover {
+        background: linear-gradient(135deg, #2563eb, #4f46e5);
+        box-shadow: 0 8px 28px rgba(99,102,241,0.6); transform: translateY(-1px);
+    }
+    .btn-run-detect:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+    .btn-run-detect svg { width: 15px; height: 15px; flex-shrink: 0; }
+
+    .detect-pill {
+        display: none; align-items: center; gap: 6px;
+        padding: 5px 14px; border-radius: 20px;
+        font-size: 0.7rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase;
+    }
+    .detect-pill.show { display: inline-flex; }
+    .dp-real { background: rgba(34,197,94,0.2);  color: #4ade80; border: 1px solid rgba(74,222,128,0.3); }
+    .dp-fake { background: rgba(239,68,68,0.2);  color: #f87171; border: 1px solid rgba(248,113,113,0.3); }
+
+    /* REPORT MODAL */
+    .report-modal {
+        display: none; position: fixed; z-index: 1200; inset: 0;
+        background: rgba(0,0,0,0.75); backdrop-filter: blur(8px);
+    }
+    .report-modal.active { display: flex; align-items: center; justify-content: center; animation: fadeIn 0.22s ease; }
+
+    .report-modal-box {
+        background: var(--surface, #fff); border: 1px solid var(--border, #e5e7eb);
+        border-radius: 24px; width: 580px; max-width: 95vw; max-height: 88vh;
+        display: flex; flex-direction: column; animation: zoomIn 0.22s ease; overflow: hidden;
+    }
+    .report-modal-hero {
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+        padding: 24px 26px 22px;
+        display: flex; align-items: center; gap: 14px; position: relative; flex-shrink: 0;
+    }
+    .report-hero-icon {
+        width: 48px; height: 48px; border-radius: 14px; flex-shrink: 0;
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+        display: flex; align-items: center; justify-content: center;
+        box-shadow: 0 6px 18px rgba(217,119,6,0.4);
+    }
+    .report-hero-icon svg { width: 22px; height: 22px; color: #fff; }
+    .report-hero-text { flex: 1; }
+    .report-hero-title { font-size: 1rem; font-weight: 800; color: #fff; letter-spacing: -0.01em; }
+    .report-hero-sub   { font-size: 0.72rem; color: rgba(255,255,255,0.45); margin-top: 2px; }
+    .report-modal-close-btn {
+        width: 30px; height: 30px; border-radius: 50%;
+        background: rgba(255,255,255,0.1); border: none; cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+        color: #fff; font-size: 18px; transition: background 0.15s; flex-shrink: 0;
+    }
+    .report-modal-close-btn:hover { background: rgba(255,255,255,0.2); }
+    .report-modal-body { padding: 22px 26px 26px; overflow-y: auto; flex: 1; }
+
+    .report-loading {
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        padding: 50px 20px; gap: 14px; color: var(--txt-3);
+    }
+    .report-loading p { font-size: 0.82rem; }
+    .report-error { color: var(--red, #dc2626); font-size: 0.82rem; text-align: center; padding: 30px 20px; }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner {
+        width: 24px; height: 24px;
+        border: 3px solid rgba(255,255,255,0.15); border-top-color: #f59e0b;
+        border-radius: 50%; animation: spin 0.7s linear infinite; flex-shrink: 0;
+    }
+
+    @keyframes fadeIn { from { opacity: 0; }                          to { opacity: 1; }             }
+    @keyframes zoomIn { from { opacity: 0; transform: scale(0.93); }  to { opacity: 1; transform: scale(1); } }
+    @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+</style>
+
+<!-- TOPBAR -->
+<div class="topbar">
+    <div>
+        <div class="page-title">Loan Requests</div>
+        <div class="page-subtitle">Review and verify incoming loan applications</div>
+    </div>
+    <div class="topbar-right">
+        <div class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">
+            <span class="theme-icon icon-moon">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.79A9 9 0 1111.21 3a7 7 0 109.79 9.79z"/></svg>
+            </span>
+            <span class="theme-icon icon-sun">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor">
+                    <circle cx="12" cy="12" r="5"/>
+                    <line x1="12" y1="1" x2="12" y2="3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <line x1="12" y1="21" x2="12" y2="23" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <line x1="4.22" y1="4.22" x2="5.64" y2="5.64" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <line x1="18.36" y1="18.36" x2="19.78" y2="19.78" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <line x1="1" y1="12" x2="3" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <line x1="21" y1="12" x2="23" y2="12" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <line x1="4.22" y1="19.78" x2="5.64" y2="18.36" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                    <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                </svg>
+            </span>
+        </div>
+    </div>
+</div>
+
+<!-- PAGE BODY -->
+<div class="page">
+
+    <!-- Stats -->
+    <div class="stats-row">
+        <div class="stat-mini">
+            <div class="sm-icon ic-blue">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </div>
+            <div><div class="sm-val">{{ data|length }}</div><div class="sm-lbl">Total Requests</div></div>
+        </div>
+        <div class="stat-mini">
+            <div class="sm-icon ic-amber">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <div><div class="sm-val">{{ pending_count }}</div><div class="sm-lbl">Pending Review</div></div>
+        </div>
+        <div class="stat-mini">
+            <div class="sm-icon ic-green">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+            </div>
+            <div><div class="sm-val">{{ approved_count }}</div><div class="sm-lbl">Approved</div></div>
+        </div>
+    </div>
+
+    <!-- Toolbar -->
+    <div class="table-toolbar">
+        <div class="tb-search">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="search-input" placeholder="Search applicant, loan type…" oninput="filterCards()">
+        </div>
+        <div class="filter-tabs">
+            <button class="ftab active" onclick="setFilter('all', this)">All</button>
+            <button class="ftab" onclick="setFilter('pending', this)">Pending</button>
+            <button class="ftab" onclick="setFilter('approved', this)">Approved</button>
+            <button class="ftab" onclick="setFilter('rejected', this)">Rejected</button>
+        </div>
+    </div>
+
+    <!-- Cards -->
+    {% if data %}
+        <div class="cards-grid" id="cardsGrid">
+        {% for item in data %}
+            <div class="loan-card"
+                 data-status="{{ item.status|lower }}"
+                 data-name="{{ item.user.first_name|lower }} {{ item.user.last_name|lower }}"
+                 data-loan="{{ item.loan_type.loan_type_name|lower }}">
+
+                <!-- Hero -->
+                <div class="card-hero">
+                    {% with s=item.status|lower %}
+                        {% if s == 'approved' %}<span class="card-status-badge csb-approved">✓ Approved</span>
+                        {% elif s == 'rejected' %}<span class="card-status-badge csb-rejected">✕ Rejected</span>
+                        {% else %}<span class="card-status-badge csb-pending">⏳ Pending</span>
+                        {% endif %}
+                    {% endwith %}
+
+                    <div class="card-av-wrap"
+                         onclick="openImgModal('{{ item.face_image.url|default:'' }}','{{ item.user.first_name }} {{ item.user.last_name }}','{{ item.id }}','{{ item.face_status|default:'' }}','{{ item.face_confidence|default:'' }}')">
+                        {% if item.face_image %}
+                            <img src="{{ item.face_image.url }}" alt="{{ item.user.first_name }}"
+                                 onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+                            <div class="card-av-placeholder" style="display:none;">{{ item.user.first_name|first|upper }}</div>
+                        {% else %}
+                            <div class="card-av-placeholder">{{ item.user.first_name|first|upper }}</div>
+                        {% endif %}
+                    </div>
+
+                    <div class="card-hero-info">
+                        <div class="card-hero-name">{{ item.user.first_name }} {{ item.user.last_name }}</div>
+                        <div class="card-hero-email">{{ item.user.email }}</div>
+                        <div class="card-hero-date">{{ item.submitted_date|date:"d M Y" }}</div>
+                    </div>
+                </div>
+
+                <!-- Body -->
+                <div class="card-body">
+                    <div class="card-loan-row">
+                        <div>
+                            <div class="card-loan-type">{{ item.loan_type.loan_type_name }}</div>
+                            <div class="card-loan-sub">{{ item.loan_type.interest_rate }}% interest · {{ item.loan_type.duration }} months</div>
+                        </div>
+                        <div class="card-amount">₹{{ item.amount }}</div>
+                    </div>
+                </div>
+
+                <!-- Footer actions -->
+                <div class="card-footer">
+
+                    <!-- Approve / Reject -->
+                    <div class="card-btn-row">
+                        {% if item.status == "Pending" %}
+                            <a href="/bank_approve_loan/{{ item.id }}/" class="btn-card btn-approve"
+                               onclick="return confirm('Approve this loan request?')">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                Approve
+                            </a>
+                            <a href="/bank_reject_loan/{{ item.id }}/" class="btn-card btn-reject"
+                               onclick="return confirm('Reject this loan request?')">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                                Reject
+                            </a>
+                        {% else %}
+                            <span style="font-size:0.75rem; color:var(--txt-3); font-weight:600; padding: 4px 0;">Decision Completed</span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Financial Report -->
+                    <button class="btn-financial"
+                            onclick="openReportModal('{{ item.id }}','{{ item.user.first_name }} {{ item.user.last_name }}')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                        Financial Report
+                    </button>
+
+                    <!-- View Document -->
+                    {% if item.documents %}
+                        <a href="{{ item.documents.url }}" target="_blank" class="btn-doc-card">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                            View Document
+                        </a>
+                    {% endif %}
+
+                    <!-- Deepfake Detection -->
+                    <button class="btn-deepfake-card"
+                            onclick="openImgModal('{{ item.face_image.url|default:'' }}','{{ item.user.first_name }} {{ item.user.last_name }}','{{ item.id }}','{{ item.face_status|default:'' }}','{{ item.face_confidence|default:'' }}')">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                        Deepfake Detection
+                    </button>
+
+                </div>
+            </div>
+        {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/></svg>
+            <div class="empty-title">No Loan Requests</div>
+            <p>No applications have been submitted to your bank yet.</p>
+        </div>
+    {% endif %}
+</div>
+
+<!-- IMAGE VIEWER MODAL -->
+<div id="imgModal" class="img-modal" onclick="closeImgModal(event)">
+    <div class="img-modal-inner" onclick="event.stopPropagation()">
+        <button class="img-modal-close" onclick="closeImgModal()">&times;</button>
+        <img id="imgModalSrc" src="" alt="" style="display:none;">
+        <div id="imgModalPlaceholder" class="img-modal-placeholder" style="display:none;"></div>
+        <div class="img-modal-caption">
+            <div class="img-modal-name-label" id="imgModalName"></div>
+            <button class="btn-run-detect" id="detectBtn" onclick="runDetectFromModal()">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                Run Deepfake Detection
+            </button>
+            <div class="detect-pill" id="detectPill">
+                <span id="detectPillText"></span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- FINANCIAL REPORT MODAL -->
+<div id="reportModal" class="report-modal" onclick="closeReportModal(event)">
+    <div class="report-modal-box" onclick="event.stopPropagation()">
+        <div class="report-modal-hero">
+            <div class="report-hero-icon">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            </div>
+            <div class="report-hero-text">
+                <div class="report-hero-title">Financial Report</div>
+                <div class="report-hero-sub" id="reportModalSubtitle">AI-generated loan eligibility analysis</div>
+            </div>
+            <button class="report-modal-close-btn" onclick="closeReportModal()">&times;</button>
+        </div>
+        <div class="report-modal-body" id="reportModalBody"></div>
+    </div>
+</div>
+
+<script>
+    let currentFilter       = 'all';
+    let currentLoanId       = null;
+    let currentReportLoanId = null;
+    let currentReportName   = '';
+
+    /* ════════════════════════════
+       Filter & Search
+    ════════════════════════════ */
+    function setFilter(filter, btn) {
+        currentFilter = filter;
+        document.querySelectorAll('.ftab').forEach(t => t.classList.remove('active'));
+        btn.classList.add('active');
+        filterCards();
+    }
+
+    function filterCards() {
+        const search = document.getElementById('search-input').value.toLowerCase();
+        document.querySelectorAll('.loan-card').forEach(card => {
+            const name        = card.dataset.name   || '';
+            const loan        = card.dataset.loan   || '';
+            const status      = card.dataset.status || '';
+            const matchSearch = name.includes(search) || loan.includes(search);
+            const matchFilter = currentFilter === 'all' || status === currentFilter;
+            card.style.display = (matchSearch && matchFilter) ? '' : 'none';
+        });
+    }
+
+    /* ════════════════════════════
+       Image / Deepfake Modal
+    ════════════════════════════ */
+    function openImgModal(imgUrl, name, loanId, faceStatus, faceConf) {
+        currentLoanId = loanId;
+
+        const imgEl   = document.getElementById('imgModalSrc');
+        const phEl    = document.getElementById('imgModalPlaceholder');
+        const nameEl  = document.getElementById('imgModalName');
+        const btn     = document.getElementById('detectBtn');
+        const pill    = document.getElementById('detectPill');
+        const pillTxt = document.getElementById('detectPillText');
+
+        nameEl.textContent = name;
+
+        if (imgUrl) {
+            imgEl.src = imgUrl; imgEl.style.display = 'block'; phEl.style.display = 'none';
+        } else {
+            imgEl.style.display = 'none';
+            phEl.textContent = name.charAt(0).toUpperCase();
+            phEl.style.display = 'flex';
+        }
+
+        btn.disabled = false;
+        btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;flex-shrink:0;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> Run Deepfake Detection`;
+
+        const s = (faceStatus || '').toLowerCase().trim();
+        if (s === 'real' || s === 'fake') {
+            pill.className = 'detect-pill show ' + (s === 'real' ? 'dp-real' : 'dp-fake');
+            const conf = faceConf ? ` (${parseFloat(faceConf).toFixed(1)}%)` : '';
+            pillTxt.textContent = s === 'real' ? `✓ Real Face${conf}` : `✕ Fake Detected${conf}`;
+            btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;flex-shrink:0;"><polyline points="20 6 9 17 4 12"/></svg> Re-run Detection`;
+        } else {
+            pill.className = 'detect-pill';
+        }
+
+        document.getElementById('imgModal').classList.add('active');
+        document.body.style.overflow = 'hidden';
+    }
+
+    async function runDetectFromModal() {
+        if (!currentLoanId) return;
+        const btn     = document.getElementById('detectBtn');
+        const pill    = document.getElementById('detectPill');
+        const pillTxt = document.getElementById('detectPillText');
+
+        btn.disabled = true;
+        btn.innerHTML = '<div class="spinner" style="border-color:rgba(255,255,255,0.2);border-top-color:#fff;width:15px;height:15px;border-width:2.5px;"></div> Analyzing…';
+        pill.className = 'detect-pill';
+
+        try {
+            const resp = await fetch(`/bank_check_face/${currentLoanId}/`, {
+                headers: { 'X-Requested-With': 'XMLHttpRequest' }
+            });
+            if (resp.ok) {
+                const data = await resp.json();
+                if (data.success) {
+                    const s    = (data.status || '').toLowerCase().trim();
+                    const conf = data.confidence ? ` (${parseFloat(data.confidence).toFixed(1)}%)` : '';
+                    pill.className = 'detect-pill show ' + (s === 'real' ? 'dp-real' : 'dp-fake');
+                    pillTxt.textContent = s === 'real' ? `✓ Real Face${conf}` : `✕ Fake Detected${conf}`;
+                    btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;flex-shrink:0;"><polyline points="20 6 9 17 4 12"/></svg> Detection Complete`;
+                } else {
+                    btn.disabled = false;
+                    btn.innerHTML = '⚠ ' + (data.error || 'Detection failed — retry');
+                }
+            } else {
+                btn.disabled = false;
+                btn.innerHTML = `⚠ Server error (${resp.status}) — retry`;
+            }
+        } catch (e) {
+            btn.disabled = false;
+            btn.innerHTML = '⚠ Network error — retry';
+        }
+    }
+
+    function closeImgModal(event) {
+        if (event && event.target !== event.currentTarget) return;
+        document.getElementById('imgModal').classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    /* ════════════════════════════
+       CSRF Helper
+    ════════════════════════════ */
+    function getCsrfToken() {
+        let token = null;
+        if (document.cookie && document.cookie !== '') {
+            document.cookie.split(';').forEach(cookie => {
+                const c = cookie.trim();
+                if (c.startsWith('csrftoken=')) {
+                    token = decodeURIComponent(c.substring('csrftoken='.length));
+                }
+            });
+        }
+        return token;
+    }
+
+    /* ════════════════════════════
+       Financial Report Modal
+    ════════════════════════════ */
+    function openReportModal(loanId, name) {
+        currentReportLoanId = loanId;
+        currentReportName   = name;
+
+        document.getElementById('reportModalSubtitle').textContent =
+            name ? `Report for ${name}` : 'AI-generated loan eligibility analysis';
+
+        // ── CIBIL input step ──
+        document.getElementById('reportModalBody').innerHTML = `
+            <div style="padding:6px 0 4px;">
+
+                <p style="font-size:0.83rem; color:var(--txt-2); margin-bottom:20px; line-height:1.65;">
+                    Enter the applicant's <strong>CIBIL score</strong> to generate the
+                    AI-powered financial eligibility report.
+                </p>
+
+                <label style="font-size:0.72rem; font-weight:700; color:var(--txt-3);
+                    letter-spacing:0.05em; text-transform:uppercase; display:block; margin-bottom:7px;">
+                    CIBIL Score &nbsp;<span style="color:#dc2626;">*</span>
+                </label>
+
+                <!-- ★ maxlength=3 limits typing to 3 chars; oninput enforces 300-900 range live -->
+                <input
+                    type="text"
+                    id="cibilInput"
+                    inputmode="numeric"
+                    maxlength="3"
+                    placeholder="300 – 900"
+                    autocomplete="off"
+                    oninput="enforceCibilInput(this)"
+                    onkeydown="if(event.key==='Enter') submitReportWithCibil()"
+                    onfocus="this.style.borderColor='#f59e0b'; this.style.boxShadow='0 0 0 3px rgba(245,158,11,0.15)';"
+                    onblur="this.style.borderColor='var(--border)'; this.style.boxShadow='none';"
+                    style="
+                        width:100%; padding:12px 15px; border-radius:12px;
+                        border:1.5px solid var(--border);
+                        background:var(--surface-2,#f9fafb);
+                        font-family:'Plus Jakarta Sans',sans-serif;
+                        font-size:1.1rem; font-weight:700; color:var(--txt-1);
+                        outline:none; box-sizing:border-box;
+                        letter-spacing:0.08em;
+                        transition:border-color 0.2s, box-shadow 0.2s;
+                    "
+                >
+
+                <!-- live score-band indicator -->
+                <div id="cibilBand" style="
+                    margin-top:8px; font-size:0.75rem; font-weight:700;
+                    min-height:18px; transition:color 0.2s;
+                "></div>
+
+                <p id="cibilError" style="font-size:0.74rem; color:#dc2626; margin-top:4px; display:none; font-weight:600;">
+                    ⚠ Score must be exactly 3 digits and between 300 – 900.
+                </p>
+
+                <button
+                    id="generateReportBtn"
+                    onclick="submitReportWithCibil()"
+                    style="
+                        margin-top:16px; width:100%;
+                        display:inline-flex; align-items:center; justify-content:center; gap:9px;
+                        padding:13px 18px; border-radius:13px; border:none;
+                        background:linear-gradient(135deg,#f59e0b,#d97706);
+                        color:#fff; font-family:'Plus Jakarta Sans',sans-serif;
+                        font-size:0.86rem; font-weight:700; cursor:pointer;
+                        box-shadow:0 6px 20px rgba(217,119,6,0.35);
+                        transition:all 0.2s ease;
+                    "
+                    onmouseover="this.style.transform='translateY(-1px)';this.style.boxShadow='0 9px 26px rgba(217,119,6,0.5)';"
+                    onmouseout="this.style.transform='';this.style.boxShadow='0 6px 20px rgba(217,119,6,0.35)';"
+                >
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/>
+                        <polyline points="14 2 14 8 20 8"/>
+                        <line x1="16" y1="13" x2="8" y2="13"/>
+                        <line x1="16" y1="17" x2="8" y2="17"/>
+                    </svg>
+                    Generate Report
+                </button>
+
+            </div>
+        `;
+
+        document.getElementById('reportModal').classList.add('active');
+        document.body.style.overflow = 'hidden';
+
+        setTimeout(() => {
+            const inp = document.getElementById('cibilInput');
+            if (inp) inp.focus();
+        }, 120);
+    }
+
+    /* ── Live CIBIL input enforcer ──
+       - Strips non-digits
+       - Caps at 3 characters
+       - Shows live band label once 3 digits entered          */
+    function enforceCibilInput(el) {
+        // keep only digits
+        let val = el.value.replace(/\D/g, '');
+        // cap to 3 digits
+        if (val.length > 3) val = val.slice(0, 3);
+        el.value = val;
+
+        const band = document.getElementById('cibilBand');
+        const err  = document.getElementById('cibilError');
+
+        if (val.length === 3) {
+            const n = parseInt(val, 10);
+            err.style.display = 'none';
+            el.style.borderColor = 'var(--border)';
+
+            if (n < 300 || n > 900) {
+                band.textContent  = '✕ Invalid — must be 300 to 900';
+                band.style.color  = '#dc2626';
+                el.style.borderColor = '#dc2626';
+                el.style.boxShadow   = '0 0 0 3px rgba(220,38,38,0.15)';
+            } else if (n >= 750) {
+                band.textContent = '● Excellent credit';
+                band.style.color = '#16a34a';
+                el.style.borderColor = '#16a34a';
+                el.style.boxShadow   = '0 0 0 3px rgba(22,163,74,0.12)';
+            } else if (n >= 650) {
+                band.textContent = '● Good credit';
+                band.style.color = '#d97706';
+                el.style.borderColor = '#d97706';
+                el.style.boxShadow   = '0 0 0 3px rgba(217,119,6,0.12)';
+            } else if (n >= 550) {
+                band.textContent = '● Fair credit';
+                band.style.color = '#ea580c';
+                el.style.borderColor = '#ea580c';
+                el.style.boxShadow   = '0 0 0 3px rgba(234,88,12,0.12)';
+            } else {
+                band.textContent = '● Poor credit';
+                band.style.color = '#dc2626';
+                el.style.borderColor = '#dc2626';
+                el.style.boxShadow   = '0 0 0 3px rgba(220,38,38,0.12)';
+            }
+        } else {
+            band.textContent = '';
+            err.style.display = 'none';
+            el.style.borderColor = '#f59e0b';
+            el.style.boxShadow   = '0 0 0 3px rgba(245,158,11,0.15)';
+        }
+    }
+
+    /* ── Submit with validation ── */
+    async function submitReportWithCibil() {
+        const cibilInput = document.getElementById('cibilInput');
+        const cibilError = document.getElementById('cibilError');
+        const raw        = (cibilInput.value || '').replace(/\D/g, '');
+        const score      = parseInt(raw, 10);
+
+        // Must be exactly 3 digits and 300-900
+        if (raw.length !== 3 || isNaN(score) || score < 300 || score > 900) {
+            cibilError.style.display  = 'block';
+            cibilInput.style.borderColor = '#dc2626';
+            cibilInput.style.boxShadow   = '0 0 0 3px rgba(220,38,38,0.15)';
+            cibilInput.focus();
+            return;
+        }
+        cibilError.style.display = 'none';
+
+        // Show spinner
+        document.getElementById('reportModalBody').innerHTML = `
+            <div class="report-loading">
+                <div class="spinner"></div>
+                <p style="font-size:0.83rem; margin-top:4px; color:var(--txt-3);">Generating AI financial report…</p>
+            </div>
+        `;
+
+        try {
+            const formData = new FormData();
+            formData.append('cibil_score', score);
+
+            const resp = await fetch(`/bank_view_user_report/${currentReportLoanId}/`, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': getCsrfToken(),
+                },
+                body: formData,
+            });
+
+            const data = await resp.json();
+
+            if (data.status === 'ok') {
+
+                // ── result variables ──
+                const isEligible   = data.loan_prediction === 'Eligible';
+                const eligColor    = isEligible ? '#16a34a' : '#dc2626';
+                const eligBg       = isEligible ? '#dcfce7' : '#fee2e2';
+                const eligBorder   = isEligible ? '#bbf7d0' : '#fecaca';
+                const eligIcon     = isEligible ? '✓' : '✕';
+
+                const cibilScore   = parseFloat(data.cibil_score);
+                const cibilColor   = cibilScore >= 750 ? '#16a34a' : cibilScore >= 650 ? '#d97706' : cibilScore >= 550 ? '#ea580c' : '#dc2626';
+                const cibilLabel   = cibilScore >= 750 ? 'Excellent' : cibilScore >= 650 ? 'Good' : cibilScore >= 550 ? 'Fair' : 'Poor';
+
+                // ★ FIX: use correct field names from Django view
+                const income       = parseFloat(data.monthly_income);
+                const expense      = parseFloat(data.monthly_expense);
+                const savings      = parseFloat(data.monthly_savings);
+                const loanAmt      = parseFloat(data.loan_amount);
+                const intRate      = parseFloat(data.interest_rate);
+                const duration     = parseFloat(data.duration);
+
+                const savingsColor = savings >= 0 ? '#16a34a' : '#dc2626';
+
+                document.getElementById('reportModalBody').innerHTML = `
+
+                    <!-- Eligibility Banner -->
+                    <div style="
+                        display:flex; align-items:center; justify-content:center; gap:12px;
+                        background:${eligBg}; border:1.5px solid ${eligBorder};
+                        border-radius:16px; padding:16px 20px; margin-bottom:22px;
+                    ">
+                        <div style="
+                            width:42px; height:42px; border-radius:12px; flex-shrink:0;
+                            background:${eligColor}; display:flex; align-items:center; justify-content:center;
+                            font-size:1.2rem; color:#fff; font-weight:900;
+                            box-shadow:0 4px 12px ${eligColor}55;
+                        ">${eligIcon}</div>
+                        <div>
+                            <div style="font-size:1rem; font-weight:800; color:${eligColor}; letter-spacing:-0.01em;">
+                                ${data.loan_prediction}
+                            </div>
+                            <div style="font-size:0.71rem; color:${eligColor}; opacity:0.7; margin-top:2px; font-weight:600;">
+                                ML Model Prediction
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Stats Grid — 6 tiles (3×2) -->
+                    <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; margin-bottom:22px;">
+
+                        <div style="background:var(--surface-2,#f9fafb); border:1px solid var(--border); border-radius:13px; padding:12px 14px;">
+                            <div style="font-size:0.62rem; color:var(--txt-3); font-weight:700; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:4px;">Income</div>
+                            <div style="font-size:0.95rem; font-weight:800; color:var(--txt-1); letter-spacing:-0.02em;">₹${income.toLocaleString('en-IN')}</div>
+                        </div>
+
+                        <div style="background:var(--surface-2,#f9fafb); border:1px solid var(--border); border-radius:13px; padding:12px 14px;">
+                            <div style="font-size:0.62rem; color:var(--txt-3); font-weight:700; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:4px;">Expense</div>
+                            <div style="font-size:0.95rem; font-weight:800; color:var(--txt-1); letter-spacing:-0.02em;">₹${expense.toLocaleString('en-IN')}</div>
+                        </div>
+
+                        <div style="background:var(--surface-2,#f9fafb); border:1px solid var(--border); border-radius:13px; padding:12px 14px;">
+                            <div style="font-size:0.62rem; color:var(--txt-3); font-weight:700; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:4px;">Savings</div>
+                            <div style="font-size:0.95rem; font-weight:800; color:${savingsColor}; letter-spacing:-0.02em;">₹${savings.toLocaleString('en-IN')}</div>
+                        </div>
+
+                        <div style="background:var(--surface-2,#f9fafb); border:1px solid var(--border); border-radius:13px; padding:12px 14px;">
+                            <div style="font-size:0.62rem; color:var(--txt-3); font-weight:700; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:4px;">Loan Amount</div>
+                            <div style="font-size:0.95rem; font-weight:800; color:var(--txt-1); letter-spacing:-0.02em;">₹${loanAmt.toLocaleString('en-IN')}</div>
+                        </div>
+
+                        <div style="background:var(--surface-2,#f9fafb); border:1px solid var(--border); border-radius:13px; padding:12px 14px;">
+                            <div style="font-size:0.62rem; color:var(--txt-3); font-weight:700; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:4px;">Interest</div>
+                            <div style="font-size:0.95rem; font-weight:800; color:var(--txt-1); letter-spacing:-0.02em;">${intRate}% / ${duration}mo</div>
+                        </div>
+
+                        <div style="background:var(--surface-2,#f9fafb); border:1px solid var(--border); border-radius:13px; padding:12px 14px;">
+                            <div style="font-size:0.62rem; color:var(--txt-3); font-weight:700; text-transform:uppercase; letter-spacing:0.05em; margin-bottom:4px;">CIBIL</div>
+                            <div style="font-size:0.95rem; font-weight:800; color:${cibilColor}; letter-spacing:-0.02em;">
+                                ${data.cibil_score}
+                                <span style="font-size:0.6rem; font-weight:700; margin-left:4px; opacity:0.85;">● ${cibilLabel}</span>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- AI Analysis -->
+                    <div style="border-top:1px solid var(--border); padding-top:18px;">
+                        <div style="
+                            font-size:0.71rem; font-weight:700; color:var(--txt-3);
+                            text-transform:uppercase; letter-spacing:0.06em;
+                            margin-bottom:12px; display:flex; align-items:center; gap:7px;
+                        ">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"/>
+                                <line x1="12" y1="8" x2="12" y2="12"/>
+                                <line x1="12" y1="16" x2="12.01" y2="16"/>
+                            </svg>
+                            AI Analysis
+                        </div>
+                        <div style="background:var(--surface-2,#f9fafb); border:1px solid var(--border); border-radius:13px; padding:16px 18px;">
+                            <pre style="
+                                white-space:pre-wrap; font-size:0.81rem; color:var(--txt-1);
+                                line-height:1.78; margin:0;
+                                font-family:'Plus Jakarta Sans',sans-serif;
+                            ">${escapeHtml(data.ai_report)}</pre>
+                        </div>
+                    </div>
+
+                    <!-- Re-run -->
+                    <div style="margin-top:18px; text-align:right;">
+                        <button
+                            onclick="openReportModal('${currentReportLoanId}','${currentReportName}')"
+                            style="
+                                padding:9px 18px; border-radius:10px;
+                                border:1px solid var(--border); background:var(--surface);
+                                color:var(--txt-2); font-family:'Plus Jakarta Sans',sans-serif;
+                                font-size:0.78rem; font-weight:600; cursor:pointer;
+                                transition:all 0.15s ease;
+                            "
+                            onmouseover="this.style.borderColor='var(--border-2)'"
+                            onmouseout="this.style.borderColor='var(--border)'"
+                        >↩ Run Again with Different Score</button>
+                    </div>
+                `;
+
+            } else {
+                document.getElementById('reportModalBody').innerHTML = `
+                    <div class="report-error">${escapeHtml(data.message || 'Could not generate report.')}</div>
+                    <div style="text-align:center; margin-top:16px;">
+                        <button onclick="openReportModal('${currentReportLoanId}','${currentReportName}')"
+                            style="padding:10px 22px; border-radius:11px; border:1px solid var(--border);
+                                   background:var(--surface); color:var(--txt-2);
+                                   font-family:'Plus Jakarta Sans',sans-serif;
+                                   font-size:0.8rem; font-weight:600; cursor:pointer;">
+                            ← Try Again
+                        </button>
+                    </div>`;
+            }
+
+        } catch (e) {
+            document.getElementById('reportModalBody').innerHTML = `
+                <div class="report-error">Network error — please try again.</div>
+                <div style="text-align:center; margin-top:16px;">
+                    <button onclick="openReportModal('${currentReportLoanId}','${currentReportName}')"
+                        style="padding:10px 22px; border-radius:11px; border:1px solid var(--border);
+                               background:var(--surface); color:var(--txt-2);
+                               font-family:'Plus Jakarta Sans',sans-serif;
+                               font-size:0.8rem; font-weight:600; cursor:pointer;">
+                        ← Try Again
+                    </button>
+                </div>`;
+        }
+    }
+
+    function closeReportModal(event) {
+        if (event && event.target !== event.currentTarget) return;
+        document.getElementById('reportModal').classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    function escapeHtml(str) {
+        return String(str)
+            .replace(/&/g, '&amp;')
+            .replace(/</g,  '&lt;')
+            .replace(/>/g,  '&gt;')
+            .replace(/"/g,  '&quot;');
+    }
+
+    document.addEventListener('keydown', e => {
+        if (e.key === 'Escape') { closeImgModal(); closeReportModal(); }
+    });
+</script>
+
+{% include 'bank_footer.html' %}

@@ -1,0 +1,19 @@
+<footer>
+        © <span id="yr"></span> <a href="#">Trustify</a> — Secured Banking Portal. All rights reserved.
+    </footer>
+</div>
+
+<script>
+   function toggleTheme() {
+    const html = document.documentElement;
+    html.setAttribute('data-theme', html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
+}
+function toggleSub(id, el) {
+    const sub = document.getElementById(id);
+    if (sub) sub.classList.toggle('open');
+    if (el)  el.classList.toggle('sub-open');
+}
+
+</script>
+</body>
+</html>
