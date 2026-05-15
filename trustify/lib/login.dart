@@ -192,48 +192,6 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       const SizedBox(height: 18),
 
-                      // ── Remember me ───────────────────────────
-                      Row(
-                        children: [
-                          GestureDetector(
-                            onTap: () {
-                              setState(() => _rememberMe = !_rememberMe);
-                            },
-                            child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 200),
-                              width: 22,
-                              height: 22,
-                              decoration: BoxDecoration(
-                                color: _rememberMe
-                                    ? const Color(0xFF0A0A0A)
-                                    : Colors.transparent,
-                                borderRadius: BorderRadius.circular(6),
-                                border: Border.all(
-                                  color: _rememberMe
-                                      ? const Color(0xFF0A0A0A)
-                                      : const Color(0xFFCCCCCC),
-                                  width: 1.5,
-                                ),
-                              ),
-                              child: _rememberMe
-                                  ? const Icon(Icons.check,
-                                  color: Colors.white, size: 14)
-                                  : null,
-                            ),
-                          ),
-                          const SizedBox(width: 10),
-                          const Text(
-                            'Remember me',
-                            style: TextStyle(
-                              color: Color(0xFF555555),
-                              fontSize: 13,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 28),
-
                       // ── Login button ──────────────────────────
                       SizedBox(
                         width: double.infinity,

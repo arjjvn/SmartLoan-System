@@ -426,7 +426,7 @@ class _RegistrationPageState extends State<RegistrationPage>
                           ),
                         ),
                         const SizedBox(height: 20),
-                        
+
 
                         // ── Register button ────────────────
                         SizedBox(

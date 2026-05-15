@@ -87,13 +87,6 @@ class _LoanRequestPageState extends State<LoanRequestPage> {
 
     setState(() => isFetching = false);
 
-    // Always open bottom sheet on first load (regardless of list content)
-    // if (!_hasShownInitialSheet) {
-    //   _hasShownInitialSheet = true;
-    //   WidgetsBinding.instance.addPostFrameCallback((_) {
-    //     _openRequestSheet();
-    //   });
-    // }
   }
 
   // ── PICK DOCUMENT ──────────────────────────────────────────
@@ -102,13 +95,6 @@ class _LoanRequestPageState extends State<LoanRequestPage> {
     if (result != null) {
       setState(() => documentFile = File(result.files.single.path!));
     }
-  }
-
-  // ── PICK IMAGE ─────────────────────────────────────────────
-  Future<void> pickImage() async {
-    final picker = ImagePicker();
-    XFile? file = await picker.pickImage(source: ImageSource.gallery);
-    if (file != null) setState(() => faceImage = File(file.path));
   }
 
   // ── TAKE PHOTO ─────────────────────────────────────────────
@@ -159,14 +145,6 @@ class _LoanRequestPageState extends State<LoanRequestPage> {
                 takePhoto();
               },
             ),
-            _PickerOption(
-              label: 'Choose from Gallery',
-              icon: Icons.photo_library_outlined,
-              onTap: () {
-                Navigator.pop(context);
-                pickImage();
-              },
-            ),
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 8, 16, 20),
               child: SizedBox(
@@ -208,7 +186,7 @@ class _LoanRequestPageState extends State<LoanRequestPage> {
     if (_amountError != null) return;
 
     if (documentFile == null) {
-      Fluttertoast.showToast(msg: "Please upload a document");
+      Fluttertoast.showToast(msg: "Please upload a your PAN card/ ");
       return;
     }
 
@@ -363,10 +341,10 @@ class _LoanRequestPageState extends State<LoanRequestPage> {
                       _buildUploadTile(
                         label: documentFile != null
                             ? documentFile!.path.split('/').last
-                            : 'Upload Document',
+                            : 'Upload PAN card',
                         subtitle: documentFile != null
                             ? 'Tap to change'
-                            : 'PDF, DOC, JPG up to 10MB',
+                            : 'PDF, JPG up to 10MB',
                         icon: Icons.upload_file_outlined,
                         isSelected: documentFile != null,
                         onTap: () async {
@@ -584,8 +562,8 @@ class _LoanRequestPageState extends State<LoanRequestPage> {
   // ── FACE IMAGE TILE ──────────────────────────────────────────
   Widget _buildFaceImageTile(StateSetter setSheetState) {
     return GestureDetector(
-      onTap: () {
-        _showImageSourcePicker();
+      onTap: () async {
+        await takePhoto();
         setSheetState(() {});
       },
       child: Container(
@@ -615,7 +593,7 @@ class _LoanRequestPageState extends State<LoanRequestPage> {
                 color: const Color(0xFFEEEEEE),
                 borderRadius: BorderRadius.circular(26),
               ),
-              child: const Icon(Icons.face_outlined,
+              child: const Icon(Icons.camera_alt_outlined,  // changed icon
                   color: Color(0xFF999999), size: 24),
             ),
             const SizedBox(width: 14),
@@ -625,9 +603,7 @@ class _LoanRequestPageState extends State<LoanRequestPage> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    faceImage != null
-                        ? 'Image Selected'
-                        : 'Upload Face Image',
+                    faceImage != null ? 'Photo Taken' : 'Take a Photo',  // updated label
                     style: TextStyle(
                       color: faceImage != null
                           ? const Color(0xFF0A0A0A)
@@ -639,8 +615,8 @@ class _LoanRequestPageState extends State<LoanRequestPage> {
                   const SizedBox(height: 3),
                   Text(
                     faceImage != null
-                        ? 'Tap to change'
-                        : 'Camera or Gallery — Clear face required',
+                        ? 'Tap to retake'           // updated hint
+                        : 'Camera only — Clear face required',  // updated hint
                     style: const TextStyle(
                         fontSize: 11.5, color: Color(0xFFBBBBBB)),
                   ),
