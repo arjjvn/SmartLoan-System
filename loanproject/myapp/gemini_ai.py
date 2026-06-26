@@ -6,8 +6,7 @@ import re
 # ==========================================================
 
 API_KEYS = [
-    "AIzaSyDQI-Lybbh4OJj7L_dBXG6FjzwmhWEHbSo",
-    "AIzaSyCTOSNfWEK9ZM0uafhPSMoXk3BiueWiC5c"
+    "API_KEY"
 ]
 
 current_key_index = 0
