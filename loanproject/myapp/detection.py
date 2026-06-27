@@ -43,7 +43,7 @@ print("Using Device:", device)
 # LOAD DEEPFAKE MODEL
 # ==========================================================
 
-MODEL_PATH = r"D:\project_trustify\loanproject\deepfake\deepfake_multiclass_best_15.pth"
+MODEL_PATH = r"D:\code\project_trustify\loanproject\deepfake\deepfake_multiclass_best_15.pth"
 
 model = models.efficientnet_b4()
 
@@ -105,20 +105,20 @@ except Exception as e:
 # SKETCH DETECTOR (LOCAL MODEL)
 # ==========================================================
 
-try:
-
-    sketch_detector = pipeline(
-        "image-classification",
-        model="Falconsai/sketch-detection"
-    )
-
-    print("✅ Sketch detector loaded")
-
-except Exception as e:
-
-    print("⚠️ Sketch detector failed:", e)
-
-    sketch_detector = None
+# try:
+#
+#     sketch_detector = pipeline(
+#         "image-classification",
+#         model="Falconsai/sketch-detection"
+#     )
+#
+#     print("✅ Sketch detector loaded")
+#
+# except Exception as e:
+#
+#     print("⚠️ Sketch detector failed:", e)
+#
+#     sketch_detector = None
 
 
 # ==========================================================
