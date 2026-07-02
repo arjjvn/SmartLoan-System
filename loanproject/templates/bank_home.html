@@ -1,122 +1,561 @@
 <!-- ══════════════ MAIN ══════════════ -->
 {% include 'bank_header.html' %}
 
-<header class="topbar">
-        <div>
-            <div class="page-title">DASHBOARD</div>
-        </div>
-        <div class="topbar-right">
+<!--<header class="topbar">-->
+<!--        <div>-->
+<!--            <div class="page-title">DASHBOARD</div>-->
+<!--        </div>-->
+<!--        <div class="topbar-right">-->
 
-            <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme" aria-label="Toggle theme">
-                <span class="theme-icon icon-moon"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg></span>
-                <span class="theme-icon icon-sun"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></span>
-            </button>
-        </div>
-    </header>
+<!--            <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme" aria-label="Toggle theme">-->
+<!--                <span class="theme-icon icon-moon"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg></span>-->
+<!--                <span class="theme-icon icon-sun"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></span>-->
+<!--            </button>-->
+<!--        </div>-->
+<!--    </header>-->
 
-    <div class="page">
+<!--    <div class="page">-->
 
-        <!-- STAT CARDS -->
-        <div class="stats">
-            <div class="stat stat-featured">
-                <div class="s-head">
-                    <div class="s-icon ic-white"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="9" width="18" height="12" rx="2"/><path d="M3 9l9-6 9 6"/></svg></div>
-                </div>
-                <div class="s-value">{{ total_loan_types }}</div>
-                <div class="s-label"> Loan Types</div>
-                <div class="s-change">All currently available</div>
-            </div>
-            <div class="stat stat-green">
-                <div class="s-head">
-                    <div class="s-icon ic-green"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>
-                </div>
-                <div class="s-value">{{ total_replied_complaints }}</div>
-                <div class="s-label">Resolved Complaints</div>
-            </div>
+<!--        &lt;!&ndash; STAT CARDS &ndash;&gt;-->
+<!--        <div class="stats">-->
+<!--            <div class="stat stat-featured">-->
+<!--                <div class="s-head">-->
+<!--                    <div class="s-icon ic-white"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="9" width="18" height="12" rx="2"/><path d="M3 9l9-6 9 6"/></svg></div>-->
+<!--                </div>-->
+<!--                <div class="s-value">{{ total_loan_types }}</div>-->
+<!--                <div class="s-label"> Loan Types</div>-->
+<!--                <div class="s-change">All currently available</div>-->
+<!--            </div>-->
+<!--            <div class="stat stat-green">-->
+<!--                <div class="s-head">-->
+<!--                    <div class="s-icon ic-green"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></div>-->
+<!--                </div>-->
+<!--                <div class="s-value">{{ total_replied_complaints }}</div>-->
+<!--                <div class="s-label">Resolved Complaints</div>-->
+<!--            </div>-->
 
-        </div>
+<!--        </div>-->
 
-        <div class="grid-main">
-            <div class="col-flex">
+<!--        <div class="grid-main">-->
+<!--            <div class="col-flex">-->
 
-                <!-- LOAN TYPES -->
-                <div class="card">
-                    <div class="card-head">
-                        <div class="card-title">Loan Types</div>
-                        <span class="badge b-blue">{{ total_loan_types }}</span>
+<!--                &lt;!&ndash; LOAN TYPES &ndash;&gt;-->
+<!--                <div class="card">-->
+<!--                    <div class="card-head">-->
+<!--                        <div class="card-title">Loan Types</div>-->
+<!--                        <span class="badge b-blue">{{ total_loan_types }}</span>-->
+<!--                    </div>-->
+<!--                    <div class="card-body" style="padding:10px 20px 18px">-->
+<!--                        {% for loan in loan_types %}-->
+
+<!--                        <div class="lt-item">-->
+<!--                            <div style="flex:1"><div class="lt-name">{{ loan.loan_type_name }}</div><div class="lt-meta">Up to {{ loan.duration }} yrs · {{ loan.interest_rate }}% p.a.</div><div class="lt-desc">{{ loan.details }}</div></div>-->
+<!--                        </div>-->
+<!--                        {% empty %}-->
+<!--                    <p style="margin: 0; color: var(&#45;&#45;text-muted);">No loan types available.</p>-->
+<!--                    {% endfor %}-->
+<!--                    </div>-->
+<!--                </div>-->
+
+<!--                &lt;!&ndash; COMPLAINTS &ndash;&gt;-->
+<!--                <div class="card">-->
+<!--                    <div class="card-head">-->
+<!--                        <div class="card-title">Complaints</div>-->
+<!--                    </div>-->
+<!--                    <div class="tbl-wrap">-->
+<!--                        <table>-->
+<!--                            <thead><tr><th>Ref</th><th>User</th><th>Complaint</th><th>Reply</th><th>Replied Date</th><th>Status</th></tr></thead>-->
+<!--                            <tbody>-->
+<!--                            {% for complaint in not_seen_complaints %}-->
+<!--                                <tr>-->
+<!--                                    <td style="font-size:0.72rem;font-weight:700;color:var(&#45;&#45;txt-3)">{{ complaint.id|stringformat:"03d" }}</td>-->
+<!--                                    <td style="font-weight:600">{{ complaint.user }}</td>-->
+<!--                                    <td style="font-weight:600;max-width:240px;white-space:normal;line-height:1.5">{{ complaint.message }}</td>-->
+<!--                                    <td style="color:var(&#45;&#45;txt-2);font-size:0.78rem;max-width:240px;white-space:normal;line-height:1.5">{{ complaint.reply }}</td>-->
+<!--                                    <td style="color:var(&#45;&#45;txt-3);font-size:0.75rem">{{ complaint.replied_date }}</td>-->
+<!--                                    <td style="color:var(&#45;&#45;txt-3);font-size:0.75rem">{{ complaint.status }}</td>-->
+<!--                                </tr>-->
+<!--                            {% empty %}-->
+<!--                            <tr>-->
+<!--                                <td colspan="4" style="text-align: center;">No open complaints.</td>-->
+<!--                            </tr>-->
+<!--                            {% endfor %}-->
+<!--                            </tbody>-->
+<!--                        </table>-->
+<!--                    </div>-->
+<!--                    <div class="tbl-foot">-->
+<!--                    </div>-->
+<!--                </div>-->
+
+<!--            </div>-->
+
+
+<!--            &lt;!&ndash; RIGHT COLUMN: Recently Added Loan Types &ndash;&gt;-->
+<!--        <div class="col-flex">-->
+<!--            <div class="card">-->
+<!--                <div class="card-head">-->
+<!--                    <div class="card-title">Recently Added Loan Types</div>-->
+<!--                    <a class="card-link" href="/bank_loan_types">View all →</a>-->
+<!--                </div>-->
+<!--                <div class="card-body" style="padding: 4px 20px 16px;">-->
+<!--                    {% for i in loan_types %}-->
+<!--                    <div class="fb-item">-->
+<!--                        <div class="fb-top">-->
+<!--                            <div class="fb-name">{{ i.loan_type_name }}</div>-->
+<!--                            <div class="fb-date">{{ i.interest_rate }}% p.a.</div>-->
+<!--                        </div>-->
+<!--                        <div class="fb-loan">{{ i.duration }} Months</div>-->
+<!--                        <div class="fb-q">{{ i.details }}</div>-->
+<!--                    </div>-->
+<!--                    {% empty %}-->
+<!--                    <p style="margin: 0; color: var(&#45;&#45;text-muted);">No loans available yet.</p>-->
+<!--                    {% endfor %}-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--        </div>-->
+<!--    </div>-->
+
+
+
+
+            <!-- ══════════════ VIEW 1: DASHBOARD (bank_home) ══════════════ -->
+            <div id="view-bank_home" class="view-panel space-y-6">
+
+                <!-- Welcome Banner (Sleek dark widget styled exactly after the header of "wp-adminify-for-wordpress-dashboard.png") -->
+                <div id="welcome-banner" class="bg-[#111115] text-white rounded-lg p-8 relative overflow-hidden transition-all duration-300">
+                    <button onclick="dismissWelcome()" class="absolute top-4 right-4 text-xs font-semibold text-slate-400 hover:text-white flex items-center gap-1.5 transition-colors">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M6 18L18 6M6 6l12 12"/></svg>
+                        Dismiss
+                    </button>
+
+                    <div class="relative z-10 max-w-2xl space-y-2">
+                        <h2 class="text-3xl font-extrabold tracking-tight">Welcome to Trustify!</h2>
+                        <p class="text-slate-400 text-sm leading-relaxed">Learn more about our robust customized premier financial products and administrative options. Access underwriter loan approvals instantly with built-in simulations.</p>
                     </div>
-                    <div class="card-body" style="padding:10px 20px 18px">
-                        {% for loan in loan_types %}
 
-                        <div class="lt-item">
-                            <div style="flex:1"><div class="lt-name">{{ loan.loan_type_name }}</div><div class="lt-meta">Up to {{ loan.duration }} yrs · {{ loan.interest_rate }}% p.a.</div><div class="lt-desc">{{ loan.details }}</div></div>
+                    <!-- WP Adminify layout blocks beneath the header card -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-8 mt-8 border-t border-slate-800">
+                        <!-- Card Col 1 -->
+                        <div class="flex gap-4">
+                            <div class="w-10 h-10 rounded bg-zinc-800/80 flex items-center justify-center text-white shrink-0 shadow-inner">
+                                <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" /></svg>
+                            </div>
+                            <div class="space-y-1">
+                                <h4 class="font-bold text-sm text-slate-100">Explore loan products</h4>
+                                <p class="text-xs text-slate-400 leading-normal">Browse through auto mobility, premier mortgages, or elite education lines.</p>
+                                <button onclick="switchView('bank_loan_types')" class="text-xs text-indigo-400 hover:underline inline-block font-medium">Add a request →</button>
+                            </div>
                         </div>
-                        {% empty %}
-                    <p style="margin: 0; color: var(--text-muted);">No loan types available.</p>
-                    {% endfor %}
-                    </div>
-                </div>
 
-                <!-- COMPLAINTS -->
-                <div class="card">
-                    <div class="card-head">
-                        <div class="card-title">Complaints</div>
-                    </div>
-                    <div class="tbl-wrap">
-                        <table>
-                            <thead><tr><th>Ref</th><th>User</th><th>Complaint</th><th>Reply</th><th>Replied Date</th><th>Status</th></tr></thead>
-                            <tbody>
-                            {% for complaint in not_seen_complaints %}
-                                <tr>
-                                    <td style="font-size:0.72rem;font-weight:700;color:var(--txt-3)">{{ complaint.id|stringformat:"03d" }}</td>
-                                    <td style="font-weight:600">{{ complaint.user }}</td>
-                                    <td style="font-weight:600;max-width:240px;white-space:normal;line-height:1.5">{{ complaint.message }}</td>
-                                    <td style="color:var(--txt-2);font-size:0.78rem;max-width:240px;white-space:normal;line-height:1.5">{{ complaint.reply }}</td>
-                                    <td style="color:var(--txt-3);font-size:0.75rem">{{ complaint.replied_date }}</td>
-                                    <td style="color:var(--txt-3);font-size:0.75rem">{{ complaint.status }}</td>
-                                </tr>
-                            {% empty %}
-                            <tr>
-                                <td colspan="4" style="text-align: center;">No open complaints.</td>
-                            </tr>
-                            {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                    <div class="tbl-foot">
-                    </div>
-                </div>
-
-            </div>
-
-
-            <!-- RIGHT COLUMN: Recently Added Loan Types -->
-        <div class="col-flex">
-            <div class="card">
-                <div class="card-head">
-                    <div class="card-title">Recently Added Loan Types</div>
-                    <a class="card-link" href="/bank_loan_types">View all →</a>
-                </div>
-                <div class="card-body" style="padding: 4px 20px 16px;">
-                    {% for i in loan_types %}
-                    <div class="fb-item">
-                        <div class="fb-top">
-                            <div class="fb-name">{{ i.loan_type_name }}</div>
-                            <div class="fb-date">{{ i.interest_rate }}% p.a.</div>
+                        <!-- Card Col 2 -->
+                        <div class="flex gap-4">
+                            <div class="w-10 h-10 rounded bg-zinc-800/80 flex items-center justify-center text-white shrink-0 shadow-inner">
+                                <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h7" /></svg>
+                            </div>
+                            <div class="space-y-1">
+                                <h4 class="font-bold text-sm text-slate-100">Custom dynamic calculations</h4>
+                                <p class="text-xs text-slate-400 leading-normal">Fine-tune principal amounts, rates, and amortization terms in real time.</p>
+                                <button onclick="switchView('user_loan_request')" class="text-xs text-indigo-400 hover:underline inline-block font-medium">Try dynamic tool →</button>
+                            </div>
                         </div>
-                        <div class="fb-loan">{{ i.duration }} Months</div>
-                        <div class="fb-q">{{ i.details }}</div>
+
+                        <!-- Card Col 3 -->
+                        <div class="flex gap-4">
+                            <div class="w-10 h-10 rounded bg-zinc-800/80 flex items-center justify-center text-white shrink-0 shadow-inner">
+                                <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m0-12.728l.707.707m11.314 11.314l.707.707M12 5a7 7 0 100 14 7 7 0 000-14z" /></svg>
+                            </div>
+                            <div class="space-y-1">
+                                <h4 class="font-bold text-sm text-slate-100">Help Desk Resolving</h4>
+                                <p class="text-xs text-slate-400 leading-normal">Submit support concerns or bugs to our underwriter automation bots.</p>
+                                <button onclick="switchView('sent_complaint')" class="text-xs text-indigo-400 hover:underline inline-block font-medium">Write ticket →</button>
+                            </div>
+                        </div>
                     </div>
-                    {% empty %}
-                    <p style="margin: 0; color: var(--text-muted);">No loans available yet.</p>
-                    {% endfor %}
+                </div>
+
+                <!-- STATS STATS GRID (Styled after wp-adminify simple boxes) -->
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="admin-card admin-border rounded p-5 shadow-sm md:col-span-3">
+        <div class="flex items-center justify-between mb-5">
+            <div>
+                <span class="text-xs text-slate-400 font-bold uppercase tracking-wider">
+                    Loan Solutions
+                </span>
+                <div class="text-3xl font-extrabold text-slate-800 dark:text-white mt-1">
+                    {{ total_loan_types }}
+                </div>
+                <span class="text-[11px] text-indigo-600 font-medium">
+                    All active products online
+                </span>
+            </div>
+
+            <div class="p-3 bg-indigo-50 dark:bg-slate-800 text-indigo-600 rounded">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M12 16V15"/>
+                </svg>
+            </div>
+        </div>
+
+        {% for loan in loan_types %}
+        <div class="border border-slate-200 dark:border-slate-700 rounded-lg p-4 mb-4 hover:shadow-md transition">
+            <div class="flex items-start justify-between">
+                <div class="flex-1">
+                    <h3 class="text-lg font-semibold text-slate-800 dark:text-white">
+                        {{ loan.loan_type_name }}
+                    </h3>
+
+                    <p class="text-sm text-slate-500 mt-1">
+                        Up to {{ loan.duration }} years • {{ loan.interest_rate }}% p.a.
+                    </p>
+
+                    <p class="text-sm text-slate-600 dark:text-slate-300 mt-3">
+                        {{ loan.details|default:"No description available." }}
+                    </p>
                 </div>
             </div>
         </div>
+        {% empty %}
+        <div class="border border-dashed border-slate-300 rounded-lg p-8 text-center">
+            <p class="text-slate-500">
+                No loan types available.
+            </p>
         </div>
+        {% endfor %}
     </div>
+</div>
+
+                    <div class="admin-card admin-border rounded p-5 flex items-center justify-between shadow-sm">
+                        <div>
+                            <span class="text-xs text-slate-400 font-bold uppercase tracking-wider">Resolved Tickets</span>
+                            <div class="text-3xl font-extrabold text-emerald-600 mt-1" id="stat-resolved-complaints">1</div>
+                            <span class="text-[11px] text-emerald-600 font-medium">Average reply delay < 1 min</span>
+                        </div>
+                        <div class="p-3 bg-emerald-50 dark:bg-slate-800 text-emerald-600 rounded">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        </div>
+                    </div>
+
+                    <div class="admin-card admin-border rounded p-5 flex items-center justify-between shadow-sm">
+                        <div>
+                            <span class="text-xs text-slate-400 font-bold uppercase tracking-wider">Pending Approvals</span>
+                            <div class="text-3xl font-extrabold text-amber-600 mt-1" id="stat-pending-loans">1</div>
+                            <span class="text-[11px] text-amber-600 font-medium">Simulated credit-verified status</span>
+                        </div>
+                        <div class="p-3 bg-amber-50 dark:bg-slate-800 text-amber-600 rounded">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- MAIN CARD AREA: WIDGET BLOCKS -->
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+                    <!-- Left: Featured Loan products list & active tickets tables (Just like Adminify widgets) -->
+                    <div class="lg:col-span-8 space-y-6">
+
+                        <!-- Widget: Loan Products -->
+                        <div class="admin-card admin-border rounded shadow-sm overflow-hidden">
+                            <div class="px-5 py-4 border-b border-gray-100 dark:border-slate-800 flex items-center justify-between bg-gray-50/50 dark:bg-slate-800/30">
+                                <div class="flex items-center gap-2">
+                                    <span class="cursor-move text-slate-300 hover:text-slate-500">
+                                        <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                                    </span>
+                                    <h3 class="font-bold text-sm text-slate-800 dark:text-white uppercase tracking-wider">Loan Products</h3>
+                                </div>
+                                <div class="flex items-center gap-1.5 text-slate-400 text-xs">
+                                    <button class="hover:text-slate-600 p-0.5" aria-label="Collapse"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" /></svg></button>
+                                    <button class="hover:text-slate-600 p-0.5" aria-label="Settings"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg></button>
+                                </div>
+                            </div>
+                            <div class="p-5 divide-y divide-gray-100 dark:divide-slate-800" id="dashboard-loan-list">
+                                <!-- Populated dynamically by script -->
+                            </div>
+                        </div>
+
+                        <!-- Widget: Complaints / Tickets -->
+                        <div class="admin-card admin-border rounded shadow-sm overflow-hidden">
+                            <div class="px-5 py-4 border-b border-gray-100 dark:border-slate-800 flex items-center justify-between bg-gray-50/50 dark:bg-slate-800/30">
+                                <div class="flex items-center gap-2">
+                                    <span class="cursor-move text-slate-300 hover:text-slate-500">
+                                        <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                                    </span>
+                                    <h3 class="font-bold text-sm text-slate-800 dark:text-white uppercase tracking-wider">Active Disputes Queue</h3>
+                                </div>
+                                <div class="flex items-center gap-1.5 text-slate-400 text-xs">
+                                    <button class="hover:text-slate-600 p-0.5" aria-label="Collapse"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" /></svg></button>
+                                    <button class="hover:text-slate-600 p-0.5" aria-label="Settings"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5" /></svg></button>
+                                </div>
+                            </div>
+                            <div class="overflow-x-auto">
+                                <table class="w-full text-left border-collapse text-xs">
+                                    <thead>
+                                        <tr class="bg-gray-50 dark:bg-slate-800/40 border-b border-gray-100 dark:border-slate-800 text-slate-500 font-bold uppercase">
+                                            <th class="px-5 py-3">ID</th>
+                                            <th class="px-5 py-3">Department</th>
+                                            <th class="px-5 py-3">Your Dispute Message</th>
+                                            <th class="px-5 py-3">Amelioration Status</th>
+                                            <th class="px-5 py-3 text-right">Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="dashboard-complaints-table" class="divide-y divide-gray-100 dark:divide-slate-800">
+                                        <!-- Populated dynamically by script -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <!-- Right sidebar widgets of bank_home: Quick draft equivalents -->
+                    <div class="lg:col-span-4 space-y-6">
+
+                        <!-- Styled after "Quick Draft" widget from "wp-adminify-for-wordpress-dashboard.png" -->
+                        <div class="admin-card admin-border rounded shadow-sm overflow-hidden">
+                            <div class="px-5 py-4 border-b border-gray-100 dark:border-slate-800 flex items-center justify-between bg-gray-50/50 dark:bg-slate-800/30">
+                                <div class="flex items-center gap-2">
+                                    <span class="cursor-move text-slate-300 hover:text-slate-500">
+                                        <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                                    </span>
+                                    <h3 class="font-bold text-sm text-slate-800 dark:text-white uppercase tracking-wider">Quick Estimator</h3>
+                                </div>
+                                <div class="flex items-center gap-1.5 text-slate-400 text-xs">
+                                    <button class="hover:text-slate-600 p-0.5" aria-label="Collapse"><svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M5 15l7-7 7 7" /></svg></button>
+                                </div>
+                            </div>
+                            <div class="p-5 space-y-4">
+                                <p class="text-xs text-slate-400">Estimate your dynamic financial loan repayments quickly prior to submission.</p>
+
+                                <div class="space-y-3">
+                                    <div>
+                                        <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1.5">Principal Balance ($)</label>
+                                        <input type="number" id="quick-draft-amt" value="35000" class="w-full text-xs px-3 py-2 border border-gray-200 dark:border-slate-700 bg-transparent rounded focus:outline-none focus:border-indigo-600 text-slate-800 dark:text-white" placeholder="35000">
+                                    </div>
+                                    <div>
+                                        <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1.5">Maturity duration (Months)</label>
+                                        <input type="number" id="quick-draft-months" value="36" class="w-full text-xs px-3 py-2 border border-gray-200 dark:border-slate-700 bg-transparent rounded focus:outline-none focus:border-indigo-600 text-slate-800 dark:text-white" placeholder="36">
+                                    </div>
+
+                                    <div class="pt-3 border-t border-gray-100 dark:border-slate-800 flex justify-between items-center text-xs">
+                                        <div>
+                                            <span class="text-[9px] uppercase font-bold text-slate-400 block">Est. Monthly Pay</span>
+                                            <span class="text-lg font-black text-indigo-600 dark:text-indigo-400" id="quick-calc-result">$1,061.34</span>
+                                        </div>
+                                        <button onclick="saveQuickDraftEstimate()" class="bg-[#4f46e5] hover:bg-indigo-700 text-white font-bold text-xs px-4 py-2 rounded transition-all shadow-sm">
+                                            Apply with terms
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Styled after "Site Health Status" widget from "wp-adminify-for-wordpress-dashboard.png" -->
+                        <div class="admin-card admin-border rounded shadow-sm overflow-hidden">
+                            <div class="px-5 py-4 border-b border-gray-100 dark:border-slate-800 flex items-center justify-between bg-gray-50/50 dark:bg-slate-800/30">
+                                <div class="flex items-center gap-2">
+                                    <span class="cursor-move text-slate-300 hover:text-slate-500">
+                                        <svg class="w-4.5 h-4.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"/></svg>
+                                    </span>
+                                    <h3 class="font-bold text-sm text-slate-800 dark:text-white uppercase tracking-wider">System Audit Status</h3>
+                                </div>
+                            </div>
+                            <div class="p-5 text-center space-y-3">
+                                <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-emerald-50 dark:bg-slate-800 text-emerald-600">
+                                    <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4" /></svg>
+                                </div>
+                                <h4 class="font-bold text-sm text-slate-800 dark:text-slate-100">Credit Score Verified</h4>
+                                <p class="text-xs text-slate-400 max-w-xs mx-auto leading-relaxed">External credit reporting systems and transaction paths are validated with zero warning flags.</p>
+                                <button onclick="showToast('System Check', 'All banking integrations and APIs are green!', 'success')" class="text-xs text-indigo-600 hover:underline inline-block font-semibold">Perform security checkup →</button>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
 
 
+            <!-- ══════════════ VIEW 2: LOAN TYPES CATALOG (bank_loan_types) ══════════════ -->
+            <div id="view-bank_loan_types" class="view-panel hidden space-y-6">
+                <div>
+                    <h3 class="text-xl font-bold text-slate-800 dark:text-white">Financial Products Catalog</h3>
+                    <p class="text-xs text-slate-400 mt-1">Select structured premier terms optimized for global or individual requests.</p>
+                </div>
 
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="loan-types-grid">
+                    <!-- Dynamic rendering via JS template structures -->
+                </div>
+            </div>
+
+
+            <!-- ══════════════ VIEW 3: LOAN REQUEST FORM & QUEUE (user_loan_request) ══════════════ -->
+            <div id="view-user_loan_request" class="view-panel hidden space-y-6">
+                <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+                    <!-- Left Column: Form to submit request -->
+                    <div class="lg:col-span-7 admin-card admin-border rounded p-6 shadow-sm space-y-6">
+                        <div>
+                            <h3 class="text-lg font-bold text-slate-800 dark:text-white">Apply for a Financial Line</h3>
+                            <p class="text-xs text-slate-400">Specify details carefully. Real-time validations inspect inputs.</p>
+                        </div>
+
+                        <form id="loan-request-form" onsubmit="handleLoanSubmit(event)" class="space-y-4">
+                            <div>
+                                <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1.5">Program Selected *</label>
+                                <select id="loan-form-type" class="w-full text-xs px-3 py-2.5 border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white rounded focus:outline-none focus:border-indigo-600" required>
+                                    <!-- Dynamic select options -->
+                                </select>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                <div>
+                                    <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1.5">Amortization Capital ($) *</label>
+                                    <input type="number" id="loan-form-amount" placeholder="e.g. 25000" class="w-full text-xs px-3 py-2.5 border border-gray-200 dark:border-slate-700 bg-transparent rounded focus:outline-none focus:border-indigo-600 text-slate-800 dark:text-white" required min="1000" max="500000">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1.5">Term Length (Months) *</label>
+                                    <input type="number" id="loan-form-term" placeholder="e.g. 24" class="w-full text-xs px-3 py-2.5 border border-gray-200 dark:border-slate-700 bg-transparent rounded focus:outline-none focus:border-indigo-600 text-slate-800 dark:text-white" required min="3" max="120">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1.5">Underwriting & Employment Details *</label>
+                                <textarea id="loan-form-details" rows="4" placeholder="Provide details about your income sources, business turnover or capital needs..." class="w-full text-xs px-3 py-2.5 border border-gray-200 dark:border-slate-700 bg-transparent rounded focus:outline-none focus:border-indigo-600 text-slate-800 dark:text-white" required minlength="15"></textarea>
+                                <span class="text-[10px] text-slate-400">At least 15 characters of explanatory data is required.</span>
+                            </div>
+
+                            <div class="flex items-start gap-2 pt-2">
+                                <input type="checkbox" id="loan-form-consent" class="mt-1 accent-indigo-600" required>
+                                <label for="loan-form-consent" class="text-xs text-slate-400 select-none">
+                                    I authorize Trustify Automated Underwriters to pull external credit checks.
+                                </label>
+                            </div>
+
+                            <button type="submit" class="w-full bg-[#4f46e5] hover:bg-indigo-700 text-white font-bold text-xs py-3 rounded transition-colors shadow-sm">
+                                Dispatch Financial Application
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- Right Column: Queue -->
+                    <div class="lg:col-span-5 space-y-6">
+                        <div class="admin-card admin-border rounded shadow-sm overflow-hidden">
+                            <div class="px-5 py-4 border-b border-gray-100 dark:border-slate-800 bg-gray-50/50 dark:bg-slate-800/30">
+                                <h3 class="font-bold text-sm text-slate-800 dark:text-white uppercase tracking-wider">Submitted Requests</h3>
+                            </div>
+                            <div class="p-5 space-y-4" id="user-loan-requests-list">
+                                <!-- Populated dynamically by script -->
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+
+            <!-- ══════════════ VIEW 4: COMPLAINTS (sent_complaint) ══════════════ -->
+            <div id="view-sent_complaint" class="view-panel hidden">
+                <div class="max-w-2xl mx-auto admin-card admin-border rounded p-6 shadow-sm space-y-6">
+                    <div>
+                        <h3 class="text-lg font-bold text-slate-800 dark:text-white">Submit Support Concerns</h3>
+                        <p class="text-xs text-slate-400">Your concerns route automatically to our customer support desk for resolution.</p>
+                    </div>
+
+                    <form id="complaint-form" onsubmit="handleComplaintSubmit(event)" class="space-y-4">
+                        <div>
+                            <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1.5">Problem Category *</label>
+                            <select id="complaint-category" class="w-full text-xs px-3 py-2.5 border border-gray-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-white rounded focus:outline-none focus:border-indigo-600" required>
+                                <option value="Transfer Error">Funds Wire / Transfer Failure</option>
+                                <option value="Card Blocking">Lost Credit Card / Block Request</option>
+                                <option value="Mobile App Issues">Core API Errors</option>
+                                <option value="Loan Terms Dispute">Amortization Schedule Discrepancies</option>
+                                <option value="Other">Other Operational Inquiries</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1.5">Elaborate Support Ticket Details *</label>
+                            <textarea id="complaint-message" rows="5" placeholder="Include amounts, approximate dates, transactional ids, and clear error logs..." class="w-full text-xs px-3 py-2.5 border border-gray-200 dark:border-slate-700 bg-transparent rounded focus:outline-none focus:border-indigo-600 text-slate-800 dark:text-white" required minlength="10"></textarea>
+                            <span class="text-[10px] text-slate-400 block mt-1">Include at least 10 characters to initialize support tracking.</span>
+                        </div>
+
+                        <button type="submit" class="w-full bg-[#4f46e5] hover:bg-indigo-700 text-white font-bold text-xs py-3 rounded transition-colors shadow-sm">
+                            Generate Support Ticket
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+
+            <!-- ══════════════ VIEW 5: REPLIES (view_reply) ══════════════ -->
+            <div id="view-view_reply" class="view-panel hidden space-y-6">
+                <div>
+                    <h3 class="text-xl font-bold text-slate-800 dark:text-white">Customer Support Replies Inbox</h3>
+                    <p class="text-xs text-slate-400">View replies and communication history relative to active audit tickets.</p>
+                </div>
+
+                <div class="space-y-4 animate-fade" id="view-replies-list">
+                    <!-- Populated dynamically by script -->
+                </div>
+            </div>
+
+
+            <!-- ══════════════ VIEW 6: FEEDBACK (send_feedback) ══════════════ -->
+            <div id="view-send_feedback" class="view-panel hidden">
+                <div class="max-w-xl mx-auto admin-card admin-border rounded p-6 shadow-sm space-y-6">
+                    <div class="text-center space-y-1">
+                        <h3 class="text-lg font-bold text-slate-800 dark:text-white">Global Portal Review</h3>
+                        <p class="text-xs text-slate-400">Provide direct feedback regarding layout, response latency, and accessibility.</p>
+                    </div>
+
+                    <form id="feedback-form" onsubmit="handleFeedbackSubmit(event)" class="space-y-4">
+                        <div class="flex flex-col items-center gap-2">
+                            <span class="text-[10px] uppercase font-bold text-slate-400">Select Rating Score</span>
+                            <div class="flex gap-1.5">
+                                <button type="button" onclick="setFeedbackRating(1)" class="star-btn text-amber-400 hover:scale-110 transition-transform" data-rating="1">
+                                    <svg class="w-8 h-8 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                </button>
+                                <button type="button" onclick="setFeedbackRating(2)" class="star-btn text-amber-400 hover:scale-110 transition-transform" data-rating="2">
+                                    <svg class="w-8 h-8 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                </button>
+                                <button type="button" onclick="setFeedbackRating(3)" class="star-btn text-amber-400 hover:scale-110 transition-transform" data-rating="3">
+                                    <svg class="w-8 h-8 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                </button>
+                                <button type="button" onclick="setFeedbackRating(4)" class="star-btn text-amber-400 hover:scale-110 transition-transform" data-rating="4">
+                                    <svg class="w-8 h-8 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                </button>
+                                <button type="button" onclick="setFeedbackRating(5)" class="star-btn text-amber-400 hover:scale-110 transition-transform" data-rating="5">
+                                    <svg class="w-8 h-8 fill-current" viewBox="0 0 20 20"><path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"/></svg>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1.5">Remarks / Comments *</label>
+                            <textarea id="feedback-message" rows="4" placeholder="How has our overall banking experience been for you?..." class="w-full text-xs px-3 py-2.5 border border-gray-200 dark:border-slate-700 bg-transparent rounded focus:outline-none focus:border-indigo-600 text-slate-800 dark:text-white" required minlength="10"></textarea>
+                            <span class="text-[10px] text-slate-400 block mt-1">Please include at least 10 characters descriptive comments.</span>
+                        </div>
+
+                        <button type="submit" class="w-full bg-[#4f46e5] hover:bg-indigo-700 text-white font-bold text-xs py-3 rounded transition-colors shadow-sm">
+                            Submit Survey Record
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- FOOTER BRAND TRADEMARK -->
+        <footer class="h-14 border-t border-gray-100 dark:border-slate-800 flex items-center justify-between px-8 text-[11px] text-slate-400 bg-white dark:bg-[#111827] mt-auto">
+            <div>&copy; 2026 Trustify Finance Inc. Powered by Adminify layout engines.</div>
+            <div class="flex gap-4">
+                <a href="#" onclick="showToast('Information', 'Privacy safeguards are active.')" class="hover:underline">Privacy Guidelines</a>
+                <a href="#" onclick="showToast('Information', 'Platform agreements apply.')" class="hover:underline">Legal Terms</a>
+            </div>
+        </footer>
+
+    </main>
 
 {% include 'bank_footer.html' %}

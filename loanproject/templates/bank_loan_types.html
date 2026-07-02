@@ -1,18 +1,24 @@
 
 {% include 'bank_header.html' %}
-
-<br>
 <style>
+/* Modal overlay + card — still used by the Edit / Delete confirmation modals */
+.reply-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.45);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.reply-overlay.on {
+    display: flex;
+}
+
 .reply-card {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--r-xl);
-    padding: 24px;
-    max-width: 600px;
-    width: 90%;
     max-height: 90vh;
     overflow-y: auto;
-    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
     animation: modalFadeIn 0.3s ease;
 }
 
@@ -26,204 +32,56 @@
         transform: translateY(0);
     }
 }
-.page { padding:28px 28px; flex:1; display:flex; flex-direction:column; gap:24px; }
 
-    /* ══════ CARD ══════ */
-    .card {
-      background:var(--surface); border:1px solid var(--border);
-      border-radius:var(--r-xl); overflow:hidden;
-      transition:background var(--transition), border-color var(--transition);
-      animation:fadeUp .4s ease both;
-    }
-    .card:nth-child(1) { animation-delay:.05s; }
-    .card:nth-child(2) { animation-delay:.12s; }
-    .card-head {
-      padding:20px 24px; border-bottom:1px solid var(--border);
-      display:flex; align-items:center; justify-content:space-between;
-    }
-    .card-title { font-size:.95rem; font-weight:700; color:var(--txt-1); letter-spacing:-.01em; }
-    .card-body  { padding:24px; }
-
-    /* ══════ FORM ══════ */
-    .form-grid { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
-    .form-full  { grid-column:1/-1; }
-    .field      { display:flex; flex-direction:column; gap:7px; }
-
-    .field label {
-      font-size:.75rem; font-weight:700; letter-spacing:.06em;
-      text-transform:uppercase; color:var(--txt-3);
-    }
-
-    .field input,
-    .field textarea {
-      background:var(--input-bg, var(--surface-2));
-      border:1.5px solid var(--border-2);
-      border-radius:var(--r-sm); padding:10px 14px;
-      font-family:'Plus Jakarta Sans', sans-serif;
-      font-size:.85rem; color:var(--txt-1);
-      outline:none; width:100%;
-      transition:border-color var(--transition), box-shadow var(--transition), background var(--transition);
-      resize:vertical;
-    }
-    .field input::placeholder,
-    .field textarea::placeholder { color:var(--txt-3); }
-
-    .field input:focus,
-    .field textarea:focus {
-      border-color:var(--blue-500);
-      box-shadow:0 0 0 3px var(--blue-050);
-    }
-
-    .field input:not(:placeholder-shown):valid,
-    .field textarea:not(:placeholder-shown):valid {
-      border-color:var(--green);
-    }
-
-    .field input:not(:placeholder-shown):invalid,
-    .field textarea:not(:placeholder-shown):invalid {
-      border-color:var(--red);
-      background:color-mix(in srgb, var(--surface-2) 96%, var(--red) 4%);
-    }
-
-    .field input:not(:placeholder-shown):invalid:focus,
-    .field textarea:not(:placeholder-shown):invalid:focus {
-      box-shadow:0 0 0 3px var(--red-dim);
-    }
-
-    .hint { font-size:.67rem; color:var(--txt-3); margin-top:-3px; }
-
-    .btn-submit {
-      display:inline-flex; align-items:center; gap:8px;
-      background:linear-gradient(135deg, var(--blue-600), var(--blue-500));
-      color:#fff; font-family:'Plus Jakarta Sans', sans-serif;
-      font-size:.85rem; font-weight:700;
-      padding:11px 32px; border-radius:10px; border:none;
-      cursor:pointer; letter-spacing:.01em;
-      box-shadow:0 4px 14px rgba(37,99,235,.35);
-      transition:all var(--transition);
-    }
-    .btn-submit:hover {
-      transform:translateY(-2px);
-      box-shadow:0 6px 22px rgba(37,99,235,.45);
-      background:linear-gradient(135deg, var(--blue-500), var(--blue-400));
-    }
-    .btn-submit:active { transform:translateY(0); }
-    .btn-submit svg { width:15px; height:15px; }
-    .form-actions { display:flex; justify-content:flex-end; margin-top:4px; }
-
-    /* ══════ TABLE ══════ */
-    .tbl-wrap { overflow-x:auto; }
-
-    table { width:100%; border-collapse:collapse; font-size:.83rem; }
-
-    thead th {
-      padding:12px 16px; text-align:left;
-      font-size:.67rem; font-weight:700;
-      letter-spacing:.08em; text-transform:uppercase;
-      color:var(--txt-3); background:var(--surface-2);
-      border-bottom:1px solid var(--border); white-space:nowrap;
-    }
-
-    /* Action columns centered */
-    thead th.th-action { text-align:center; width:48px; }
-
-    tbody td {
-      padding:13px 16px; border-bottom:1px solid var(--border);
-      color:var(--txt-1); vertical-align:middle;
-      transition:background var(--transition);
-    }
-    tbody tr:last-child td { border-bottom:none; }
-    tbody tr:hover td { background:var(--surface-2); }
-
-    /* Column-specific */
-    .td-counter { color:var(--txt-3); font-size:.78rem; width:36px; }
-    .td-name    { font-weight:600; white-space:nowrap; }
-    .td-rate    {
-      font-size:.82rem; font-weight:700; color:var(--blue-400);
-      font-variant-numeric:tabular-nums; white-space:nowrap;
-    }
-    .td-muted   { color:var(--txt-2); }
-    .td-details {
-      max-width:260px; white-space:normal;
-      font-size:.78rem; line-height:1.5; color:var(--txt-2);
-    }
-    .td-action  { text-align:center; width:48px; padding:10px 8px; }
-
-    /* ── Action buttons ── */
-    .act-btn {
-      width:32px; height:32px; border-radius:8px;
-      border:1px solid var(--border);
-      background:var(--surface-2);
-      display:inline-flex; align-items:center; justify-content:center;
-      cursor:pointer; color:var(--txt-3);
-      transition:all var(--transition);
-    }
-    .act-btn:hover            { border-color:var(--blue-500); color:var(--blue-400); background:var(--blue-050); }
-    .act-btn.del:hover        { border-color:var(--red);      color:var(--red);      background:var(--red-dim);  }
-    .act-btn svg              { width:13px; height:13px; pointer-events:none; }
-
-    /* ── Empty state ── */
-    .empty-state {
-      display:flex; flex-direction:column; align-items:center;
-      gap:12px; padding:52px 24px; color:var(--txt-3);
-    }
-    .empty-state svg { opacity:.25; }
-    .empty-state p   { font-size:.82rem; }
-
-    /* ── Table footer ── */
-    .tbl-foot {
-      padding:13px 22px; border-top:1px solid var(--border);
-      display:flex; align-items:center; justify-content:space-between;
-    }
-    .reply-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,.4);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
+/* Native HTML5 validation feedback (no JS) — scoped to this page's form fields */
+#id_loan_type_name:not(:placeholder-shown):valid,
+#id_interest:not(:placeholder-shown):valid,
+#id_duration:not(:placeholder-shown):valid,
+#id_details:not(:placeholder-shown):valid,
+#edit_loan_type_name:not(:placeholder-shown):valid,
+#edit_interest:not(:placeholder-shown):valid,
+#edit_duration:not(:placeholder-shown):valid,
+#edit_details:not(:placeholder-shown):valid {
+    border-color: #059669 !important; /* emerald-600 */
 }
 
-.reply-overlay.on {
-    display: flex;
+#id_loan_type_name:not(:placeholder-shown):invalid,
+#id_interest:not(:placeholder-shown):invalid,
+#id_duration:not(:placeholder-shown):invalid,
+#id_details:not(:placeholder-shown):invalid,
+#edit_loan_type_name:not(:placeholder-shown):invalid,
+#edit_interest:not(:placeholder-shown):invalid,
+#edit_duration:not(:placeholder-shown):invalid,
+#edit_details:not(:placeholder-shown):invalid {
+    border-color: #dc2626 !important; /* red-600 */
 }
 
+#id_loan_type_name:not(:placeholder-shown):invalid:focus,
+#id_interest:not(:placeholder-shown):invalid:focus,
+#id_duration:not(:placeholder-shown):invalid:focus,
+#id_details:not(:placeholder-shown):invalid:focus,
+#edit_loan_type_name:not(:placeholder-shown):invalid:focus,
+#edit_interest:not(:placeholder-shown):invalid:focus,
+#edit_duration:not(:placeholder-shown):invalid:focus,
+#edit_details:not(:placeholder-shown):invalid:focus {
+    box-shadow: 0 0 0 3px rgba(220, 38, 38, .15);
+}
 </style>
-
-<!-- TOPBAR -->
-<header class="topbar">
-  <div>
-    <div class="page-title">Manage Loan Types</div>
-    <div class="page-subtitle">Add, view and manage all loan product categories</div>
-  </div>
-  <div class="topbar-right">
-    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle theme" aria-label="Toggle theme">
-      <span class="theme-icon icon-moon">
-        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
-      </span>
-      <span class="theme-icon icon-sun">
-        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-      </span>
-    </button>
-  </div>
-</header>
-
-<div class="page">
+<div class="p-6 lg:p-8 space-y-6">
 
   <!-- ══ ADD FORM CARD ══ -->
-  <div class="card">
-    <div class="card-head">
-      <div class="card-title">Add New Loan Type</div>
+  <div class="admin-card admin-border rounded shadow-sm overflow-hidden">
+    <div class="px-5 py-4 border-b border-gray-100 dark:border-slate-800 bg-gray-50/50 dark:bg-slate-800/30">
+      <div class="font-bold text-sm text-slate-800 dark:text-white uppercase tracking-wider">Add New Loan Type</div>
     </div>
-    <div class="card-body">
-      <form method="post" novalidate>
+    <div class="p-5">
+      <form method="post">
         {% csrf_token %}
-        <div class="form-grid">
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
 
           <!-- Loan Type Name — full width -->
-          <div class="field form-full">
-            <label for="id_loan_type_name">Loan Type Name</label>
+          <div class="sm:col-span-2">
+            <label for="id_loan_type_name" class="block text-[10px] uppercase font-bold text-slate-400 mb-1.5">Loan Type Name</label>
             <input
               type="text"
               id="id_loan_type_name"
@@ -233,13 +91,14 @@
               minlength="3"
               maxlength="100"
               autocomplete="off"
+              class="w-full text-xs px-3 py-2.5 border border-gray-200 dark:border-slate-700 bg-transparent rounded focus:outline-none focus:border-indigo-600 text-slate-800 dark:text-white"
             >
-            <span class="hint">Required · Min 3 characters</span>
+            <span class="text-[10px] text-slate-400 block mt-1">Required · Min 3 characters</span>
           </div>
 
           <!-- Interest Rate — left col -->
-          <div class="field">
-            <label for="id_interest">Interest Rate</label>
+          <div>
+            <label for="id_interest" class="block text-[10px] uppercase font-bold text-slate-400 mb-1.5">Interest Rate</label>
             <input
               type="text"
               id="id_interest"
@@ -248,13 +107,14 @@
               required
               pattern="^\d+(\.\d{1,2})?%?$"
               title="Enter a valid rate, e.g. 7.5 or 7.5%"
+              class="w-full text-xs px-3 py-2.5 border border-gray-200 dark:border-slate-700 bg-transparent rounded focus:outline-none focus:border-indigo-600 text-slate-800 dark:text-white"
             >
-            <span class="hint">Required · Format: 7.5 or 7.5%</span>
+            <span class="text-[10px] text-slate-400 block mt-1">Required · Format: 7.5 or 7.5%</span>
           </div>
 
           <!-- Duration — right col -->
-          <div class="field">
-            <label for="id_duration">Duration</label>
+          <div>
+            <label for="id_duration" class="block text-[10px] uppercase font-bold text-slate-400 mb-1.5">Duration</label>
             <input
               type="text"
               id="id_duration"
@@ -263,13 +123,14 @@
               required
               minlength="2"
               maxlength="50"
+              class="w-full text-xs px-3 py-2.5 border border-gray-200 dark:border-slate-700 bg-transparent rounded focus:outline-none focus:border-indigo-600 text-slate-800 dark:text-white"
             >
-            <span class="hint">Required · e.g. 10 Years or 120 Months</span>
+            <span class="text-[10px] text-slate-400 block mt-1">Required · e.g. 10 Years or 120 Months</span>
           </div>
 
           <!-- Details — full width -->
-          <div class="field form-full">
-            <label for="id_details">Details</label>
+          <div class="sm:col-span-2">
+            <label for="id_details" class="block text-[10px] uppercase font-bold text-slate-400 mb-1.5">Details</label>
             <textarea
               id="id_details"
               name="details"
@@ -278,15 +139,16 @@
               required
               minlength="10"
               maxlength="500"
+              class="w-full text-xs px-3 py-2.5 border border-gray-200 dark:border-slate-700 bg-transparent rounded focus:outline-none focus:border-indigo-600 text-slate-800 dark:text-white"
             ></textarea>
-            <span class="hint">Required · Min 10 characters</span>
+            <span class="text-[10px] text-slate-400 block mt-1">Required · Min 10 characters</span>
           </div>
 
         </div><!-- /.form-grid -->
 
-        <div class="form-actions">
-          <button type="submit" class="btn-submit">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        <div class="flex gap-3 pt-4">
+          <button type="submit" class="bg-[#4f46e5] hover:bg-indigo-700 text-white font-bold text-xs px-5 py-2.5 rounded flex items-center gap-2 transition-colors shadow-sm">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
             Register
           </button>
         </div>
@@ -295,102 +157,65 @@
   </div><!-- /.card (form) -->
 
   <!-- ══ TABLE CARD ══ -->
-  <div class="card">
-    <div class="card-head">
-      <div class="card-title">Loan Type List</div>
+  <div class="admin-card admin-border rounded shadow-sm overflow-hidden">
+    <div class="px-5 py-4 border-b border-gray-100 dark:border-slate-800 bg-gray-50/50 dark:bg-slate-800/30 flex items-center justify-between">
+      <div class="font-bold text-sm text-slate-800 dark:text-white uppercase tracking-wider">Loan Type List</div>
       {% if L %}
-      <span style="font-size:.73rem;color:var(--txt-3);">{{ L|length }} loan type{{ L|length|pluralize }}</span>
+      <span class="text-[11px] text-slate-400">{{ L|length }} loan type{{ L|length|pluralize }}</span>
       {% endif %}
     </div>
 
-    <div class="tbl-wrap">
-      <table>
+    <div class="overflow-x-auto">
+      <table class="w-full text-left border-collapse text-xs">
         <thead>
-          <tr>
-            <th style="width:40px">#</th>
-            <th>Loan Type</th>
-            <th style="width:130px">Interest Rate</th>
-            <th style="width:140px">Duration</th>
-            <th>Details</th>
-            <th class="th-action">Edit</th>
-            <th class="th-action">Delete</th>
+          <tr class="bg-gray-50 dark:bg-slate-800/40 border-b border-gray-100 dark:border-slate-800 text-slate-500 font-bold uppercase">
+            <th class="px-5 py-3 w-10">#</th>
+            <th class="px-5 py-3">Loan Type</th>
+            <th class="px-5 py-3 w-32">Interest Rate</th>
+            <th class="px-5 py-3 w-36">Duration</th>
+            <th class="px-5 py-3">Details</th>
+            <th class="px-5 py-3 text-right">Edit</th>
+            <th class="px-5 py-3 text-right">Delete</th>
           </tr>
         </thead>
-        <tbody>
+        <tbody class="divide-y divide-gray-100 dark:divide-slate-800">
           {% for i in L %}
-          <tr>
-            <td class="td-counter">{{ forloop.counter }}</td>
-            <td class="td-name">{{ i.loan_type_name }}</td>
-            <td class="td-rate">{{ i.interest_rate }}</td>
-            <td class="td-muted">{{ i.duration }}</td>
-            <td class="td-details">{{ i.details }}</td>
-            <td class="td-action">
-              <button class="act-btn" title="Edit" onclick="openEditmodal('{{ i.id }}','{{ i.loan_type_name|escapejs }}',
+          <tr class="hover:bg-gray-50/50 dark:hover:bg-slate-800/20 transition">
+            <td class="px-5 py-3 text-slate-400">{{ forloop.counter }}</td>
+            <td class="px-5 py-3 font-semibold text-slate-800 dark:text-white">{{ i.loan_type_name }}</td>
+            <td class="px-5 py-3 text-indigo-600 font-semibold">{{ i.interest_rate }}</td>
+            <td class="px-5 py-3 text-slate-500">{{ i.duration }}</td>
+            <td class="px-5 py-3 text-slate-500">{{ i.details }}</td>
+            <td class="px-5 py-3 text-right">
+              <button class="text-slate-400 hover:text-indigo-600 p-1.5 rounded border border-gray-200 dark:border-slate-700 transition-colors" title="Edit" onclick="openEditmodal('{{ i.id }}','{{ i.loan_type_name|escapejs }}',
             '{{ i.interest_rate|escapejs }}',
             '{{ i.duration|escapejs }}',
             '{{ i.details|escapejs }}')">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
               </button>
             </td>
-            <td class="td-action">
-              <button class="act-btn del delete-btn" title="Delete" onclick="openDeleteModal('{{ i.id }}')">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+            <td class="px-5 py-3 text-right">
+              <button class="text-slate-400 hover:text-red-600 hover:border-red-200 p-1.5 rounded border border-gray-200 dark:border-slate-700 transition-colors delete-btn" title="Delete" onclick="openDeleteModal('{{ i.id }}')">
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
               </button>
             </td>
           </tr>
           {% empty %}
           <tr>
-            <td colspan="7" style="padding:0;border:none;">
-              <div class="empty-state">
-                <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
-                <p>No loan types added yet. Use the form above to create one.</p>
+            <td colspan="7" class="p-0 border-none">
+              <div class="flex flex-col items-center justify-center gap-3 py-12 text-slate-400">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
+                <p class="text-xs">No loan types added yet. Use the form above to create one.</p>
               </div>
             </td>
           </tr>
-
- {% endfor %}
+          {% endfor %}
         </tbody>
       </table>
-
-</table>
-
-<!-- Delete Confirmation Modal -->
-<div class="reply-overlay" id="delete-modal">
-    <div class="reply-card">
-
-        <h3 style="margin-bottom:15px;">Delete Loan Type</h3>
-
-        <p style="margin-bottom:20px;color:var(--txt-2);">
-            Are you sure you want to delete this loan type?
-        </p>
-
-        <form id="delete-form" method="post">
-            {% csrf_token %}
-
-            <div class="form-actions">
-
-                <button type="submit" class="btn-submit" style="background:red;">
-                    Delete
-                </button>
-
-                <button type="button"
-                        class="act-btn"
-                        onclick="closeDeleteModal()"
-                        style="width:auto;padding:10px 18px;">
-                    Cancel
-                </button>
-
-            </div>
-
-        </form>
-
-    </div>
-</div>
-
     </div>
 
-    <div class="tbl-foot">
-      <span style="font-size:.73rem;color:var(--txt-3);">
+    <div class="px-5 py-3 border-t border-gray-100 dark:border-slate-800">
+      <span class="text-[11px] text-slate-400">
         {% if L %}Showing {{ L|length }} loan type{{ L|length|pluralize }}{% endif %}
       </span>
     </div>
@@ -398,88 +223,111 @@
 
 </div><!-- /.page -->
 
+<!-- Delete Confirmation Modal -->
+<div class="reply-overlay" id="delete-modal">
+  <div class="reply-card bg-white dark:bg-[#111827] rounded-lg shadow-lg p-6 w-full max-w-md">
+    <h3 class="text-lg font-bold text-slate-800 dark:text-white mb-3">Delete Loan Type</h3>
+    <p class="text-xs text-slate-400 mb-5">Are you sure you want to delete this loan type?</p>
 
-
-    <div class="reply-overlay" id="edit">
-    <div class="reply-card">
-        <form id="editform" method="post" novalidate>
-            {% csrf_token %}
-            <div class="form-grid">
-                <!-- Loan Type Name — full width -->
-                <div class="field form-full">
-                    <label for="edit_loan_type_name">Loan Type Name</label>
-                    <input
-                        type="text"
-                        id="edit_loan_type_name"
-                        name="loan_type_name"
-                        placeholder="e.g. Home Loan"
-                        required
-                        minlength="3"
-                        maxlength="100"
-                        autocomplete="off"
-                    >
-                    <span class="hint">Required · Min 3 characters</span>
-                </div>
-
-                <!-- Interest Rate — left col -->
-                <div class="field">
-                    <label for="edit_interest">Interest Rate</label>
-                    <input
-                        type="text"
-                        id="edit_interest"
-                        name="interest"
-                        placeholder="e.g. 7.5%"
-                        required
-                        pattern="^\d+(\.\d{1,2})?%?$"
-                        title="Enter a valid rate, e.g. 7.5 or 7.5%"
-                    >
-                    <span class="hint">Required · Format: 7.5 or 7.5%</span>
-                </div>
-
-                <!-- Duration — right col -->
-                <div class="field">
-                    <label for="edit_duration">Duration</label>
-                    <input
-                        type="text"
-                        id="edit_duration"
-                        name="duration"
-                        placeholder="e.g. 10 Years"
-                        required
-                        minlength="2"
-                        maxlength="50"
-                    >
-                    <span class="hint">Required · e.g. 10 Years or 120 Months</span>
-                </div>
-
-                <!-- Details — full width -->
-                <div class="field form-full">
-                    <label for="edit_details">Details</label>
-                    <textarea
-                        id="edit_details"
-                        name="details"
-                        rows="3"
-                        placeholder="Brief description of the loan product…"
-                        required
-                        minlength="10"
-                        maxlength="500"
-                    ></textarea>
-                    <span class="hint">Required · Min 10 characters</span>
-                </div>
-            </div>
-
-            <div class="form-actions">
-                <button type="submit" class="btn-submit">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-                    Edit
-                </button>
-                <button type="button" class="act-btn" onclick="closeEditmodal()" style="width:auto;padding:10px 18px;">
-                    Cancel
-                </button>
-            </div>
-        </form>
-    </div>
+    <form id="delete-form" method="post">
+      {% csrf_token %}
+      <div class="flex gap-3">
+        <button type="submit" class="bg-red-600 hover:bg-red-700 text-white font-bold text-xs px-5 py-2.5 rounded transition-colors shadow-sm">
+          Delete
+        </button>
+        <button type="button" class="text-slate-500 hover:text-slate-700 dark:hover:text-white font-bold text-xs px-5 py-2.5 rounded border border-gray-200 dark:border-slate-700 transition-colors" onclick="closeDeleteModal()">
+          Cancel
+        </button>
+      </div>
+    </form>
+  </div>
 </div>
 
+<!-- Edit Modal -->
+<div class="reply-overlay" id="edit">
+  <div class="reply-card bg-white dark:bg-[#111827] rounded-lg shadow-lg p-6 w-full max-w-lg">
+    <h3 class="text-lg font-bold text-slate-800 dark:text-white mb-4">Edit Loan Type</h3>
+    <form id="editform" method="post">
+      {% csrf_token %}
+      <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <!-- Loan Type Name — full width -->
+        <div class="sm:col-span-2">
+          <label for="edit_loan_type_name" class="block text-[10px] uppercase font-bold text-slate-400 mb-1.5">Loan Type Name</label>
+          <input
+            type="text"
+            id="edit_loan_type_name"
+            name="loan_type_name"
+            placeholder="e.g. Home Loan"
+            required
+            minlength="3"
+            maxlength="100"
+            autocomplete="off"
+            class="w-full text-xs px-3 py-2.5 border border-gray-200 dark:border-slate-700 bg-transparent rounded focus:outline-none focus:border-indigo-600 text-slate-800 dark:text-white"
+          >
+          <span class="text-[10px] text-slate-400 block mt-1">Required · Min 3 characters</span>
+        </div>
+
+        <!-- Interest Rate — left col -->
+        <div>
+          <label for="edit_interest" class="block text-[10px] uppercase font-bold text-slate-400 mb-1.5">Interest Rate</label>
+          <input
+            type="text"
+            id="edit_interest"
+            name="interest"
+            placeholder="e.g. 7.5%"
+            required
+            pattern="^\d+(\.\d{1,2})?%?$"
+            title="Enter a valid rate, e.g. 7.5 or 7.5%"
+            class="w-full text-xs px-3 py-2.5 border border-gray-200 dark:border-slate-700 bg-transparent rounded focus:outline-none focus:border-indigo-600 text-slate-800 dark:text-white"
+          >
+          <span class="text-[10px] text-slate-400 block mt-1">Required · Format: 7.5 or 7.5%</span>
+        </div>
+
+        <!-- Duration — right col -->
+        <div>
+          <label for="edit_duration" class="block text-[10px] uppercase font-bold text-slate-400 mb-1.5">Duration</label>
+          <input
+            type="text"
+            id="edit_duration"
+            name="duration"
+            placeholder="e.g. 10 Years"
+            required
+            minlength="2"
+            maxlength="50"
+            class="w-full text-xs px-3 py-2.5 border border-gray-200 dark:border-slate-700 bg-transparent rounded focus:outline-none focus:border-indigo-600 text-slate-800 dark:text-white"
+          >
+          <span class="text-[10px] text-slate-400 block mt-1">Required · e.g. 10 Years or 120 Months</span>
+        </div>
+
+        <!-- Details — full width -->
+        <div class="sm:col-span-2">
+          <label for="edit_details" class="block text-[10px] uppercase font-bold text-slate-400 mb-1.5">Details</label>
+          <textarea
+            id="edit_details"
+            name="details"
+            rows="3"
+            placeholder="Brief description of the loan product…"
+            required
+            minlength="10"
+            maxlength="500"
+            class="w-full text-xs px-3 py-2.5 border border-gray-200 dark:border-slate-700 bg-transparent rounded focus:outline-none focus:border-indigo-600 text-slate-800 dark:text-white"
+          ></textarea>
+          <span class="text-[10px] text-slate-400 block mt-1">Required · Min 10 characters</span>
+        </div>
+      </div>
+
+      <div class="flex gap-3 pt-4">
+        <button type="submit" class="bg-[#4f46e5] hover:bg-indigo-700 text-white font-bold text-xs px-5 py-2.5 rounded flex items-center gap-2 transition-colors shadow-sm">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Edit
+        </button>
+        <button type="button" class="text-slate-500 hover:text-slate-700 dark:hover:text-white font-bold text-xs px-5 py-2.5 rounded border border-gray-200 dark:border-slate-700 transition-colors" onclick="closeEditmodal()">
+          Cancel
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
 
 <script>
 function openEditmodal(id, name, interest, duration, details) {
@@ -513,5 +361,4 @@ function closeDeleteModal() {
     modal.classList.remove('on');
 }
 </script>
-
 {% include 'bank_footer.html' %}

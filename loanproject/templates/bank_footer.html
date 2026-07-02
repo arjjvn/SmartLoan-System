@@ -1,49 +1,581 @@
-<footer>
-        © <span id="yr"></span> <a href="#">Trustify</a> — Secured Banking Portal. All rights reserved.
-    </footer>
-</div>
+   <!-- ══════════════ CORE APPLICATION JAVASCRIPT STATE ENGINE ══════════════ -->
+    <script>
 
-<script>
-   function toggleTheme() {
-    const html = document.documentElement;
-    html.setAttribute('data-theme', html.getAttribute('data-theme') === 'dark' ? 'light' : 'dark');
-}
+        // Initial Mock Database (Matching variables expected from local environments)
+        const db = {
+            loanTypes: [
+                { id: 1, name: "Home Mortgages Platinum", duration: 15, interestRate: 4.8, details: "Fast-tracked approval on multi-story housing and properties. Flexible amortizations.", popular: true },
+                { id: 2, name: "Premium Commercial Business Loan", duration: 5, interestRate: 6.2, details: "Fuel your enterprise growth, equipment upgrades, capital investments, and scaling operations.", popular: true },
+                { id: 3, name: "Auto Premium Mobility Loan", duration: 3, interestRate: 5.5, details: "Superb flexible rates on electric cars, SUVs, and personal transit vehicles.", popular: false },
+                { id: 4, name: "Education & Elite Studies", duration: 4, interestRate: 3.5, details: "Low interest tailored support for engineering, medicine, and international university tuitions.", popular: false }
+            ],
+            complaints: [
+                { id: "001", user: "John Doe", category: "Transfer Error", message: "Failed wire transfer of $10,000 on June 12th to Bank of America routing.", reply: "We completed the trace on our server routing. The amount was safely bounced back into your account balance due to a typo in the receiver account number.", status: "RESOLVED", date: "June 13, 2026", seenByUser: false }
+            ],
+            loanRequests: [
+                { id: "LR-901", type: "Home Mortgages Platinum", amount: 450000, duration: 120, status: "PENDING", date: "June 13, 2026" }
+            ],
+            feedback: [
+                { user: "Jane S.", rating: 5, comment: "Trustify changed how our design studio handles quick loans. Spectacular turnaround!", date: "2 days ago" },
+                { user: "Oliver P.", rating: 4, comment: "Support resolves issues incredibly fast. Beautiful responsive dashboard.", date: "1 week ago" }
+            ],
+            activeFeedbackRating: 5
+        };
 
+        // Mobile Menu Toggling support mimicking the WordPress layouts
+        const mobileToggle = document.getElementById('mobile-menu-toggle');
+        const navMenu = document.getElementById('nav-menu');
 
+        mobileToggle.addEventListener('click', () => {
+            navMenu.classList.toggle('hidden');
+            navMenu.classList.toggle('flex');
+        });
 
-document.addEventListener("DOMContentLoaded", function () {
-
-    const links = document.querySelectorAll(".nav-link");
-
-    // 🔹 Highlight based on current URL
-    const currentPath = window.location.pathname;
-
-    links.forEach(link => {
-        if (link.getAttribute("href") === currentPath) {
-            link.classList.add("active");
+        // Dismiss the Welcome banner helper
+        function dismissWelcome() {
+            document.getElementById('welcome-banner').style.display = 'none';
+            showToast("Notification", "Welcome banner dismissed.", "info");
         }
 
-        // 🔹 Click event for manual selection
-        link.addEventListener("click", function () {
-            links.forEach(l => l.classList.remove("active"));
-            this.classList.add("active");
+        function updateAllCounters() {
+            // Stats Counts
+            document.getElementById('stat-total-loans').innerText = db.loanTypes.length;
+            document.getElementById('stat-resolved-complaints').innerText = db.complaints.filter(c => c.status === "RESOLVED").length;
+            document.getElementById('stat-pending-loans').innerText = db.loanRequests.filter(l => l.status === "PENDING").length;
 
-            // Optional: store in localStorage
-            localStorage.setItem("activeLink", this.getAttribute("href"));
-        });
-    });
+            // Badge counters matching "wp-adminify-for-wordpress-dashboard.png" notification indicators
+            const unreadCount = db.complaints.filter(c => c.status === "RESOLVED" && !c.seenByUser).length;
 
-    // 🔹 Restore active from localStorage (optional)
-    const saved = localStorage.getItem("activeLink");
-    if (saved) {
-        links.forEach(link => {
-            if (link.getAttribute("href") === saved) {
-                link.classList.add("active");
+            const badge = document.getElementById('replies-badge');
+            const subBadge = document.getElementById('updates-badge');
+            const topbarBadge = document.getElementById('topbar-notif-badge');
+
+            if (unreadCount > 0) {
+                badge.innerText = unreadCount;
+                badge.classList.remove('hidden');
+
+                subBadge.innerText = unreadCount;
+                subBadge.classList.remove('hidden');
+
+                topbarBadge.innerText = unreadCount;
+                topbarBadge.classList.remove('hidden');
+            } else {
+                badge.classList.add('hidden');
+                subBadge.classList.add('hidden');
+                topbarBadge.classList.add('hidden');
             }
-        });
-    }
+        }
 
-});
-</script>
+        // Generate custom flat toast overlays matching admin portal alerts
+        function showToast(title, body, type = 'info') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+
+            toast.className = `p-3.5 rounded shadow-lg bg-white dark:bg-[#111827] flex items-start gap-3 border-l-4 border-slate-300 dark:border-slate-800 transition-all duration-300 transform translate-y-2 opacity-0 pointer-events-auto cursor-pointer`;
+
+            if (type === 'success') {
+                toast.classList.add('border-emerald-500');
+                toast.classList.remove('border-slate-300', 'dark:border-slate-800');
+            } else if (type === 'warning') {
+                toast.classList.add('border-amber-500');
+                toast.classList.remove('border-slate-300', 'dark:border-slate-800');
+            } else if (type === 'info') {
+                toast.classList.add('border-[#4f46e5]');
+                toast.classList.remove('border-slate-300', 'dark:border-slate-800');
+            }
+
+            toast.innerHTML = `
+                <div class="flex-1">
+                    <h5 class="text-[10px] font-bold uppercase tracking-wider text-slate-800 dark:text-slate-200">${title}</h5>
+                    <p class="text-xs text-slate-500 mt-0.5">${body}</p>
+                </div>
+                <button class="text-slate-400 hover:text-slate-600 font-bold">&times;</button>
+            `;
+
+            container.appendChild(toast);
+
+            // Trigger transition timing
+            setTimeout(() => {
+                toast.classList.remove('translate-y-2', 'opacity-0');
+            }, 50);
+
+            // Close bindings
+            const remove = () => {
+                toast.classList.add('opacity-0', 'translate-x-4');
+                setTimeout(() => toast.remove(), 300);
+            };
+
+            toast.addEventListener('click', remove);
+            setTimeout(remove, 4500); // Auto expire after 4.5s
+        }
+
+        function switchView(viewId) {
+            // Hide all active view panels
+            document.querySelectorAll('.view-panel').forEach(panel => panel.classList.add('hidden'));
+
+            // Activate target view panel
+            const activePanel = document.getElementById(`view-${viewId}`);
+            if(activePanel) {
+                activePanel.classList.remove('hidden');
+            }
+
+            // Restore non-active styles on the sidebar navigational buttons
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                btn.classList.remove('sidebar-active');
+            });
+
+            // Apply the distinct active indicator styling (royal indigo)
+            const activeBtn = document.getElementById(`nav-${viewId}`);
+            if (activeBtn) {
+                activeBtn.classList.add('sidebar-active');
+            }
+
+            // Close submenus on inactive clicks
+            const subMenu = document.getElementById('dashboard-submenu');
+            if(viewId !== 'bank_home' && viewId !== 'view_reply') {
+                subMenu.classList.add('hidden');
+            } else {
+                subMenu.classList.remove('hidden');
+            }
+
+            // Update topbar title
+            const headerTitles = {
+                'bank_home': 'Dashboard',
+                'bank_loan_types': 'Loan Types Catalog',
+                'user_loan_request': 'Request Portfolio',
+                'sent_complaint': 'Dispute Desk',
+                'view_reply': 'Replies / Inbox Update Logs',
+                'send_feedback': 'Customer Survey Review'
+            };
+            document.getElementById('view-title').innerText = headerTitles[viewId] || 'Portal Core';
+
+            // Collapse mobile sidebar when navigation occurs
+            if (window.innerWidth < 1024) {
+                navMenu.classList.add('hidden');
+            }
+
+            // Run localized views renderings
+            if(viewId === 'bank_home') {
+                renderDashboard();
+            } else if(viewId === 'bank_loan_types') {
+                renderLoanCatalog();
+            } else if(viewId === 'user_loan_request') {
+                renderLoanRequests();
+            } else if(viewId === 'view_reply') {
+                renderReplies();
+                // Flag all as resolved-seen
+                db.complaints.forEach(c => c.seenByUser = true);
+                updateAllCounters();
+            }
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function renderDashboard() {
+            // 1. Featured list
+            const loanContainer = document.getElementById('dashboard-loan-list');
+            loanContainer.innerHTML = '';
+
+            db.loanTypes.forEach(loan => {
+                const item = document.createElement('div');
+                item.className = 'py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3';
+                item.innerHTML = `
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h4 class="font-bold text-xs text-slate-800 dark:text-slate-100">${loan.name}</h4>
+                            ${loan.popular ? '<span class="px-1 py-0.5 text-[8px] font-bold rounded bg-indigo-50 dark:bg-slate-800 text-indigo-600 uppercase tracking-widest">Active Standard</span>' : ''}
+                        </div>
+                        <p class="text-xs text-slate-400 mt-1 max-w-xl">${loan.details}</p>
+                    </div>
+                    <div class="text-right flex flex-row sm:flex-col items-center sm:items-end justify-between sm:justify-center gap-1 shrink-0">
+                        <span class="text-xs text-slate-400">Up to ${loan.duration} Years</span>
+                        <span class="text-xs font-bold text-indigo-600 dark:text-indigo-400">${loan.interestRate}% Interest APR</span>
+                    </div>
+                `;
+                loanContainer.appendChild(item);
+            });
+
+            // 2. Dispute reports table mapping "wp-adminify-for-wordpress-dashboard.png" data table structures
+            const tableBody = document.getElementById('dashboard-complaints-table');
+            tableBody.innerHTML = '';
+
+            if(db.complaints.length === 0) {
+                tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="5" class="px-5 py-6 text-center text-xs text-slate-400">No support tickets currently compiled.</td>
+                    </tr>
+                `;
+            } else {
+                db.complaints.forEach(complaint => {
+                    const row = document.createElement('tr');
+                    row.className = 'hover:bg-slate-50 dark:hover:bg-slate-800/20 text-xs text-slate-600 dark:text-slate-300';
+                    row.innerHTML = `
+                        <td class="px-5 py-3 font-semibold text-slate-400">#${complaint.id}</td>
+                        <td class="px-5 py-3 font-bold text-slate-800 dark:text-slate-100">${complaint.category}</td>
+                        <td class="px-5 py-3 max-w-xs truncate">${complaint.message}</td>
+                        <td class="px-5 py-3">
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold ${complaint.status === 'RESOLVED' ? 'bg-emerald-50 dark:bg-slate-800 text-emerald-600' : 'bg-amber-50 dark:bg-slate-800 text-amber-600'}">
+                                ${complaint.status}
+                            </span>
+                        </td>
+                        <td class="px-5 py-3 text-right">
+                            <button onclick="switchView('view_reply')" class="px-2.5 py-1 text-slate-500 hover:text-indigo-600 hover:bg-slate-100 dark:hover:bg-slate-800 rounded border border-gray-100 dark:border-slate-800 font-medium transition-all">
+                                View Ticket
+                            </button>
+                        </td>
+                    `;
+                    tableBody.appendChild(row);
+                });
+            }
+        }
+
+        function renderLoanCatalog() {
+            const container = document.getElementById('loan-types-grid');
+            container.innerHTML = '';
+
+            db.loanTypes.forEach(loan => {
+                const card = document.createElement('div');
+                card.className = 'admin-card admin-border rounded p-5 relative overflow-hidden flex flex-col justify-between hover:shadow-md transition-all group';
+                card.innerHTML = `
+                    <div>
+                        <div class="flex justify-between items-start mb-3">
+                            <div>
+                                <h4 class="font-bold text-sm text-slate-800 dark:text-white group-hover:text-indigo-600 transition-colors">${loan.name}</h4>
+                                <span class="text-[10px] text-slate-400 uppercase tracking-widest">Trustify Verified Program</span>
+                            </div>
+                            <div class="px-2 py-1 bg-indigo-50 dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 font-bold rounded text-xs">
+                                ${loan.interestRate}% APR
+                            </div>
+                        </div>
+                        <p class="text-xs text-slate-400 mb-6 leading-relaxed">${loan.details}</p>
+                    </div>
+                    <div class="pt-3 border-t border-gray-100 dark:border-slate-800 flex justify-between items-center text-xs">
+                        <div class="text-slate-500">
+                            Repayment Duration: <span class="font-bold text-slate-700 dark:text-slate-200">${loan.duration} years</span>
+                        </div>
+                        <button onclick="startLoanFormRedirect(${loan.id})" class="px-3 py-1.5 bg-[#4f46e5] hover:bg-indigo-700 text-white font-bold rounded transition-colors shadow-sm">
+                            Apply
+                        </button>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function renderLoanRequests() {
+            // Select programs options
+            const selectEl = document.getElementById('loan-form-type');
+            selectEl.innerHTML = '';
+            db.loanTypes.forEach(loan => {
+                const opt = document.createElement('option');
+                opt.value = loan.name;
+                opt.innerText = `${loan.name} (${loan.interestRate}% APR)`;
+                selectEl.appendChild(opt);
+            });
+
+            // Requests history queue
+            const historyContainer = document.getElementById('user-loan-requests-list');
+            historyContainer.innerHTML = '';
+
+            if (db.loanRequests.length === 0) {
+                historyContainer.innerHTML = `
+                    <div class="p-6 text-center text-xs text-slate-400">No requests submitted.</div>
+                `;
+            } else {
+                db.loanRequests.forEach(req => {
+                    let statusClass = 'bg-amber-50 text-amber-600 dark:bg-slate-800';
+                    if (req.status === 'APPROVED') statusClass = 'bg-emerald-50 text-emerald-600 dark:bg-slate-800';
+                    if (req.status === 'REJECTED') statusClass = 'bg-rose-50 text-rose-600 dark:bg-slate-800';
+
+                    const item = document.createElement('div');
+                    item.className = 'p-4 rounded border border-gray-100 dark:border-slate-800 text-xs flex flex-col gap-2.5';
+                    item.innerHTML = `
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h5 class="font-bold text-slate-700 dark:text-slate-200">${req.type}</h5>
+                                <span class="text-[10px] text-slate-400">${req.date} &middot; Ref: ${req.id}</span>
+                            </div>
+                            <span class="px-2 py-0.5 rounded font-bold text-[9px] uppercase ${statusClass}">
+                                ${req.status}
+                            </span>
+                        </div>
+                        <div class="flex justify-between items-center pt-2.5 border-t border-gray-100 dark:border-slate-800">
+                            <div>
+                                <span class="text-slate-400 text-[10px] block">Capital Requested</span>
+                                <span class="font-bold text-slate-800 dark:text-slate-100">$${Number(req.amount).toLocaleString()}</span>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-slate-400 text-[10px] block">Amortization Term</span>
+                                <span class="font-bold text-slate-800 dark:text-slate-100">${req.duration} Months</span>
+                            </div>
+                        </div>
+                    `;
+                    historyContainer.appendChild(item);
+                });
+            }
+        }
+
+        // Fast route from catalog page to active form
+        function startLoanFormRedirect(loanId) {
+            const loan = db.loanTypes.find(l => l.id === loanId);
+            switchView('user_loan_request');
+            if (loan) {
+                document.getElementById('loan-form-type').value = loan.name;
+                // Pre-fill defaults
+                document.getElementById('loan-form-amount').value = (loanId === 1) ? 220000 : 25000;
+                document.getElementById('loan-form-term').value = loan.duration * 12;
+            }
+        }
+
+        function renderReplies() {
+            const container = document.getElementById('view-replies-list');
+            container.innerHTML = '';
+
+            db.complaints.forEach(c => {
+                const card = document.createElement('div');
+                card.className = 'admin-card admin-border rounded p-5 flex flex-col gap-4 shadow-sm';
+                card.innerHTML = `
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-gray-100 dark:border-slate-800">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="px-2 py-0.5 bg-indigo-50 dark:bg-slate-800 text-indigo-600 dark:text-indigo-400 font-bold rounded text-[10px] uppercase">${c.category}</span>
+                                <span class="text-xs text-slate-400">Ticket Ref: #${c.id}</span>
+                            </div>
+                            <h4 class="font-bold text-sm text-slate-800 dark:text-slate-100 mt-1">Audit Thread for ${c.user}</h4>
+                        </div>
+                        <span class="text-xs text-slate-400">${c.date}</span>
+                    </div>
+
+                    <div class="space-y-4">
+                        <div class="p-4 rounded bg-gray-50 dark:bg-slate-800/40 text-xs">
+                            <span class="text-[9px] font-bold uppercase tracking-wider text-slate-400 block mb-1">Your Complaint Submission</span>
+                            <p class="text-slate-600 dark:text-slate-300 italic leading-relaxed">"${c.message}"</p>
+                        </div>
+
+                        ${c.reply ? `
+                        <div class="p-4 rounded bg-indigo-50/50 dark:bg-slate-800/20 text-xs border border-indigo-100 dark:border-slate-800">
+                            <div class="flex items-center gap-2 mb-2">
+                                <div class="w-5 h-5 bg-indigo-600 rounded-full flex items-center justify-center text-[10px] font-bold text-white">T</div>
+                                <span class="font-bold text-indigo-600 dark:text-indigo-400">Trustify Automated Agent Response</span>
+                            </div>
+                            <p class="text-slate-600 dark:text-slate-300 leading-relaxed">${c.reply}</p>
+                        </div>
+                        ` : `
+                        <div class="p-4 rounded bg-amber-50/50 dark:bg-slate-800/20 text-xs text-amber-600 border border-amber-200 dark:border-slate-800 flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-amber-500 animate-ping"></span>
+                            <span>Resolving dispute in real time. Processing audit logs (Awaiting simulation callback). Check again shortly!</span>
+                        </div>
+                        `}
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // Amortization estimations inside quick calculator
+        function calculateEstimates() {
+            const amount = parseFloat(document.getElementById('quick-draft-amt').value) || 0;
+            const duration = parseFloat(document.getElementById('quick-draft-months').value) || 0;
+
+            if (amount <= 0 || duration <= 0) {
+                document.getElementById('quick-calc-result').innerText = "$0.00";
+                return;
+            }
+
+            const annualRate = 5.8;
+            const monthlyRate = (annualRate / 12) / 100;
+
+            const emi = (amount * monthlyRate * Math.pow(1 + monthlyRate, duration)) / (Math.pow(1 + monthlyRate, duration) - 1);
+
+            document.getElementById('quick-calc-result').innerText = `$${emi.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        }
+
+        document.getElementById('quick-draft-amt').addEventListener('input', calculateEstimates);
+        document.getElementById('quick-draft-months').addEventListener('input', calculateEstimates);
+
+        function saveQuickDraftEstimate() {
+            const val = parseFloat(document.getElementById('quick-draft-amt').value);
+            const months = parseInt(document.getElementById('quick-draft-months').value);
+
+            switchView('user_loan_request');
+            document.getElementById('loan-form-amount').value = val;
+            document.getElementById('loan-form-term').value = months;
+            showToast("Calculated Terms", `Applied quick amortization estimation details: $${val.toLocaleString()} over ${months} Months.`, "success");
+        }
+
+
+        // ================== DISPATCH VALIDATIONS ==================
+
+
+        // 1. Submit requests validation handler
+        function handleLoanSubmit(e) {
+            e.preventDefault();
+
+            const type = document.getElementById('loan-form-type').value;
+            const amount = parseFloat(document.getElementById('loan-form-amount').value);
+            const duration = parseInt(document.getElementById('loan-form-term').value);
+            const details = document.getElementById('loan-form-details').value.trim();
+
+            if (amount < 1000 || amount > 500000) {
+                showToast("Submission Rejected", "Loan principal amount parameters must be within $1,000 & $500,000 limits.", "warning");
+                return;
+            }
+            if (duration < 3 || duration > 120) {
+                showToast("Submission Rejected", "Maturity duration parameters must be within 3 & 120 months limits.", "warning");
+                return;
+            }
+            if (details.length < 15) {
+                showToast("Submission Rejected", "Details are too vague. Describe your income sources or capital applications in at least 15 characters.", "warning");
+                return;
+            }
+
+            const nextId = "LR-" + (Math.floor(Math.random() * 899) + 100);
+            const newRequest = {
+                id: nextId,
+                type: type,
+                amount: amount,
+                duration: duration,
+                status: "PENDING",
+                date: "June 13, 2026"
+            };
+
+            db.loanRequests.unshift(newRequest);
+            updateAllCounters();
+            renderLoanRequests();
+
+            showToast("Application Received", `Financial Line Request ${nextId} dispatched to our credit bureau desk!`, "success");
+
+            // Wipe forms
+            document.getElementById('loan-form-amount').value = '';
+            document.getElementById('loan-form-term').value = '';
+            document.getElementById('loan-form-details').value = '';
+            document.getElementById('loan-form-consent').checked = false;
+        }
+
+        // 2. Complaints workflow validation & AI response latency callback (WordPress style)
+        function handleComplaintSubmit(e) {
+            e.preventDefault();
+            const category = document.getElementById('complaint-category').value;
+            const message = document.getElementById('complaint-message').value.trim();
+
+            if (message.length < 10) {
+                showToast("Dispute Validation Error", "Elaborated support details must be at least 10 characters length.", "warning");
+                return;
+            }
+
+            const cId = String(db.complaints.length + 1).padStart(3, '0');
+            const newComplaint = {
+                id: cId,
+                user: "John Doe",
+                category: category,
+                message: message,
+                reply: null,
+                status: "PENDING",
+                date: "June 13, 2026",
+                seenByUser: false
+            };
+
+            db.complaints.unshift(newComplaint);
+            updateAllCounters();
+            showToast("Ticket Initialized", `Dispute ticket #${cId} successfully dispatched for audit. Resolving shortly...`, "info");
+
+            // Reset message
+            document.getElementById('complaint-message').value = '';
+            switchView('view_reply');
+
+            // Simulated resolution latency check (3.5 seconds)
+            setTimeout(() => {
+                const targetTicket = db.complaints.find(c => c.id === cId);
+                if (targetTicket) {
+                    targetTicket.status = "RESOLVED";
+                    targetTicket.seenByUser = false;
+                    targetTicket.reply = `Thank you for your patience. Regarding the transaction dispute under category "${category}", we checked current ledger reports and bounced the balance back safely. Ledger systems are updated successfully.`;
+
+                    updateAllCounters();
+                    if(document.getElementById('view-view_reply').classList.contains('hidden') === false) {
+                        renderReplies();
+                    }
+                    showToast("Resolution Notification", `Support Ticket #${cId} has been successfully resolved!`, "success");
+                }
+            }, 3500);
+        }
+
+        // 3. Survey rating
+        function setFeedbackRating(stars) {
+            db.activeFeedbackRating = stars;
+            const buttons = document.querySelectorAll('.star-btn');
+            buttons.forEach((btn, idx) => {
+                if (idx < stars) {
+                    btn.classList.add('text-amber-400');
+                    btn.classList.remove('text-slate-300', 'dark:text-slate-700');
+                } else {
+                    btn.classList.remove('text-amber-400');
+                    btn.classList.add('text-slate-300', 'dark:text-slate-700');
+                }
+            });
+        }
+
+        function handleFeedbackSubmit(e) {
+            e.preventDefault();
+            const comment = document.getElementById('feedback-message').value.trim();
+
+            if(comment.length < 10) {
+                showToast("Feedback Rejected", "Comments must contain at least 10 characters.", "warning");
+                return;
+            }
+
+            const nextFeedback = {
+                user: "John Doe (You)",
+                rating: db.activeFeedbackRating,
+                comment: comment,
+                date: "Just now"
+            };
+
+            db.feedback.unshift(nextFeedback);
+            showToast("Survey Saved", "Thank you for supporting continuous delivery cycles on the Trustify portal!", "success");
+
+            // Clean
+            document.getElementById('feedback-message').value = '';
+            setFeedbackRating(5);
+            switchView('bank_home');
+        }
+
+        // Simulated logout logs termination
+        function handleLogout() {
+            showToast("Session Logging Out", "Safely destroying secure banking tokens...", "warning");
+            setTimeout(() => {
+                showToast("Session Terminated", "You have successfully signed out of Adminify Trustify core systems.", "success");
+            }, 1200);
+        }
+
+        // Themes switching supporting data persistence
+        function toggleTheme() {
+            const html = document.documentElement;
+            const sunIcon = document.getElementById('sun-icon');
+            const moonIcon = document.getElementById('moon-icon');
+
+            if (html.getAttribute('data-theme') === 'dark') {
+                html.setAttribute('data-theme', 'light');
+                html.classList.remove('dark');
+                sunIcon.classList.add('hidden');
+                moonIcon.classList.remove('hidden');
+                showToast("Theme Updated", "Switched layout to Light Mode.", "info");
+            } else {
+                html.setAttribute('data-theme', 'dark');
+                html.classList.add('dark');
+                sunIcon.classList.remove('hidden');
+                moonIcon.classList.add('hidden');
+                showToast("Theme Updated", "Switched layout to Dark Mode.", "info");
+            }
+        }
+
+        // DOM Initializations
+        window.onload = function() {
+            calculateEstimates();
+            switchView('bank_home');
+            updateAllCounters();
+        };
+
+    </script>
 </body>
 </html>

@@ -1,962 +1,215 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="light">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trustify — Dashboard</title>
+    <title>Trustify — Adminify Premium Dashboard</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        adminify: {
+                            active: '#4f46e5', // Royal Indigo active color from wp-adminify-for-wordpress-dashboard.png
+                            hover: '#f3f4f6',
+                            border: '#e5e7eb',
+                            darkBg: '#0f172a',
+                            lightBg: '#f8fafc',
+                            banner: '#111115', // Dark banner color
+                            textDark: '#0f172a',
+                            textMuted: '#6b7280',
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+
+    <!-- Google Fonts & FontAwesome Icons -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
     <style>
-        /* ═══════════════════════════════════════
-           THEME TOKENS
-        ═══════════════════════════════════════ */
-        :root {
-            --blue-600:  #2563eb;
-            --blue-500:  #3b82f6;
-            --blue-400:  #60a5fa;
-            --blue-300:  #93c5fd;
-            --blue-100:  rgba(59,130,246,0.12);
-            --blue-050:  rgba(59,130,246,0.06);
-
-            --green:     #22c55e;
-            --green-dim: rgba(34,197,94,0.12);
-            --amber:     #f59e0b;
-            --amber-dim: rgba(245,158,11,0.12);
-            --red:       #ef4444;
-            --red-dim:   rgba(239,68,68,0.12);
-            --purple:    #a855f7;
-            --purple-dim:rgba(168,85,247,0.12);
-
-            --r-sm: 8px;
-            --r-md: 12px;
-            --r-lg: 16px;
-            --r-xl: 20px;
-            --sidebar-w: 248px;
-
-            --transition: 0.22s cubic-bezier(0.4,0,0.2,1);
-        }
-
-        /* ── DARK ── */
-        [data-theme="dark"] {
-            --bg:          #080c14;
-            --bg-2:        #0d1220;
-            --surface:     #111827;
-            --surface-2:   #162032;
-            --surface-3:   #1c2a3f;
-            --border:      rgba(255,255,255,0.07);
-            --border-2:    rgba(255,255,255,0.12);
-            --txt-1:       #f0f4ff;
-            --txt-2:       rgba(240,244,255,0.65);
-            --txt-3:       rgba(240,244,255,0.35);
-            --topbar-blur: rgba(8,12,20,0.85);
-        }
-
-        /* ── LIGHT ── */
-        [data-theme="light"] {
-            --bg:          #f0f4ff;
-            --bg-2:        #e8eef8;
-            --surface:     #ffffff;
-            --surface-2:   #f5f8ff;
-            --surface-3:   #eef2fb;
-            --border:      rgba(37,99,235,0.1);
-            --border-2:    rgba(37,99,235,0.2);
-            --txt-1:       #0f172a;
-            --txt-2:       rgba(15,23,42,0.65);
-            --txt-3:       rgba(15,23,42,0.38);
-            --topbar-blur: rgba(240,244,255,0.88);
-        }
-
-        /* ═══════════════════════════════════════
-           BASE
-        ═══════════════════════════════════════ */
-        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-        html { font-size: 15px; }
-
         body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background: var(--bg);
-            color: var(--txt-1);
-            display: flex;
-            min-height: 100vh;
-            transition: background var(--transition), color var(--transition);
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+            color: #0f172a;
+            transition: background-color 0.2s, color 0.2s;
         }
 
-        ::-webkit-scrollbar { width: 4px; height: 4px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 4px; }
-
-        /* ═══════════════════════════════════════
-           SIDEBAR
-        ═══════════════════════════════════════ */
-        .sidebar {
-            width: var(--sidebar-w);
-            min-height: 100vh;
-            background: var(--surface);
-            border-right: 1px solid var(--border);
-            display: flex;
-            flex-direction: column;
-            position: fixed;
-            left: 0; top: 0; bottom: 0;
-            z-index: 200;
-            transition: background var(--transition), border-color var(--transition);
+        /* Dark mode overrides styled matching the adminify profile */
+        html[data-theme="dark"] body {
+            background-color: #0b0f19;
+            color: #f1f5f9;
         }
 
-        .brand {
-            padding: 26px 20px 20px;
-            border-bottom: 1px solid var(--border);
-            display: flex;
-            align-items: center;
-            gap: 12px;
+        /* Border transitions */
+        .admin-border {
+            border: 1px solid #e5e7eb;
+        }
+        html[data-theme="dark"] .admin-border {
+            border: 1px solid #1e293b;
         }
 
-        .brand-icon {
-            width: 40px; height: 40px;
-            border-radius: 12px;
-            background: linear-gradient(135deg, var(--blue-600), var(--blue-400));
-            display: flex; align-items: center; justify-content: center;
-            flex-shrink: 0;
-            box-shadow: 0 4px 14px rgba(37,99,235,0.4);
+        .admin-card {
+            background-color: #ffffff;
+            transition: background-color 0.2s, box-shadow 0.2s;
+        }
+        html[data-theme="dark"] .admin-card {
+            background-color: #111827;
         }
 
-        .brand-icon svg { color: #fff; }
-
-        .brand-text { line-height: 1.2; }
-        .brand-name  { font-size: 1.05rem; font-weight: 800; color: var(--txt-1); letter-spacing: -0.02em; }
-        .brand-tag   { font-size: 0.62rem; color: var(--txt-3); letter-spacing: 0.1em; text-transform: uppercase; margin-top: 1px; }
-
-        .nav-scroll { flex: 1; overflow-y: auto; padding: 16px 12px; }
-
-        .nav-section {
-            font-size: 0.6rem;
-            font-weight: 700;
-            letter-spacing: 0.14em;
-            text-transform: uppercase;
-            color: var(--txt-3);
-            padding: 14px 10px 7px;
+        /* Custom styling to map exact Adminify Sidebar layout */
+        .sidebar-active {
+            background-color: #4f46e5 !important;
+            color: #ffffff !important;
         }
 
-        .nav-link {
-            display: flex;
-            align-items: center;
-            gap: 11px;
-            padding: 10px 12px;
-            border-radius: var(--r-sm);
-            color: var(--txt-2);
-            text-decoration: none;
-            font-size: 0.85rem;
-            font-weight: 500;
-            transition: all var(--transition);
-            margin-bottom: 2px;
-            position: relative;
+        html[data-theme="dark"] .sidebar-active {
+            background-color: #4f46e5 !important;
+            color: #ffffff !important;
         }
-
-        .nav-link svg { width: 17px; height: 17px; flex-shrink: 0; }
-
-        .nav-link:hover { background: var(--blue-050); color: var(--blue-400); }
-
-        .nav-link.active {
-            background: var(--blue-100);
-            color: var(--blue-400);
-            font-weight: 600;
-        }
-
-        .nav-link.active::before {
-            content: '';
-            position: absolute;
-            left: 0; top: 7px; bottom: 7px;
-            width: 3px;
-            border-radius: 0 3px 3px 0;
-            background: var(--blue-500);
-        }
-
-        .nav-badge {
-            background: var(--blue-600);
-            color: #fff;
-            font-size: 0.6rem;
-            font-weight: 700;
-            padding: 2px 6px;
-            border-radius: 20px;
-            min-width: 18px;
-            text-align: center;
-        }
-
-        /* ── SUB MENU ── */
-        .nav-sub {
-            overflow: hidden;
-            max-height: 0;
-            transition: max-height 0.32s cubic-bezier(0.4,0,0.2,1);
-            margin: 2px 0 2px 28px;
-            border-left: 2px solid var(--border-2);
-            padding-left: 6px;
-        }
-
-        .nav-sub.open { max-height: 140px; }
-
-        .nav-sub-link {
-            display: flex;
-            align-items: center;
-            gap: 9px;
-            padding: 8px 12px;
-            border-radius: var(--r-sm);
-            color: var(--txt-3);
-            text-decoration: none;
-            font-size: 0.8rem;
-            font-weight: 500;
-            transition: all var(--transition);
-            margin-bottom: 1px;
-        }
-
-        .nav-sub-link:hover { background: var(--blue-050); color: var(--blue-400); }
-        .nav-sub-link.active { background: var(--blue-100); color: var(--blue-400); font-weight: 600; }
-
-        .nav-link.sub-open .chevron { transform: rotate(180deg) !important; }
-        .nav-link.sub-open { color: var(--blue-400); }
-
-        .sidebar-footer {
-            padding: 14px 12px;
-            border-top: 1px solid var(--border);
-        }
-
-        .user-row {
-            display: flex;
-            align-items: center;
-            gap: 11px;
-            padding: 10px 12px;
-            border-radius: var(--r-sm);
-            background: var(--surface-2);
-            cursor: pointer;
-            transition: background var(--transition);
-        }
-
-        .user-row:hover { background: var(--surface-3); }
-
-        .user-av {
-            width: 34px; height: 34px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--blue-600), var(--blue-400));
-            display: flex; align-items: center; justify-content: center;
-            font-weight: 700; font-size: 0.75rem; color: #fff;
-            flex-shrink: 0;
-        }
-
-        .user-name { font-size: 0.82rem; font-weight: 600; color: var(--txt-1); }
-        .user-role { font-size: 0.67rem; color: var(--txt-3); }
-
-        /* ═══════════════════════════════════════
-           MAIN
-        ═══════════════════════════════════════ */
-        .main {
-            margin-left: var(--sidebar-w);
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-        }
-
-        /* ── TOPBAR ── */
-        .topbar {
-            position: sticky; top: 0; z-index: 100;
-            height: 66px;
-            background: var(--topbar-blur);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border-bottom: 1px solid var(--border);
-            padding: 0 28px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            transition: background var(--transition), border-color var(--transition);
-        }
-
-        .page-title   { font-size: 1.05rem; font-weight: 700; color: var(--txt-1); letter-spacing: -0.02em; }
-        .page-subtitle{ font-size: 0.72rem; color: var(--txt-3); margin-top: 1px; }
-
-        .topbar-right { display: flex; align-items: center; gap: 10px; }
-
-        .search {
-            display: flex; align-items: center; gap: 8px;
-            background: var(--surface-2);
-            border: 1px solid var(--border);
-            border-radius: 10px;
-            padding: 8px 14px;
-            transition: border-color var(--transition), background var(--transition);
-        }
-
-        .search:focus-within { border-color: var(--blue-500); }
-        .search input {
-            border: none; background: transparent;
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            font-size: 0.82rem; color: var(--txt-1); outline: none; width: 180px;
-        }
-
-        .search input::placeholder { color: var(--txt-3); }
-
-        /* theme toggle */
-        .theme-toggle {
-            width: 52px; height: 28px;
-            border-radius: 28px;
-            background: var(--surface-2);
-            border: 1px solid var(--border-2);
-            position: relative;
-            cursor: pointer;
-            transition: all var(--transition);
-            flex-shrink: 0;
-        }
-
-        .theme-toggle::after {
-            content: '';
-            position: absolute;
-            width: 20px; height: 20px;
-            border-radius: 50%;
-            background: var(--blue-500);
-            top: 3px; left: 3px;
-            transition: transform var(--transition);
-            box-shadow: 0 2px 6px rgba(59,130,246,0.4);
-        }
-
-        [data-theme="light"] .theme-toggle::after { transform: translateX(24px); }
-
-        .theme-icon {
-            position: absolute;
-            top: 50%; transform: translateY(-50%);
-            display: flex; align-items: center;
-            pointer-events: none;
-        }
-
-        .icon-moon { left: 7px;  color: var(--txt-3); }
-        .icon-sun  { right: 7px; color: var(--txt-3); }
-
-        [data-theme="light"] .icon-moon { opacity: 0; }
-        [data-theme="dark"]  .icon-sun  { opacity: 0; }
-
-        .tb-btn {
-            width: 38px; height: 38px;
-            border-radius: 10px;
-            border: 1px solid var(--border);
-            background: var(--surface-2);
-            display: flex; align-items: center; justify-content: center;
-            cursor: pointer; color: var(--txt-2);
-            position: relative;
-            transition: all var(--transition);
-        }
-
-        .tb-btn:hover { border-color: var(--blue-500); color: var(--blue-400); background: var(--blue-050); }
-
-        .tb-pip {
-            position: absolute; top: 7px; right: 7px;
-            width: 6px; height: 6px;
-            background: var(--blue-500); border-radius: 50%;
-            border: 1.5px solid var(--surface);
-        }
-
-        .tb-av {
-            width: 38px; height: 38px;
-            border-radius: 10px;
-            background: linear-gradient(135deg, var(--blue-600), var(--blue-400));
-            display: flex; align-items: center; justify-content: center;
-            font-weight: 700; font-size: 0.76rem; color: #fff;
-            cursor: pointer;
-        }
-
-        /* ═══════════════════════════════════════
-           PAGE BODY
-        ═══════════════════════════════════════ */
-        .page { padding: 24px 28px; flex: 1; }
-
-        /* ── STAT CARDS ── */
-        .stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 22px; }
-
-        .stat {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--r-lg);
-            padding: 20px 22px;
-            position: relative;
-            overflow: hidden;
-            cursor: default;
-            transition: background var(--transition), border-color var(--transition), transform 0.2s;
-        }
-
-        .stat:hover { transform: translateY(-2px); border-color: var(--border-2); }
-
-        /* gradient glow corner */
-        .stat::after {
-            content: '';
-            position: absolute;
-            top: -30px; right: -30px;
-            width: 90px; height: 90px;
-            border-radius: 50%;
-            opacity: 0.06;
-        }
-
-        .stat-primary::after  { background: var(--blue-500); opacity: 0.2; }
-        .stat-green::after    { background: var(--green); opacity: 0.2; }
-        .stat-amber::after    { background: var(--amber); opacity: 0.2; }
-        .stat-red::after      { background: var(--red); opacity: 0.2; }
-
-        /* featured stat */
-        .stat.stat-featured {
-            background: linear-gradient(135deg, var(--blue-600) 0%, #1e40af 100%);
-            border-color: transparent;
-            box-shadow: 0 8px 28px rgba(37,99,235,0.35);
-        }
-
-        .stat.stat-featured .s-label,
-        .stat.stat-featured .s-change { color: rgba(255,255,255,0.65); }
-        .stat.stat-featured .s-value  { color: #fff; }
-
-        .s-head { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 14px; }
-
-        .s-icon {
-            width: 42px; height: 42px;
-            border-radius: 11px;
-            display: flex; align-items: center; justify-content: center;
-        }
-
-        .ic-blue   { background: var(--blue-100);   color: var(--blue-400); }
-        .ic-green  { background: var(--green-dim);  color: var(--green); }
-        .ic-amber  { background: var(--amber-dim);  color: var(--amber); }
-        .ic-red    { background: var(--red-dim);    color: var(--red); }
-        .ic-white  { background: rgba(255,255,255,0.15); color: #fff; }
-
-        .s-badge {
-            font-size: 0.7rem; font-weight: 600;
-            padding: 3px 8px; border-radius: 20px;
-        }
-
-        .badge-up   { background: var(--green-dim); color: var(--green); }
-        .badge-down { background: var(--red-dim);   color: var(--red); }
-        .badge-white{ background: rgba(255,255,255,0.2); color: #fff; }
-
-        .s-value { font-size: 1.85rem; font-weight: 800; color: var(--txt-1); letter-spacing: -0.03em; line-height: 1; margin-bottom: 4px; }
-        .s-label { font-size: 0.76rem; color: var(--txt-3); }
-        .s-change { font-size: 0.7rem; color: var(--txt-3); margin-top: 6px; }
-
-        /* ── QUICK ACTIONS ── */
-        .quick { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; margin-bottom: 22px; }
-
-        .qbtn {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--r-md);
-            padding: 15px 16px;
-            display: flex; align-items: center; gap: 13px;
-            cursor: pointer; text-decoration: none;
-            transition: all var(--transition);
-        }
-
-        .qbtn:hover {
-            border-color: var(--blue-500);
-            background: var(--blue-050);
-            transform: translateY(-1px);
-        }
-
-        .qbtn:hover .qi { background: var(--blue-600); color: #fff; box-shadow: 0 4px 12px rgba(37,99,235,0.4); }
-        .qbtn:hover .ql { color: var(--blue-400); }
-
-        .qi {
-            width: 38px; height: 38px;
-            border-radius: 10px;
-            background: var(--surface-2);
-            border: 1px solid var(--border);
-            display: flex; align-items: center; justify-content: center;
-            color: var(--txt-2); flex-shrink: 0;
-            transition: all var(--transition);
-        }
-
-        .ql { font-size: 0.82rem; font-weight: 600; color: var(--txt-2); transition: color var(--transition); }
-        .qs { font-size: 0.7rem; color: var(--txt-3); margin-top: 1px; }
-
-        /* ── GRID ── */
-      .grid-main {
-    display: grid;
-    grid-template-columns: 0fr 250px; /* right side smaller relative to left */
-    gap: 8px;
-    margin-bottom: 22px;
-}        .col-flex { display: flex; flex-direction: column; gap: 18px; }
-
-        /* ── CARD ── */
-        .card {
-            background: var(--surface);
-            border: 1px solid var(--border);
-            border-radius: var(--r-lg);
-            overflow: hidden;
-            transition: background var(--transition), border-color var(--transition);
-        }
-
-        .card-head {
-            padding: 18px 22px;
-            border-bottom: 1px solid var(--border);
-            display: flex; align-items: center; justify-content: space-between;
-        }
-
-        .card-title { font-size: 0.92rem; font-weight: 700; color: var(--txt-1); letter-spacing: -0.01em; }
-        .card-link  { font-size: 0.75rem; color: var(--blue-400); text-decoration: none; font-weight: 600; transition: opacity 0.18s; }
-        .card-link:hover { opacity: 0.7; }
-        .card-body  { padding: 18px 22px; }
-
-        /* ── CHART ── */
-        .chart-outer { padding: 0 0 24px; }
-
-        .chart-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 14px; }
-
-        .chart-tabs { display: flex; gap: 4px; }
-
-        .ctab {
-            font-size: 0.72rem; font-weight: 600;
-            padding: 5px 12px; border-radius: 7px;
-            border: 1px solid var(--border);
-            background: transparent; color: var(--txt-3);
-            cursor: pointer; transition: all var(--transition);
-        }
-
-        .ctab.active, .ctab:hover { background: var(--blue-100); color: var(--blue-400); border-color: var(--blue-500); }
-
-        .chart-container {
-            background: var(--surface-2);
-            border-radius: var(--r-md);
-            padding: 20px 16px 0;
-            height: 190px;
-            display: flex;
-            align-items: flex-end;
-            gap: 5px;
-            position: relative;
-            overflow: hidden;
-            border: 1px solid var(--border);
-        }
-
-        /* horizontal grid lines */
-        .chart-container::before {
-            content: '';
-            position: absolute; inset: 0;
-            background: repeating-linear-gradient(
-                transparent,
-                transparent calc(25% - 1px),
-                var(--border) calc(25% - 1px),
-                var(--border) 25%
-            );
-            pointer-events: none;
-        }
-
-        .bar-g { flex: 1; display: flex; flex-direction: column; align-items: center; position: relative; }
-
-        .bar {
-            width: 100%; border-radius: 6px 6px 0 0;
-            min-height: 6px;
-            position: relative; z-index: 1;
-            transition: opacity 0.2s;
-            cursor: pointer;
-        }
-
-        .bar:hover { opacity: 0.75; }
-
-        .bar.b-blue { background: linear-gradient(180deg, var(--blue-500), var(--blue-600)); }
-        .bar.b-dim  { background: var(--surface-3); }
-
-        .bar-label {
-            position: absolute; bottom: -19px;
-            left: 50%; transform: translateX(-50%);
-            font-size: 0.58rem; color: var(--txt-3); white-space: nowrap;
-        }
-
-        .chart-legend { display: flex; gap: 18px; margin-top: 30px; }
-        .leg { display: flex; align-items: center; gap: 7px; font-size: 0.72rem; color: var(--txt-3); }
-        .leg-dot { width: 10px; height: 10px; border-radius: 3px; }
-
-        /* ── TABLE ── */
-        .tbl-wrap { overflow-x: auto; }
-
-        table { width: 100%; border-collapse: collapse; font-size: 0.83rem; }
-
-        thead th {
-            padding: 11px 16px;
-            text-align: left; font-size: 0.67rem;
-            font-weight: 700; letter-spacing: 0.08em;
-            text-transform: uppercase; color: var(--txt-3);
-            background: var(--surface-2);
-            border-bottom: 1px solid var(--border);
-            white-space: nowrap;
-        }
-
-        tbody td {
-            padding: 13px 16px;
-            border-bottom: 1px solid var(--border);
-            color: var(--txt-1); vertical-align: middle; white-space: nowrap;
-            transition: background var(--transition);
-        }
-
-        tbody tr:last-child td { border-bottom: none; }
-        tbody tr:hover td { background: var(--surface-2); }
-
-        .badge {
-            display: inline-flex; align-items: center;
-            padding: 3px 9px; border-radius: 20px;
-            font-size: 0.68rem; font-weight: 700;
-        }
-
-        .b-green  { background: var(--green-dim);  color: var(--green); }
-        .b-amber  { background: var(--amber-dim);  color: var(--amber); }
-        .b-red    { background: var(--red-dim);    color: var(--red); }
-        .b-blue   { background: var(--blue-100);   color: var(--blue-400); }
-        .b-purple { background: var(--purple-dim); color: var(--purple); }
-
-        .prog-row { display: flex; align-items: center; gap: 10px; }
-        .prog-track { flex: 1; height: 5px; background: var(--surface-3); border-radius: 5px; overflow: hidden; }
-        .prog-fill  { height: 100%; border-radius: 5px; }
-        .pf-blue   { background: linear-gradient(90deg, var(--blue-600), var(--blue-400)); }
-        .pf-green  { background: var(--green); }
-        .pf-amber  { background: var(--amber); }
-        .pf-red    { background: var(--red); }
-        .prog-pct  { font-size: 0.7rem; color: var(--txt-3); width: 32px; text-align: right; }
-
-        .act-btn {
-            width: 30px; height: 30px; border-radius: 7px;
-            border: 1px solid var(--border); background: var(--surface-2);
-            display: inline-flex; align-items: center; justify-content: center;
-            cursor: pointer; color: var(--txt-3);
-            transition: all var(--transition);
-        }
-
-        .act-btn:hover { border-color: var(--blue-500); color: var(--blue-400); background: var(--blue-050); }
-        .act-btn.del:hover { border-color: var(--red); color: var(--red); background: var(--red-dim); }
-
-        /* ── TRANSACTIONS ── */
-        .tx-list { list-style: none; }
-
-        .tx-item {
-            display: flex; align-items: center; gap: 13px;
-            padding: 11px 0;
-            border-bottom: 1px solid var(--border);
-            transition: opacity 0.18s;
-        }
-
-        .tx-item:last-child { border-bottom: none; }
-        .tx-item:hover { opacity: 0.8; }
-
-        .tx-av {
-            width: 36px; height: 36px;
-            border-radius: 10px;
-            display: flex; align-items: center; justify-content: center;
-            font-weight: 700; font-size: 0.76rem; flex-shrink: 0;
-        }
-
-        .tx-name { font-size: 0.82rem; font-weight: 600; color: var(--txt-1); }
-        .tx-time { font-size: 0.68rem; color: var(--txt-3); margin-top: 1px; }
-        .tx-r    { margin-left: auto; text-align: right; }
-        .tx-amt  { font-size: 0.88rem; font-weight: 700; color: var(--txt-1); }
-        .tx-st   { font-size: 0.68rem; margin-top: 2px; }
-
-        .st-ok   { color: var(--green); }
-        .st-warn { color: var(--amber); }
-        .st-fail { color: var(--red); }
-
-        /* ── LOAN TYPES ── */
-        .lt-item {
-            display: flex; align-items: center; gap: 12px;
-            padding: 13px 14px; border-radius: var(--r-md);
-            background: var(--surface-2);
-            border: 1px solid var(--border);
-            margin-bottom: 9px;
-            cursor: pointer;
-            transition: all var(--transition);
-        }
-
-        .lt-item:last-child { margin-bottom: 0; }
-        .lt-item:hover { border-color: var(--blue-500); background: var(--blue-050); }
-
-        .lt-icon {
-            width: 36px; height: 36px;
-            border-radius: 9px;
-            display: flex; align-items: center; justify-content: center;
-            flex-shrink: 0;
-        }
-
-        .lt-name { font-size: 0.82rem; font-weight: 600; color: var(--txt-1); }
-        .lt-meta { font-size: 0.68rem; color: var(--txt-3); margin-top: 1px; }
-
-        /* ── PAGINATION ── */
-        .pager { display: flex; gap: 5px; }
-        .pg-btn {
-            padding: 5px 11px; border-radius: 7px;
-            border: 1px solid var(--border); background: var(--surface-2);
-            font-size: 0.75rem; cursor: pointer; color: var(--txt-3);
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            transition: all var(--transition);
-        }
-
-        .pg-btn:hover { border-color: var(--blue-500); color: var(--blue-400); }
-        .pg-btn.active { background: var(--blue-600); border-color: var(--blue-600); color: #fff; font-weight: 700; }
-
-        /* ── FOOTER ── */
-        footer {
-            text-align: center;
-            padding: 18px;
-            font-size: 0.73rem;
-            color: var(--txt-3);
-            border-top: 1px solid var(--border);
-            background: var(--surface);
-            transition: background var(--transition), border-color var(--transition);
-        }
-
-        footer a { color: var(--blue-400); text-decoration: none; }
-
-        /* ── DIVIDER ── */
-        .tbl-foot {
-            padding: 12px 20px;
-            border-top: 1px solid var(--border);
-            display: flex; align-items: center; justify-content: space-between;
-        }
-
-        /* ── ANIMATED ENTRY ── */
-        @keyframes fadeUp {
-            from { opacity: 0; transform: translateY(14px); }
-            to   { opacity: 1; transform: translateY(0); }
-        }
-
-        .stat       { animation: fadeUp 0.4s ease both; }
-        .stat:nth-child(1) { animation-delay: 0.05s; }
-        .stat:nth-child(2) { animation-delay: 0.10s; }
-        .stat:nth-child(3) { animation-delay: 0.15s; }
-        .stat:nth-child(4) { animation-delay: 0.20s; }
-        .logout-btn {
-    width:100%;
-    display:flex;
-    align-items:center;
-    gap:10px;
-    padding:12px 14px;
-    border-radius:10px;
-    border:1px solid var(--border);
-    background:var(--surface-2);
-    color:var(--txt-2);
-    font-family:'Plus Jakarta Sans', sans-serif;
-    font-size:.85rem;
-    font-weight:600;
-    cursor:pointer;
-    transition:all var(--transition);
-    text-decoration:none;   /* important for <a> */
-}
-
-.logout-btn svg {
-    width:16px;
-    height:16px;
-}
-
-.logout-btn:hover {
-    background:var(--red-dim);
-    border-color:var(--red);
-    color:var(--red);
-}
-            .page { padding: 24px 28px; flex: 1; }
-
-        /* STAT CARDS */
-        .stats { display: grid; grid-template-columns: repeat(4,1fr); gap: 16px; margin-bottom: 22px; }
-        .stat { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); padding: 20px 22px; position: relative; overflow: hidden; cursor: default; transition: background var(--transition), border-color var(--transition), transform 0.2s; }
-        .stat:hover { transform: translateY(-2px); border-color: var(--border-2); }
-        .stat::after { content: ''; position: absolute; top: -30px; right: -30px; width: 90px; height: 90px; border-radius: 50%; opacity: 0.06; }
-        .stat-primary::after { background: var(--blue-500); opacity: 0.2; }
-        .stat-green::after   { background: var(--green); opacity: 0.2; }
-        .stat-amber::after   { background: var(--amber); opacity: 0.2; }
-        .stat-red::after     { background: var(--red); opacity: 0.2; }
-        .stat.stat-featured { background: linear-gradient(135deg, var(--blue-600) 0%, #1e40af 100%); border-color: transparent; box-shadow: 0 8px 28px rgba(37,99,235,0.35); }
-        .stat.stat-featured .s-label, .stat.stat-featured .s-change { color: rgba(255,255,255,0.65); }
-        .stat.stat-featured .s-value { color: #fff; }
-        .s-head  { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 14px; }
-        .s-icon  { width: 42px; height: 42px; border-radius: 11px; display: flex; align-items: center; justify-content: center; }
-        .ic-blue  { background: var(--blue-100); color: var(--blue-400); }
-        .ic-green { background: var(--green-dim); color: var(--green); }
-        .ic-amber { background: var(--amber-dim); color: var(--amber); }
-        .ic-red   { background: var(--red-dim); color: var(--red); }
-        .ic-white { background: rgba(255,255,255,0.15); color: #fff; }
-        .s-badge  { font-size: 0.7rem; font-weight: 600; padding: 3px 8px; border-radius: 20px; }
-        .badge-up    { background: var(--green-dim); color: var(--green); }
-        .badge-down  { background: var(--red-dim);   color: var(--red); }
-        .badge-white { background: rgba(255,255,255,0.2); color: #fff; }
-        .s-value { font-size: 1.85rem; font-weight: 800; color: var(--txt-1); letter-spacing: -0.03em; line-height: 1; margin-bottom: 4px; }
-        .s-label { font-size: 0.76rem; color: var(--txt-3); }
-        .s-change{ font-size: 0.7rem; color: var(--txt-3); margin-top: 6px; }
-
-        /* CARD */
-        .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-lg); overflow: hidden; transition: background var(--transition), border-color var(--transition); }
-        .card-head { padding: 18px 22px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
-        .card-title { font-size: 0.92rem; font-weight: 700; color: var(--txt-1); letter-spacing: -0.01em; }
-        .card-link  { font-size: 0.75rem; color: var(--blue-400); text-decoration: none; font-weight: 600; transition: opacity 0.18s; }
-        .card-link:hover { opacity: 0.7; }
-        .card-body  { padding: 18px 22px; }
-
-        /* BADGE */
-        .badge { display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 20px; font-size: 0.68rem; font-weight: 700; }
-        .b-green  { background: var(--green-dim);  color: var(--green); }
-        .b-amber  { background: var(--amber-dim);  color: var(--amber); }
-        .b-red    { background: var(--red-dim);    color: var(--red); }
-        .b-blue   { background: var(--blue-100);   color: var(--blue-400); }
-        .b-purple { background: var(--purple-dim); color: var(--purple); }
-
-        /* TABLE */
-        .tbl-wrap { overflow-x: auto; }
-        table { width: 100%; border-collapse: collapse; font-size: 0.83rem; }
-        thead th { padding: 11px 16px; text-align: left; font-size: 0.67rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--txt-3); background: var(--surface-2); border-bottom: 1px solid var(--border); white-space: nowrap; }
-        tbody td { padding: 13px 16px; border-bottom: 1px solid var(--border); color: var(--txt-1); vertical-align: middle; white-space: nowrap; transition: background var(--transition); }
-        tbody tr:last-child td { border-bottom: none; }
-        tbody tr:hover td { background: var(--surface-2); }
-        .tbl-foot { padding: 12px 20px; border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
-
-        /* PAGINATION */
-        .pager { display: flex; gap: 5px; }
-        .pg-btn { padding: 5px 11px; border-radius: 7px; border: 1px solid var(--border); background: var(--surface-2); font-size: 0.75rem; cursor: pointer; color: var(--txt-3); font-family: 'Plus Jakarta Sans', sans-serif; transition: all var(--transition); }
-        .pg-btn:hover { border-color: var(--blue-500); color: var(--blue-400); }
-        .pg-btn.active { background: var(--blue-600); border-color: var(--blue-600); color: #fff; font-weight: 700; }
-
-        /* LOAN TYPE ITEM */
-        .lt-item { display: flex; align-items: center; gap: 12px; padding: 13px 14px; border-radius: var(--r-md); background: var(--surface-2); border: 1px solid var(--border); margin-bottom: 9px; transition: all var(--transition); }
-        .lt-item:last-child { margin-bottom: 0; }
-        .lt-item:hover { border-color: var(--blue-500); background: var(--blue-050); }
-        .lt-icon { width: 36px; height: 36px; border-radius: 9px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-        .lt-name { font-size: 0.82rem; font-weight: 600; color: var(--txt-1); }
-        .lt-meta { font-size: 0.68rem; color: var(--txt-3); margin-top: 1px; }
-
-        /* DESCRIPTION TEXT */
-        .lt-desc { font-size: 0.76rem; color: var(--txt-2); margin-top: 6px; line-height: 1.6; }
-
-        /* GRID */
-        .grid-main { display: grid; grid-template-columns: 1fr 316px; gap: 18px; margin-bottom: 22px; }
-        .col-flex { display: flex; flex-direction: column; gap: 18px; }
-
-        /* PROGRESS */
-        .prog-row  { display: flex; align-items: center; gap: 10px; }
-        .prog-track{ flex: 1; height: 5px; background: var(--surface-3); border-radius: 5px; overflow: hidden; }
-        .prog-fill { height: 100%; border-radius: 5px; }
-        .pf-blue  { background: linear-gradient(90deg, var(--blue-600), var(--blue-400)); }
-        .pf-green { background: var(--green); }
-        .pf-amber { background: var(--amber); }
-        .pf-red   { background: var(--red); }
-        .prog-pct { font-size: 0.7rem; color: var(--txt-3); width: 32px; text-align: right; }
-
-        /* COMPLAINT ITEM */
-        .cx-item { padding: 14px 0; border-bottom: 1px solid var(--border); }
-        .cx-item:last-child { border-bottom: none; }
-        .cx-top  { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; margin-bottom: 6px; }
-        .cx-ref  { font-size: 0.68rem; font-weight: 700; color: var(--txt-3); letter-spacing: 0.06em; }
-        .cx-subj { font-size: 0.85rem; font-weight: 600; color: var(--txt-1); margin-bottom: 4px; }
-        .cx-msg  { font-size: 0.76rem; color: var(--txt-2); line-height: 1.6; }
-        .cx-foot { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
-        .cx-date { font-size: 0.68rem; color: var(--txt-3); }
-        .cx-user { font-size: 0.72rem; font-weight: 600; color: var(--txt-2); }
-
-        /* FEEDBACK ITEM */
-        .fb-item { padding: 14px 0; border-bottom: 1px solid var(--border); }
-        .fb-item:last-child { border-bottom: none; }
-        .fb-top  { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
-        .fb-name { font-size: 0.82rem; font-weight: 600; color: var(--txt-1); }
-        .fb-date { font-size: 0.68rem; color: var(--txt-3); }
-        .fb-score{ font-size: 1rem; font-weight: 800; color: var(--amber); letter-spacing: -0.02em; }
-        .fb-q    { font-size: 0.78rem; color: var(--txt-2); line-height: 1.65; margin-top: 4px; }
-
-        /* RATING BAR */
-        .rb-row  { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
-        .rb-lbl  { font-size: 0.72rem; color: var(--txt-3); width: 14px; text-align: right; flex-shrink: 0; }
-        .rb-n    { font-size: 0.7rem; font-weight: 600; color: var(--txt-2); width: 24px; text-align: right; flex-shrink: 0; }
-
-        /* ANIMATIONS */
-        @keyframes fadeUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
-        .stat { animation: fadeUp 0.4s ease both; }
-        .stat:nth-child(1) { animation-delay: 0.05s; }
-        .stat:nth-child(2) { animation-delay: 0.10s; }
-        .stat:nth-child(3) { animation-delay: 0.15s; }
-        .stat:nth-child(4) { animation-delay: 0.20s; }
-
-
     </style>
 </head>
-<body>
+<body class="min-h-screen flex flex-col lg:flex-row overflow-x-hidden">
 
-<!-- ══════════════ SIDEBAR ══════════════ -->
-<aside class="sidebar">
+    <!-- TOAST NOTIFICATION SYSTEM -->
+    <div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-2.5 pointer-events-none max-w-sm w-full"></div>
 
-    <!-- BRAND -->
-    <div class="brand">
-        <div class="brand-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                <rect x="3" y="9" width="18" height="12" rx="2"/>
-                <path d="M3 9l9-6 9 6"/>
-            </svg>
+    <!-- ══════════════ SIDEBAR (Styled exactly after "wp-adminify-for-wordpress-dashboard.png") ══════════════ -->
+    <aside class="w-full lg:w-60 bg-white dark:bg-[#111827] admin-border border-r flex flex-col justify-between sticky top-0 lg:h-screen z-40 transition-all duration-300">
+        <div>
+            <!-- Sidebar Header / Logo -->
+            <div class="px-5 py-4 border-b border-gray-100 dark:border-slate-800 flex items-center justify-between">
+                <div class="flex items-center gap-2.5">
+                    <div class="p-1.5 bg-indigo-600 rounded-lg text-white">
+                        <svg class="w-5 h-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="9" width="18" height="12" rx="2"/>
+                            <path d="M3 9l9-6 9 6"/>
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="font-bold text-base tracking-tight text-slate-800 dark:text-white flex items-center gap-1.5">
+                            Trustify
+                            <span class="text-[10px] py-0.5 px-1 bg-slate-100 dark:bg-slate-800 text-indigo-600 rounded font-normal">v2.1</span>
+                        </h1>
+                    </div>
+                </div>
+
+                <!-- Mobile Menu Button -->
+                <button id="mobile-menu-toggle" class="lg:hidden p-1.5 rounded bg-gray-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200" aria-label="Toggle Menu">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+                </button>
+            </div>
+
+            <!-- Sidebar Nav Links -->
+            <nav id="nav-menu" class="hidden lg:flex flex-col p-3 gap-0.5">
+
+                <!-- Dashboard Active Block Category (with Home and Updates sub-links as seen in wp-adminify-for-wordpress-dashboard.png) -->
+                <div class="mb-1">
+                    <button onclick="window.location.href='/bank_home'" id="nav-bank_home" class="nav-btn w-full flex items-center justify-between px-3 py-2 rounded text-sm font-semibold transition-colors duration-150 text-slate-700 dark:text-slate-200 hover:bg-gray-100 dark:hover:bg-slate-800">
+                        <div class="flex items-center gap-2.5">
+                            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+                            <span>Dashboard</span>
+                        </div>
+                    </button>
+                </div>
+
+                <!-- CATEGORY: Loan Services -->
+                <div class="px-3 py-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Financial Services</div>
+
+                <button onclick="window.location.href='/bank_loan_types'" id="nav-bank_loan_types" class="nav-btn w-full flex items-center justify-between px-3 py-2 rounded text-sm font-medium transition-colors duration-150 text-slate-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800">
+                    <div class="flex items-center gap-2.5">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                        <span>Loan Types</span>
+                    </div>
+                    <svg class="w-3 h-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                </button>
+
+                <button onclick="window.location.href='/user_loan_request'" id="nav-user_loan_request" class="nav-btn w-full flex items-center justify-between px-3 py-2 rounded text-sm font-medium transition-colors duration-150 text-slate-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800">
+                    <div class="flex items-center gap-2.5">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                        <span>Loan Requests</span>
+                    </div>
+                    <svg class="w-3 h-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                </button>
+
+                <!-- CATEGORY: Support -->
+                <div class="px-3 py-2 text-[10px] font-bold text-slate-400 uppercase tracking-wider">Help Desk</div>
+
+                <button onclick="window.location.href='/sent_complaint'"  id="nav-sent_complaint" class="nav-btn w-full flex items-center justify-between px-3 py-2 rounded text-sm font-medium transition-colors duration-150 text-slate-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800">
+                    <div class="flex items-center gap-2.5">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14z"/></svg>
+                        <span>Complaints</span>
+                    </div>
+                    <svg class="w-3 h-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                </button>
+
+                <button onclick="window.location.href='/view_reply'" id="nav-view_reply" class="nav-btn w-full flex items-center justify-between px-3 py-2 rounded text-sm font-medium transition-colors duration-150 text-slate-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800">
+                    <div class="flex items-center gap-2.5">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg>
+                        <span>Agent Replies</span>
+                    </div>
+                    <span id="replies-badge" class="px-1.5 py-0.5 text-[10px] font-bold text-white bg-rose-500 rounded-full hidden animate-pulse">0</span>
+                </button>
+
+                <button onclick="window.location.href='/send_feedback'" id="nav-send_feedback" class="nav-btn w-full flex items-center justify-between px-3 py-2 rounded text-sm font-medium transition-colors duration-150 text-slate-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-slate-800">
+                    <div class="flex items-center gap-2.5">
+                        <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/></svg>
+                        <span>Feedback</span>
+                    </div>
+                    <svg class="w-3 h-3 opacity-50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M9 5l7 7-7 7"/></svg>
+                </button>
+            </nav>
         </div>
-        <div class="brand-text">
-            <div class="brand-name">Trustify</div>
-            <div class="brand-tag">Banking Portal</div>
+
+        <!-- Sidebar Footer Panel -->
+        <div class="p-3 border-t border-gray-100 dark:border-slate-800">
+            <!-- Logout Simulated Link -->
+            <button onclick="window.location.href='/logout_view'" class="w-full flex items-center gap-2.5 px-3 py-2 rounded text-xs text-rose-500 hover:bg-rose-500/10 font-medium transition-colors">
+                <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+                Logout
+            </button>
         </div>
-    </div>
+    </aside>
+    <main class="flex-1 flex flex-col min-w-0">
 
-    <!-- NAV -->
-    <div class="nav-scroll">
+        <!-- ══════════════ TOPBAR (Adminify Styled Headers) ══════════════ -->
+        <header class="h-14 px-6 bg-white dark:bg-[#111827] admin-border border-b flex items-center justify-between sticky top-0 z-30 transition-all duration-200">
+            <div class="flex items-center gap-3">
+                <button class="text-slate-400 hover:text-slate-600" aria-label="Toggle Navigation">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h7" /></svg>
+                </button>
 
-        <!-- DASHBOARD -->
-        <a class="nav-link" href="/bank_home">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M3 9l9-6 9 6v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-            </svg>
-            Dashboard
-        </a>
+                <!-- Styled "+ New" button identical to "wp-adminify-for-wordpress-dashboard.png" -->
+                <button onclick="switchView('user_loan_request')" class="bg-[#4f46e5] hover:bg-indigo-700 text-white px-3 py-1.5 rounded text-xs font-bold flex items-center gap-1.5 transition-colors shadow-sm">
+                    <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="3" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" /></svg>
+                    <span>+ New Loan</span>
+                </button>
 
-        <!-- LOAN -->
-        <div class="nav-section">Loan</div>
+                <span class="text-xs text-slate-400 font-medium tracking-tight hidden md:inline-block">Adminify Banking Core</span>
+            </div>
 
-        <a class="nav-link " href="/bank_loan_types">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <rect x="3" y="3" width="7" height="7"/>
-                <rect x="14" y="3" width="7" height="7"/>
-                <rect x="3" y="14" width="7" height="7"/>
-                <rect x="14" y="14" width="7" height="7"/>
-            </svg>
-            Loan Types
-        </a>
+            <div class="flex items-center gap-4">
 
-        <a class="nav-link" href="/user_loan_request">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-                <line x1="8" y1="13" x2="16" y2="13"/>
-            </svg>
-            Loan Requests
-        </a>
+                <!-- System Theme Switcher -->
+                <button class="text-slate-400 hover:text-indigo-600 transition-colors p-1" onclick="toggleTheme()" title="Toggle system layout mode">
+                    <svg id="moon-icon" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+                    <svg id="sun-icon" class="w-4 h-4 hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><path d="M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>
+                </button>
 
-        <!-- SUPPORT -->
-        <div class="nav-section">Support</div>
-
-        <a class="nav-link" href="/sent_complaint">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14z"/>
-            </svg>
-            Complaints
-        </a>
-
-        <a class="nav-link" href="/view_reply">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="9 14 4 9 9 4"/>
-                <path d="M20 20v-7a4 4 0 0 0-4-4H4"/>
-            </svg>
-            Replies
-        </a>
-
-        <a class="nav-link" href="/send_feedback">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M22 16.92v3a2 2 0 0 1-2 2A19.79 19.79 0 0 1 3.07 10.8"/>
-            </svg>
-            Feedback
-        </a>
-
-    </div>
-
-    <!-- FOOTER -->
-    <div class="sidebar-footer">
-        <a href="/logout_view" class="logout-btn">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="16 17 21 12 16 7"/>
-                <line x1="21" y1="12" x2="9" y2="12"/>
-            </svg>
-            Logout
-        </a>
-    </div>
-
-</aside>
+                <div class="h-4 w-[1px] bg-gray-200 dark:bg-slate-700"></div>
 
 
-<div class="main">
+            </div>
+        </header>
+
+        <!-- ══════════════ MAIN WORKSPACE CONTENT ══════════════ -->
+        <div class="p-6 lg:p-8 flex-grow space-y-6">
