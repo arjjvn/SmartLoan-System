@@ -2,375 +2,154 @@
 
 
 {% include 'bank_header.html' %}
-
 <style>
-    .page {
-        padding: 24px 28px;
-        flex: 1;
-    }
+/* Keyframes used by modal transitions and the loading spinner */
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes zoomIn { from { opacity: 0; transform: scale(0.93); } to { opacity: 1; transform: scale(1); } }
+@keyframes spin { to { transform: rotate(360deg); } }
 
-    /* STATS */
-    .stats-row {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 14px;
-        margin-bottom: 26px;
-    }
+/* Filter tabs — 'active' toggled via classList in setFilter(), so needs real CSS */
+.ftab {
+    font-size: 0.73rem; font-weight: 600; padding: 7px 16px;
+    border-radius: 9px; border: 1px solid #e5e7eb;
+    background: transparent; color: #94a3b8; cursor: pointer;
+    transition: all .15s ease; font-family: inherit;
+}
+.dark .ftab { border-color: #334155; }
+.ftab.active, .ftab:hover {
+    background: #eef2ff; color: #4f46e5; border-color: #4f46e5;
+}
+.dark .ftab.active, .dark .ftab:hover {
+    background: rgba(79,70,229,0.18); color: #818cf8; border-color: #4f46e5;
+}
 
-    .stat-mini {
-        background: var(--surface);
-        border: 1px solid var(--border);
-        border-radius: var(--r-md);
-        padding: 16px 18px;
-        display: flex;
-        align-items: center;
-        gap: 14px;
-        transition: all var(--transition);
-        animation: fadeUp 0.4s ease both;
-    }
+/* Deepfake detection pill — JS sets pill.className directly, must be self-contained */
+.detect-pill {
+    display: none; align-items: center; gap: 6px;
+    padding: 5px 14px; border-radius: 20px;
+    font-size: 0.7rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase;
+}
+.detect-pill.show { display: inline-flex; }
+.dp-real { background: rgba(34,197,94,0.2);  color: #4ade80; border: 1px solid rgba(74,222,128,0.3); }
+.dp-fake { background: rgba(239,68,68,0.2);  color: #f87171; border: 1px solid rgba(248,113,113,0.3); }
 
-    .stat-mini:nth-child(1) { animation-delay: 0.05s; }
-    .stat-mini:nth-child(2) { animation-delay: 0.10s; }
-    .stat-mini:nth-child(3) { animation-delay: 0.15s; }
+/* Image viewer (lightbox) modal — JS toggles .active for open/close */
+.img-modal {
+    display: none; position: fixed; z-index: 1100; inset: 0;
+    background: rgba(0,0,0,0.88); backdrop-filter: blur(14px);
+    align-items: center; justify-content: center;
+}
+.img-modal.active { display: flex; animation: fadeIn 0.2s ease; }
+.img-modal-inner {
+    position: relative; width: 340px;
+    animation: zoomIn 0.22s ease;
+    display: flex; flex-direction: column; align-items: center; gap: 0;
+}
+.img-modal-inner img {
+    width: 340px; height: 340px;
+    border-radius: 18px; object-fit: cover; display: block;
+    box-shadow: 0 24px 70px rgba(0,0,0,0.7);
+}
+.img-modal-placeholder {
+    width: 340px; height: 340px; border-radius: 18px;
+    background: linear-gradient(135deg, #3b82f6, #6366f1);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 5rem; font-weight: 800; color: #fff;
+    box-shadow: 0 24px 70px rgba(0,0,0,0.7);
+}
+.img-modal-close {
+    position: absolute; top: -14px; right: -14px;
+    width: 36px; height: 36px; border-radius: 50%;
+    background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.25);
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 20px; line-height: 1; transition: background 0.15s;
+}
+.img-modal-close:hover { background: rgba(255,255,255,0.32); }
+.img-modal-caption {
+    width: 100%;
+    display: flex; flex-direction: column; align-items: center; gap: 10px;
+    margin-top: 18px;
+}
+.img-modal-name-label { font-size: 0.88rem; font-weight: 700; color: #fff; letter-spacing: -0.01em; }
 
-    .stat-mini:hover {
-        transform: translateY(-2px);
-        border-color: var(--border-2);
-    }
+.btn-run-detect {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 11px 24px; border-radius: 12px; border: none;
+    background: linear-gradient(135deg, #4f46e5, #6366f1);
+    color: #fff; font-family: inherit;
+    font-size: 0.82rem; font-weight: 700; cursor: pointer;
+    box-shadow: 0 6px 22px rgba(99,102,241,0.45);
+    transition: all 0.2s ease; width: 100%; justify-content: center;
+}
+.btn-run-detect:hover {
+    background: linear-gradient(135deg, #4338ca, #4f46e5);
+    box-shadow: 0 8px 28px rgba(99,102,241,0.6); transform: translateY(-1px);
+}
+.btn-run-detect:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+.btn-run-detect svg { width: 15px; height: 15px; flex-shrink: 0; }
 
-    .sm-icon {
-        width: 40px; height: 40px; border-radius: 10px;
-        display: flex; align-items: center; justify-content: center; flex-shrink: 0;
-    }
-    .ic-blue  { background: var(--blue-100);  color: var(--blue-400); }
-    .ic-green { background: var(--green-dim); color: var(--green); }
-    .ic-amber { background: var(--amber-dim); color: var(--amber); }
+/* Financial report modal — JS toggles .active; body content is injected by JS */
+.report-modal {
+    display: none; position: fixed; z-index: 1200; inset: 0;
+    background: rgba(0,0,0,0.75); backdrop-filter: blur(8px);
+}
+.report-modal.active { display: flex; align-items: center; justify-content: center; animation: fadeIn 0.22s ease; }
+.report-modal-box {
+    background: var(--surface, #fff); border: 1px solid var(--border, #e5e7eb);
+    border-radius: 24px; width: 580px; max-width: 95vw; max-height: 88vh;
+    display: flex; flex-direction: column; animation: zoomIn 0.22s ease; overflow: hidden;
+}
+.report-modal-hero {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    padding: 24px 26px 22px;
+    display: flex; align-items: center; gap: 14px; position: relative; flex-shrink: 0;
+}
+.report-hero-icon {
+    width: 48px; height: 48px; border-radius: 14px; flex-shrink: 0;
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    display: flex; align-items: center; justify-content: center;
+    box-shadow: 0 6px 18px rgba(217,119,6,0.4);
+}
+.report-hero-icon svg { width: 22px; height: 22px; color: #fff; }
+.report-hero-text { flex: 1; }
+.report-hero-title { font-size: 1rem; font-weight: 800; color: #fff; letter-spacing: -0.01em; }
+.report-hero-sub   { font-size: 0.72rem; color: rgba(255,255,255,0.45); margin-top: 2px; }
+.report-modal-close-btn {
+    width: 30px; height: 30px; border-radius: 50%;
+    background: rgba(255,255,255,0.1); border: none; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: #fff; font-size: 18px; transition: background 0.15s; flex-shrink: 0;
+}
+.report-modal-close-btn:hover { background: rgba(255,255,255,0.2); }
+.report-modal-body { padding: 22px 26px 26px; overflow-y: auto; flex: 1; }
 
-    .sm-val { font-size: 1.4rem; font-weight: 800; color: var(--txt-1); letter-spacing: -0.03em; line-height: 1; }
-    .sm-lbl { font-size: 0.72rem; color: var(--txt-3); margin-top: 2px; }
+.report-loading {
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 50px 20px; gap: 14px; color: var(--txt-3, #94a3b8);
+}
+.report-loading p { font-size: 0.82rem; }
+.report-error { color: var(--red, #dc2626); font-size: 0.82rem; text-align: center; padding: 30px 20px; }
 
-    /* TOOLBAR */
-    .table-toolbar {
-        display: flex; align-items: center; justify-content: space-between;
-        margin-bottom: 20px; gap: 12px; flex-wrap: wrap;
-    }
-
-    .tb-search {
-        display: flex; align-items: center; gap: 8px;
-        background: var(--surface); border: 1px solid var(--border);
-        border-radius: 10px; padding: 9px 14px; flex: 1; max-width: 300px;
-        transition: border-color var(--transition);
-    }
-    .tb-search:focus-within { border-color: var(--blue-500); }
-    .tb-search input {
-        border: none; background: transparent;
-        font-family: 'Plus Jakarta Sans', sans-serif;
-        font-size: 0.82rem; color: var(--txt-1); outline: none; width: 100%;
-    }
-    .tb-search input::placeholder { color: var(--txt-3); }
-    .tb-search svg { color: var(--txt-3); flex-shrink: 0; }
-
-    .filter-tabs { display: flex; gap: 6px; flex-wrap: wrap; }
-    .ftab {
-        font-size: 0.73rem; font-weight: 600; padding: 7px 16px;
-        border-radius: 9px; border: 1px solid var(--border);
-        background: transparent; color: var(--txt-3); cursor: pointer;
-        transition: all var(--transition); font-family: 'Plus Jakarta Sans', sans-serif;
-    }
-    .ftab.active, .ftab:hover {
-        background: var(--blue-100); color: var(--blue-400); border-color: var(--blue-500);
-    }
-
-    /* CARD GRID */
-    .cards-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
-        gap: 18px;
-    }
-
-    .loan-card {
-        background: var(--surface);
-        border: 1px solid var(--border);
-        border-radius: 18px;
-        overflow: hidden;
-        animation: fadeUp 0.4s ease both;
-        transition: box-shadow 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
-        display: flex; flex-direction: column;
-    }
-    .loan-card:hover {
-        box-shadow: 0 8px 30px rgba(0,0,0,0.1);
-        border-color: var(--border-2);
-        transform: translateY(-2px);
-    }
-
-    /* Card hero */
-    .card-hero {
-        background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%);
-        padding: 22px 22px 20px;
-        display: flex; align-items: center; gap: 16px; position: relative;
-    }
-
-    .card-status-badge {
-        position: absolute; top: 14px; right: 14px;
-        display: inline-flex; align-items: center; gap: 4px;
-        padding: 4px 10px; border-radius: 20px;
-        font-size: 0.65rem; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase;
-    }
-    .csb-pending  { background: rgba(251,191,36,0.2);  color: #fbbf24; border: 1px solid rgba(251,191,36,0.3); }
-    .csb-approved { background: rgba(34,197,94,0.2);   color: #4ade80; border: 1px solid rgba(74,222,128,0.3); }
-    .csb-rejected { background: rgba(239,68,68,0.2);   color: #f87171; border: 1px solid rgba(248,113,113,0.3); }
-
-    .card-av-wrap {
-        width: 58px; height: 58px; border-radius: 14px; overflow: hidden;
-        flex-shrink: 0; cursor: pointer;
-        border: 2px solid rgba(255,255,255,0.15);
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-    .card-av-wrap:hover { transform: scale(1.06); box-shadow: 0 6px 20px rgba(0,0,0,0.35); }
-    .card-av-wrap img { width: 100%; height: 100%; object-fit: cover; display: block; }
-    .card-av-placeholder {
-        width: 100%; height: 100%;
-        background: linear-gradient(135deg, #3b82f6, #6366f1);
-        display: flex; align-items: center; justify-content: center;
-        font-size: 1.3rem; font-weight: 800; color: #fff;
-    }
-
-    .card-hero-info { flex: 1; min-width: 0; }
-    .card-hero-name  { font-size: 0.95rem; font-weight: 700; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .card-hero-email { font-size: 0.7rem;  color: rgba(255,255,255,0.45); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .card-hero-date  { font-size: 0.68rem; color: rgba(255,255,255,0.35); margin-top: 6px; }
-
-    /* Card body */
-    .card-body { padding: 18px 20px; flex: 1; display: flex; flex-direction: column; gap: 14px; }
-
-    .card-loan-row {
-        display: flex; align-items: center; justify-content: space-between;
-        background: var(--surface-2); border: 1px solid var(--border);
-        border-radius: 12px; padding: 12px 14px;
-    }
-    .card-loan-type { font-size: 0.82rem; font-weight: 700; color: var(--txt-1); }
-    .card-loan-sub  { font-size: 0.68rem; color: var(--txt-3); margin-top: 2px; }
-    .card-amount    { font-size: 1.2rem;  font-weight: 800; color: var(--txt-1); letter-spacing: -0.03em; }
-
-    /* Card footer */
-    .card-footer { padding: 0 20px 18px; display: flex; flex-direction: column; gap: 8px; }
-    .card-btn-row { display: flex; gap: 8px; }
-
-    /* Action buttons */
-    .btn-card {
-        flex: 1; display: inline-flex; align-items: center; justify-content: center; gap: 7px;
-        padding: 10px 14px; border-radius: 11px; border: none;
-        font-family: 'Plus Jakarta Sans', sans-serif;
-        font-size: 0.78rem; font-weight: 700; cursor: pointer;
-        transition: all 0.18s ease; text-decoration: none; white-space: nowrap;
-    }
-    .btn-card svg { width: 13px; height: 13px; flex-shrink: 0; }
-
-    .btn-approve {
-        background: #dcfce7; color: #15803d;
-        box-shadow: inset 0 0 0 1.5px #bbf7d0;
-    }
-    .btn-approve:hover {
-        background: #16a34a; color: #fff;
-        box-shadow: 0 4px 14px rgba(22,163,74,0.4); transform: translateY(-1px);
-    }
-
-    .btn-reject {
-        background: #fee2e2; color: #dc2626;
-        box-shadow: inset 0 0 0 1.5px #fecaca;
-    }
-    .btn-reject:hover {
-        background: #dc2626; color: #fff;
-        box-shadow: 0 4px 14px rgba(220,38,38,0.4); transform: translateY(-1px);
-    }
-
-    .btn-financial {
-        width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 7px;
-        padding: 10px 14px; border-radius: 11px; border: none;
-        background: #fef3c7; color: #b45309;
-        box-shadow: inset 0 0 0 1.5px #fde68a;
-        font-family: 'Plus Jakarta Sans', sans-serif;
-        font-size: 0.78rem; font-weight: 700; cursor: pointer;
-        transition: all 0.18s ease; white-space: nowrap;
-    }
-    .btn-financial svg { width: 13px; height: 13px; flex-shrink: 0; }
-    .btn-financial:hover {
-        background: #d97706; color: #fff;
-        box-shadow: 0 4px 14px rgba(217,119,6,0.4); transform: translateY(-1px);
-    }
-
-    .btn-doc-card {
-        width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 7px;
-        padding: 10px 14px; border-radius: 11px; border: none;
-        background: #ede9fe; color: #7c3aed;
-        box-shadow: inset 0 0 0 1.5px #ddd6fe;
-        font-family: 'Plus Jakarta Sans', sans-serif;
-        font-size: 0.78rem; font-weight: 700; cursor: pointer;
-        transition: all 0.18s ease; text-decoration: none; white-space: nowrap;
-    }
-    .btn-doc-card svg { width: 13px; height: 13px; flex-shrink: 0; }
-    .btn-doc-card:hover {
-        background: #7c3aed; color: #fff;
-        box-shadow: 0 4px 14px rgba(124,58,237,0.4); transform: translateY(-1px);
-    }
-
-    .btn-deepfake-card {
-        width: 100%; display: inline-flex; align-items: center; justify-content: center; gap: 7px;
-        padding: 10px 14px; border-radius: 11px; border: none;
-        background: #e0e7ff; color: #4338ca;
-        box-shadow: inset 0 0 0 1.5px #c7d2fe;
-        font-family: 'Plus Jakarta Sans', sans-serif;
-        font-size: 0.78rem; font-weight: 700; cursor: pointer;
-        transition: all 0.18s ease; white-space: nowrap;
-    }
-    .btn-deepfake-card svg { width: 13px; height: 13px; flex-shrink: 0; }
-    .btn-deepfake-card:hover {
-        background: #4338ca; color: #fff;
-        box-shadow: 0 4px 14px rgba(67,56,202,0.4); transform: translateY(-1px);
-    }
-
-    /* Empty state */
-    .empty-state { text-align: center; padding: 60px 20px; color: var(--txt-3); }
-    .empty-state svg { width: 40px; height: 40px; margin-bottom: 12px; opacity: 0.3; }
-    .empty-state p { font-size: 0.85rem; margin-top: 6px; }
-    .empty-title { font-size: 0.95rem; font-weight: 600; color: var(--txt-2); }
-
-    /* IMAGE VIEWER MODAL */
-    .img-modal {
-        display: none; position: fixed; z-index: 1100; inset: 0;
-        background: rgba(0,0,0,0.88); backdrop-filter: blur(14px);
-        align-items: center; justify-content: center;
-    }
-    .img-modal.active { display: flex; animation: fadeIn 0.2s ease; }
-
-    .img-modal-inner {
-        position: relative; width: 340px;
-        animation: zoomIn 0.22s ease;
-        display: flex; flex-direction: column; align-items: center; gap: 0;
-    }
-
-    .img-modal-inner img {
-        width: 340px; height: 340px;
-        border-radius: 18px; object-fit: cover; display: block;
-        box-shadow: 0 24px 70px rgba(0,0,0,0.7);
-    }
-    .img-modal-placeholder {
-        width: 340px; height: 340px; border-radius: 18px;
-        background: linear-gradient(135deg, #3b82f6, #6366f1);
-        display: flex; align-items: center; justify-content: center;
-        font-size: 5rem; font-weight: 800; color: #fff;
-        box-shadow: 0 24px 70px rgba(0,0,0,0.7);
-    }
-
-    .img-modal-close {
-        position: absolute; top: -14px; right: -14px;
-        width: 36px; height: 36px; border-radius: 50%;
-        background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.25);
-        cursor: pointer; display: flex; align-items: center; justify-content: center;
-        color: #fff; font-size: 20px; line-height: 1; transition: background 0.15s;
-    }
-    .img-modal-close:hover { background: rgba(255,255,255,0.32); }
-
-    .img-modal-caption {
-        width: 100%;
-        display: flex; flex-direction: column; align-items: center; gap: 10px;
-        margin-top: 18px;
-    }
-    .img-modal-name-label { font-size: 0.88rem; font-weight: 700; color: #fff; letter-spacing: -0.01em; }
-
-    .btn-run-detect {
-        display: inline-flex; align-items: center; gap: 8px;
-        padding: 11px 24px; border-radius: 12px; border: none;
-        background: linear-gradient(135deg, #3b82f6, #6366f1);
-        color: #fff; font-family: 'Plus Jakarta Sans', sans-serif;
-        font-size: 0.82rem; font-weight: 700; cursor: pointer;
-        box-shadow: 0 6px 22px rgba(99,102,241,0.45);
-        transition: all 0.2s ease; width: 100%; justify-content: center;
-    }
-    .btn-run-detect:hover {
-        background: linear-gradient(135deg, #2563eb, #4f46e5);
-        box-shadow: 0 8px 28px rgba(99,102,241,0.6); transform: translateY(-1px);
-    }
-    .btn-run-detect:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
-    .btn-run-detect svg { width: 15px; height: 15px; flex-shrink: 0; }
-
-    .detect-pill {
-        display: none; align-items: center; gap: 6px;
-        padding: 5px 14px; border-radius: 20px;
-        font-size: 0.7rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase;
-    }
-    .detect-pill.show { display: inline-flex; }
-    .dp-real { background: rgba(34,197,94,0.2);  color: #4ade80; border: 1px solid rgba(74,222,128,0.3); }
-    .dp-fake { background: rgba(239,68,68,0.2);  color: #f87171; border: 1px solid rgba(248,113,113,0.3); }
-
-    /* REPORT MODAL */
-    .report-modal {
-        display: none; position: fixed; z-index: 1200; inset: 0;
-        background: rgba(0,0,0,0.75); backdrop-filter: blur(8px);
-    }
-    .report-modal.active { display: flex; align-items: center; justify-content: center; animation: fadeIn 0.22s ease; }
-
-    .report-modal-box {
-        background: var(--surface, #fff); border: 1px solid var(--border, #e5e7eb);
-        border-radius: 24px; width: 580px; max-width: 95vw; max-height: 88vh;
-        display: flex; flex-direction: column; animation: zoomIn 0.22s ease; overflow: hidden;
-    }
-    .report-modal-hero {
-        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-        padding: 24px 26px 22px;
-        display: flex; align-items: center; gap: 14px; position: relative; flex-shrink: 0;
-    }
-    .report-hero-icon {
-        width: 48px; height: 48px; border-radius: 14px; flex-shrink: 0;
-        background: linear-gradient(135deg, #f59e0b, #d97706);
-        display: flex; align-items: center; justify-content: center;
-        box-shadow: 0 6px 18px rgba(217,119,6,0.4);
-    }
-    .report-hero-icon svg { width: 22px; height: 22px; color: #fff; }
-    .report-hero-text { flex: 1; }
-    .report-hero-title { font-size: 1rem; font-weight: 800; color: #fff; letter-spacing: -0.01em; }
-    .report-hero-sub   { font-size: 0.72rem; color: rgba(255,255,255,0.45); margin-top: 2px; }
-    .report-modal-close-btn {
-        width: 30px; height: 30px; border-radius: 50%;
-        background: rgba(255,255,255,0.1); border: none; cursor: pointer;
-        display: flex; align-items: center; justify-content: center;
-        color: #fff; font-size: 18px; transition: background 0.15s; flex-shrink: 0;
-    }
-    .report-modal-close-btn:hover { background: rgba(255,255,255,0.2); }
-    .report-modal-body { padding: 22px 26px 26px; overflow-y: auto; flex: 1; }
-
-    .report-loading {
-        display: flex; flex-direction: column; align-items: center; justify-content: center;
-        padding: 50px 20px; gap: 14px; color: var(--txt-3);
-    }
-    .report-loading p { font-size: 0.82rem; }
-    .report-error { color: var(--red, #dc2626); font-size: 0.82rem; text-align: center; padding: 30px 20px; }
-
-    @keyframes spin { to { transform: rotate(360deg); } }
-    .spinner {
-        width: 24px; height: 24px;
-        border: 3px solid rgba(255,255,255,0.15); border-top-color: #f59e0b;
-        border-radius: 50%; animation: spin 0.7s linear infinite; flex-shrink: 0;
-    }
-
-    @keyframes fadeIn { from { opacity: 0; }                          to { opacity: 1; }             }
-    @keyframes zoomIn { from { opacity: 0; transform: scale(0.93); }  to { opacity: 1; transform: scale(1); } }
-    @keyframes fadeUp { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+.spinner {
+    width: 24px; height: 24px;
+    border: 3px solid rgba(0,0,0,0.1); border-top-color: #f59e0b;
+    border-radius: 50%; animation: spin 0.7s linear infinite; flex-shrink: 0;
+}
 </style>
 
 <!-- TOPBAR -->
-<div class="topbar">
+<header class="h-14 px-6 bg-white dark:bg-[#111827] admin-border border-b flex items-center justify-between sticky top-0 z-30 transition-all duration-200">
     <div>
-        <div class="page-title">Loan Requests</div>
-        <div class="page-subtitle">Review and verify incoming loan applications</div>
+        <div class="text-lg font-bold text-slate-800 dark:text-white">Loan Requests</div>
+        <div class="text-xs text-slate-400 mt-0.5">Review and verify incoming loan applications</div>
     </div>
-    <div class="topbar-right">
-        <div class="theme-toggle" onclick="toggleTheme()" title="Toggle theme">
+    <div class="flex items-center gap-4">
+        <button class="text-slate-400 hover:text-indigo-600 transition-colors p-1" onclick="toggleTheme()" title="Toggle theme">
             <span class="theme-icon icon-moon">
-                <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.79A9 9 0 1111.21 3a7 7 0 109.79 9.79z"/></svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M21 12.79A9 9 0 1111.21 3a7 7 0 109.79 9.79z"/></svg>
             </span>
-            <span class="theme-icon icon-sun">
-                <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor">
+            <span class="theme-icon icon-sun hidden">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                     <circle cx="12" cy="12" r="5"/>
                     <line x1="12" y1="1" x2="12" y2="3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                     <line x1="12" y1="21" x2="12" y2="23" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
@@ -382,42 +161,51 @@
                     <line x1="18.36" y1="5.64" x2="19.78" y2="4.22" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
                 </svg>
             </span>
-        </div>
+        </button>
     </div>
-</div>
+</header>
 
 <!-- PAGE BODY -->
-<div class="page">
+<div class="p-6 lg:p-8 space-y-6">
 
     <!-- Stats -->
-    <div class="stats-row">
-        <div class="stat-mini">
-            <div class="sm-icon ic-blue">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div class="admin-card admin-border rounded p-5 flex items-center gap-4 shadow-sm">
+            <div class="w-10 h-10 rounded-lg bg-indigo-50 dark:bg-slate-800 text-indigo-600 flex items-center justify-center shrink-0">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
             </div>
-            <div><div class="sm-val">{{ data|length }}</div><div class="sm-lbl">Total Requests</div></div>
+            <div>
+                <div class="text-2xl font-extrabold text-slate-800 dark:text-white leading-none">{{ data|length }}</div>
+                <div class="text-[11px] text-slate-400 mt-1">Total Requests</div>
+            </div>
         </div>
-        <div class="stat-mini">
-            <div class="sm-icon ic-amber">
+        <div class="admin-card admin-border rounded p-5 flex items-center gap-4 shadow-sm">
+            <div class="w-10 h-10 rounded-lg bg-amber-50 dark:bg-slate-800 text-amber-600 flex items-center justify-center shrink-0">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
             </div>
-            <div><div class="sm-val">{{ pending_count }}</div><div class="sm-lbl">Pending Review</div></div>
+            <div>
+                <div class="text-2xl font-extrabold text-amber-600 leading-none">{{ pending_count }}</div>
+                <div class="text-[11px] text-slate-400 mt-1">Pending Review</div>
+            </div>
         </div>
-        <div class="stat-mini">
-            <div class="sm-icon ic-green">
+        <div class="admin-card admin-border rounded p-5 flex items-center gap-4 shadow-sm">
+            <div class="w-10 h-10 rounded-lg bg-emerald-50 dark:bg-slate-800 text-emerald-600 flex items-center justify-center shrink-0">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
             </div>
-            <div><div class="sm-val">{{ approved_count }}</div><div class="sm-lbl">Approved</div></div>
+            <div>
+                <div class="text-2xl font-extrabold text-emerald-600 leading-none">{{ approved_count }}</div>
+                <div class="text-[11px] text-slate-400 mt-1">Approved</div>
+            </div>
         </div>
     </div>
 
     <!-- Toolbar -->
-    <div class="table-toolbar">
-        <div class="tb-search">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-            <input type="text" id="search-input" placeholder="Search applicant, loan type…" oninput="filterCards()">
+    <div class="flex items-center justify-between gap-3 flex-wrap">
+        <div class="flex items-center gap-2 bg-white dark:bg-slate-800/40 border border-gray-200 dark:border-slate-700 rounded-lg px-3.5 py-2 flex-1 max-w-xs focus-within:border-indigo-600 transition-colors">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-slate-400 shrink-0"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            <input type="text" id="search-input" placeholder="Search applicant, loan type…" oninput="filterCards()" class="border-none bg-transparent text-xs text-slate-800 dark:text-white outline-none w-full placeholder:text-slate-400">
         </div>
-        <div class="filter-tabs">
+        <div class="flex gap-1.5 flex-wrap">
             <button class="ftab active" onclick="setFilter('all', this)">All</button>
             <button class="ftab" onclick="setFilter('pending', this)">Pending</button>
             <button class="ftab" onclick="setFilter('approved', this)">Approved</button>
@@ -427,91 +215,97 @@
 
     <!-- Cards -->
     {% if data %}
-        <div class="cards-grid" id="cardsGrid">
+        <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5" id="cardsGrid">
         {% for item in data %}
-            <div class="loan-card"
+            <div class="loan-card admin-border rounded-2xl overflow-hidden bg-white dark:bg-[#111827] shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-200 flex flex-col"
                  data-status="{{ item.status|lower }}"
                  data-name="{{ item.user.first_name|lower }} {{ item.user.last_name|lower }}"
                  data-loan="{{ item.loan_type.loan_type_name|lower }}">
 
                 <!-- Hero -->
-                <div class="card-hero">
+                <div class="bg-gradient-to-br from-[#0f172a] to-[#1e3a5f] px-5 py-5 flex items-center gap-4 relative">
                     {% with s=item.status|lower %}
-                        {% if s == 'approved' %}<span class="card-status-badge csb-approved">✓ Approved</span>
-                        {% elif s == 'rejected' %}<span class="card-status-badge csb-rejected">✕ Rejected</span>
-                        {% else %}<span class="card-status-badge csb-pending">⏳ Pending</span>
+                        {% if s == 'approved' %}
+                            <span class="absolute top-3.5 right-3.5 inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wide bg-emerald-500/20 text-emerald-400 border border-emerald-400/30">✓ Approved</span>
+                        {% elif s == 'rejected' %}
+                            <span class="absolute top-3.5 right-3.5 inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wide bg-red-500/20 text-red-400 border border-red-400/30">✕ Rejected</span>
+                        {% else %}
+                            <span class="absolute top-3.5 right-3.5 inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wide bg-amber-500/20 text-amber-400 border border-amber-400/30">⏳ Pending</span>
                         {% endif %}
                     {% endwith %}
 
-                    <div class="card-av-wrap"
+                    <div class="w-[58px] h-[58px] rounded-2xl overflow-hidden shrink-0 cursor-pointer border-2 border-white/15 hover:scale-105 transition-transform"
                          onclick="openImgModal('{{ item.face_image.url|default:'' }}','{{ item.user.first_name }} {{ item.user.last_name }}','{{ item.id }}','{{ item.face_status|default:'' }}','{{ item.face_confidence|default:'' }}')">
                         {% if item.face_image %}
-                            <img src="{{ item.face_image.url }}" alt="{{ item.user.first_name }}"
+                            <img src="{{ item.face_image.url }}" alt="{{ item.user.first_name }}" class="w-full h-full object-cover block"
                                  onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
-                            <div class="card-av-placeholder" style="display:none;">{{ item.user.first_name|first|upper }}</div>
+                            <div class="w-full h-full flex items-center justify-center text-xl font-extrabold text-white bg-gradient-to-br from-indigo-500 to-indigo-600" style="display:none;">{{ item.user.first_name|first|upper }}</div>
                         {% else %}
-                            <div class="card-av-placeholder">{{ item.user.first_name|first|upper }}</div>
+                            <div class="w-full h-full flex items-center justify-center text-xl font-extrabold text-white bg-gradient-to-br from-indigo-500 to-indigo-600">{{ item.user.first_name|first|upper }}</div>
                         {% endif %}
                     </div>
 
-                    <div class="card-hero-info">
-                        <div class="card-hero-name">{{ item.user.first_name }} {{ item.user.last_name }}</div>
-                        <div class="card-hero-email">{{ item.user.email }}</div>
-                        <div class="card-hero-date">{{ item.submitted_date|date:"d M Y" }}</div>
+                    <div class="flex-1 min-w-0">
+                        <div class="text-sm font-bold text-white truncate">{{ item.user.first_name }} {{ item.user.last_name }}</div>
+                        <div class="text-[11px] text-white/45 truncate mt-0.5">{{ item.user.email }}</div>
+                        <div class="text-[10px] text-white/35 mt-1.5">{{ item.submitted_date|date:"d M Y" }}</div>
                     </div>
                 </div>
 
                 <!-- Body -->
-                <div class="card-body">
-                    <div class="card-loan-row">
+                <div class="p-5 flex-1 flex flex-col gap-3.5">
+                    <div class="flex items-center justify-between bg-gray-50 dark:bg-slate-800/50 border border-gray-100 dark:border-slate-800 rounded-xl px-3.5 py-3">
                         <div>
-                            <div class="card-loan-type">{{ item.loan_type.loan_type_name }}</div>
-                            <div class="card-loan-sub">{{ item.loan_type.interest_rate }}% interest · {{ item.loan_type.duration }} months</div>
+                            <div class="text-xs font-bold text-slate-800 dark:text-white">{{ item.loan_type.loan_type_name }}</div>
+                            <div class="text-[10px] text-slate-400 mt-0.5">{{ item.loan_type.interest_rate }}% interest · {{ item.loan_type.duration }} months</div>
                         </div>
-                        <div class="card-amount">₹{{ item.amount }}</div>
+                        <div class="text-lg font-extrabold text-slate-800 dark:text-white">₹{{ item.amount }}</div>
                     </div>
                 </div>
 
                 <!-- Footer actions -->
-                <div class="card-footer">
+                <div class="px-5 pb-5 flex flex-col gap-2">
 
                     <!-- Approve / Reject -->
-                    <div class="card-btn-row">
+                    <div class="flex gap-2">
                         {% if item.status == "Pending" %}
-                            <a href="/bank_approve_loan/{{ item.id }}/" class="btn-card btn-approve"
+                            <a href="/bank_approve_loan/{{ item.id }}/"
+                               class="flex-1 inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-bold bg-emerald-50 text-emerald-700 ring-1 ring-inset ring-emerald-200 hover:bg-emerald-600 hover:text-white transition-colors"
                                onclick="return confirm('Approve this loan request?')">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                                 Approve
                             </a>
-                            <a href="/bank_reject_loan/{{ item.id }}/" class="btn-card btn-reject"
+                            <a href="/bank_reject_loan/{{ item.id }}/"
+                               class="flex-1 inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-bold bg-red-50 text-red-600 ring-1 ring-inset ring-red-200 hover:bg-red-600 hover:text-white transition-colors"
                                onclick="return confirm('Reject this loan request?')">
-                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
                                 Reject
                             </a>
                         {% else %}
-                            <span style="font-size:0.75rem; color:var(--txt-3); font-weight:600; padding: 4px 0;">Decision Completed</span>
+                            <span class="text-xs text-slate-400 font-semibold py-1">Decision Completed</span>
                         {% endif %}
                     </div>
 
                     <!-- Financial Report -->
-                    <button class="btn-financial"
-                            onclick="openReportModal('{{ item.id }}','{{ item.user.first_name }} {{ item.user.last_name }}')">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                    <button onclick="openReportModal('{{ item.id }}','{{ item.user.first_name }} {{ item.user.last_name }}')"
+                            class="w-full inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-bold bg-amber-50 text-amber-700 ring-1 ring-inset ring-amber-200 hover:bg-amber-600 hover:text-white transition-colors">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
                         Financial Report
                     </button>
 
                     <!-- View Document -->
                     {% if item.documents %}
-                        <a href="{{ item.documents.url }}" target="_blank" class="btn-doc-card">
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+                        <a href="{{ item.documents.url }}" target="_blank"
+                           class="w-full inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-bold bg-violet-50 text-violet-700 ring-1 ring-inset ring-violet-200 hover:bg-violet-600 hover:text-white transition-colors">
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
                             View Document
                         </a>
                     {% endif %}
 
                     <!-- Deepfake Detection -->
-                    <button class="btn-deepfake-card"
-                            onclick="openImgModal('{{ item.face_image.url|default:'' }}','{{ item.user.first_name }} {{ item.user.last_name }}','{{ item.id }}','{{ item.face_status|default:'' }}','{{ item.face_confidence|default:'' }}')">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    <button onclick="openImgModal('{{ item.face_image.url|default:'' }}','{{ item.user.first_name }} {{ item.user.last_name }}','{{ item.id }}','{{ item.face_status|default:'' }}','{{ item.face_confidence|default:'' }}')"
+                            class="w-full inline-flex items-center justify-center gap-1.5 px-3.5 py-2.5 rounded-xl text-xs font-bold bg-indigo-50 text-indigo-700 ring-1 ring-inset ring-indigo-200 hover:bg-indigo-600 hover:text-white transition-colors">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                         Deepfake Detection
                     </button>
 
@@ -520,10 +314,10 @@
         {% endfor %}
         </div>
     {% else %}
-        <div class="empty-state">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/></svg>
-            <div class="empty-title">No Loan Requests</div>
-            <p>No applications have been submitted to your bank yet.</p>
+        <div class="flex flex-col items-center justify-center gap-3 py-16 text-slate-400">
+            <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="9" y1="13" x2="15" y2="13"/></svg>
+            <div class="text-sm font-semibold text-slate-500 dark:text-slate-300">No Loan Requests</div>
+            <p class="text-xs">No applications have been submitted to your bank yet.</p>
         </div>
     {% endif %}
 </div>
