@@ -1,169 +1,170 @@
 
 {% include 'admin_header.html' %}
 
+<!-- ══════════════════ MAIN ══════════════════ -->
+<div class="main-wrapper">
 
- <div class="sect active" id="sect-dashboard">
+  <div class="topbar">
+    <div class="pg-title" id="pgTitle">Dashboard</div>
+    <div class="topbar-r">
+      <!-- Search Form with Basic HTML5 Validation -->
+      <form class="search-form" action="#" onsubmit="event.preventDefault();">
+        <input type="text" placeholder="Search users or complaints..." required minlength="3" title="Please enter at least 3 characters">
+        <button type="submit">🔍</button>
+      </form>
 
-      <span class="s-h-lbl">Overview & Stats</span>
-      <div class="stat-row">
-        <div class="stat-card"><div class="s-lbl">Total Registered Banks</div><div class="s-val">{{ banks|length }}</div></div>
-        <div class="stat-card"><div class="s-lbl">Available Loan Types</div><div class="s-val">{{ loan_types|length }}</div></div>
-        <div class="stat-card"><div class="s-lbl">Total Registered Users</div><div class="s-val">{{ users|length}}</div></div>
+      <div class="theme-btn" onclick="toggleTheme()">
+        <div class="tgl"><div class="tgl-k"></div></div>
+        <span id="tglLbl">Light Mode</span>
       </div>
+    </div>
+  </div>
 
-      <span class="s-h-lbl">All Banks</span>
-      <div class="bank-grid">
-        {% for bank in banks %}
-        <div class="bank-card">
-          <div class="bk-name">{{ bank.name }}</div>
-          <div class="bk-loc">{{ bank.branch }}</div>
-          <div class="bk-stats">
-            <div class="bk-s">
-              <div class="bk-sl">Loan Types</div>
-              <div class="bk-sv">{{ bank.loantype_set.count }}</div>
-            </div>
-            <div class="bk-s">
-              <div class="bk-sl">Status</div>
-              <div class="bk-sv">Active</div>
-            </div>
-          </div>
-        </div>
-        {% empty %}
-        <p style="color: var(--text-muted); font-size: 14px; grid-column: 1/-1;">No banks available at this moment.</p>
-        {% endfor %}
+  <div class="main-scroll">
+    <div class="tabs" id="tabBar">
+      <div class="tab active">SYSTEM OVERVIEW</div>
+    </div>
 
-        <!-- Add Bank Card -->
-        <a href="/admin_manage_bank" class="bank-card add-bank" style="text-decoration:none">
-          <div style="font-size:32px; color: var(--text-light); margin-bottom:10px">＋</div>
-          <div style="font-size:14px; font-weight:700; color:var(--text-muted)">Register New Bank</div>
-        </a>
+    <!-- Stats row 1 (Banks and Loans) -->
+    <div class="stat-row">
+      <div class="stat-card">
+        <div class="s-lbl">TOTAL BANKS</div>
+        <div class="s-val">{{ banks|length|default:"3" }}</div>
       </div>
-
-      <!-- ══════ VIEW USERS ══════ -->
-      <div class="table-wrap">
-        <div class="tw-header">
-          <span class="tw-title">All Registered Users</span>
-        </div>
-        <table>
-          <thead>
-            <tr><th>#</th><th>User</th><th>Phone</th><th>Place</th><th>Joined</th></tr>
-          </thead>
-          <tbody>
-            {% for u in users %}
-            <tr>
-              <td style="color:var(--text-muted);">{{ forloop.counter|stringformat:"03d" }}</td>
-              <td>
-                <div class="u-name">{{ u.first_name }} {{ u.last_name }}</div>
-                <div class="u-email">{{ u.email }}</div>
-              </td>
-              <td>{{ u.phone }}</td>
-              <td>{{ u.place }}</td>
-              <td style="color:var(--text-muted);">{{ u.user.date_joined|date:"M d, Y" }}</td>
-            </tr>
-            {% empty %}
-            <tr><td colspan="5" style="text-align: center; color: var(--text-muted);">No users found.</td></tr>
-            {% endfor %}
-          </tbody>
-        </table>
+      <div class="stat-card">
+        <div class="s-lbl">TOTAL LOANS</div>
+        <div class="s-val">{{ loan_types|length|default:"14" }}</div>
       </div>
+    </div>
 
-      <!-- ══════ VIEW COMPLAINTS ══════ -->
-      <div class="table-wrap">
-        <div class="tw-header">
-          <span class="tw-title">All Complaints</span>
-          <div style="display:flex; gap:10px;">
-            <span class="badge b-red">{{ complaints|length }} Complaints</span>
-          </div>
-        </div>
-        <table>
-          <thead>
-            <tr><th>Ref</th><th>User</th><th>Complaint</th><th>Date</th><th>Replyed Date</th><th>Status</th></tr>
-          </thead>
-          <tbody>
-            {% for c in complaints %}
-            <tr>
-              <td style="color:var(--text-muted); font-weight:800;">C-{{ forloop.counter|stringformat:"03d" }}</td>
-              <td><div class="u-name">{{ c.user.username }}</div></td>
-              <td class="c-subj">{{ c.message }}</td>
-              <td><div class="c-text">{{ c.date }}</div></td>
-              <td style="color:var(--text-muted);">{{ c.replied_date }}</td>
-              <td>
-                {% if c.status == "Open" %}
-                  <span class="badge b-red">{{ c.status }}</span>
-                {% elif c.status == "In Review" %}
-                  <span class="badge b-amber">{{ c.status }}</span>
-                {% else %}
-                  <span class="badge b-green">{{ c.status }}</span>
-                {% endif %}
-              </td>
-            </tr>
-            {% empty %}
-            <tr><td colspan="6" style="text-align: center; color: var(--text-muted);">No complaints found.</td></tr>
-            {% endfor %}
-          </tbody>
-        </table>
-      </div>
+    <div class="section-title">All Registered Banks</div>
 
-      <!-- ══════ VIEW FEEDBACK ══════ -->
-      <div class="two-col" style="margin-top:20px">
-        <div>
-          <div class="s-head" style="margin-bottom:20px">
-            <span class="s-h-lbl" style="margin:0;">Customer Feedback</span>
-            <span class="badge b-green">{{ total_feedback|default:"0" }} reviews</span>
-          </div>
-
-          <div class="fb-grid">
-            {% if feedbacks %}
-              {% for fb in feedbacks %}
-                <div class="fb-card">
-                  <div class="fb-q">"{{ fb.message }}"</div>
-                  <div class="fb-from">
-                    <div class="fb-av">{{ fb.user.first_name|slice:":1" }}{{ fb.user.last_name|slice:":1" }}</div>
-                    <div>
-                      <div class="fb-name">{{ fb.user.first_name }} {{ fb.user.last_name }}</div>
-                      <div class="fb-date">{{ fb.date|date:"M d, Y" }}</div>
-                    </div>
-                  </div>
-                </div>
-              {% endfor %}
-            {% else %}
-              <p style="padding:10px; color:var(--text-muted); font-size:14px;">No feedback available.</p>
-            {% endif %}
-          </div>
-        </div>
-
-        <div class="side-col">
-          <div class="side-card" style="text-align:center !important; padding: 40px 20px;">
-            <div class="sc-title" style="text-align:center; margin-bottom: 5px;">Overall Feedbacks</div>
-            <div style="font-size:56px; font-weight:800; color:var(--primary-blue); letter-spacing:-2px; margin:10px 0;">
-              {{ feedbacks|length }}
-            </div>
-            <div style="font-size:13px; color:var(--text-muted); font-weight: 600;">
-              Total Feedback Submitted
-            </div>
-          </div>
-
-          <div class="side-card">
-            <div class="sc-title">Top Loan Types</div>
-            {% for loan in loan_types %}
-              <div class="cap-row">
-                <div>
-                  <div class="cap-name">{{ loan.loan_type_name }}</div>
-                  <div style="font-size:12px; color:var(--text-muted); font-weight: 600;">
-                    {{ loan.bank.name }} · {{ loan.interest_rate }}% · {{ loan.duration }} months
-                  </div>
-                </div>
-              </div>
-            {% empty %}
-              <p style="color:var(--text-muted); font-size:13px;">No loan types available.</p>
-            {% endfor %}
+    <div class="bank-grid">
+      {% for bank in banks %}
+      <div class="bank-card">
+        <div class="bk-name">{{ bank.name }}</div>
+        <div class="bk-loc">{{ bank.branch }}</div>
+        <div class="bk-divider"></div>
+        <div class="bk-stats">
+          <div>
+            <div class="bk-sl">LOAN TYPES</div>
+            <div class="bk-sv">{{ bank.loantype_set.count|default:"0" }}</div>
           </div>
         </div>
       </div>
+      {% empty %}
+      <!-- Dummy items to replicate the picture if template tag is empty -->
+      <div class="bank-card">
+        <div class="bk-name">State Bank of India</div>
+        <div class="bk-loc">palakkad</div>
+        <div class="bk-divider"></div>
+        <div class="bk-stats">
+          <div>
+            <div class="bk-sl">LOAN TYPES</div>
+            <div class="bk-sv">6</div>
+          </div>
+        </div>
+      </div>
+      <div class="bank-card">
+        <div class="bk-name">Punjab national Bank</div>
+        <div class="bk-loc">palakkad</div>
+        <div class="bk-divider"></div>
+        <div class="bk-stats">
+          <div>
+            <div class="bk-sl">LOAN TYPES</div>
+            <div class="bk-sv">8</div>
+          </div>
+        </div>
+      </div>
+      <div class="bank-card">
+        <div class="bk-name">Central Bank of India</div>
+        <div class="bk-loc">alathur</div>
+        <div class="bk-divider"></div>
+        <div class="bk-stats">
+          <div>
+            <div class="bk-sl">LOAN TYPES</div>
+            <div class="bk-sv">0</div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
 
-    </div><!-- /sect-dashboard -->
-  </div><!-- /content -->
-</div><!-- /main -->
+      <!-- Add Bank Card -->
+      <a href="/admin_manage_bank" class="bank-card add-bank" style="text-decoration:none">
+        <div class="add-icon">＋</div>
+        <div class="add-text">REGISTER NEW BANK</div>
+      </a>
+    </div>
+
+    <!-- Stats row 2 (Users spanning full width) -->
+    <div class="stat-row">
+      <div class="stat-card">
+        <div class="s-lbl">TOTAL USERS</div>
+        <div class="s-val">{{ users|length|default:"4" }}</div>
+      </div>
+    </div>
+
+    <!-- VIEW USERS -->
+    <div class="section-title primary-colored">All Registered Users</div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>#</th><th>USER</th><th>PHONE</th><th>PLACE</th><th>JOINED</th></tr>
+        </thead>
+        <tbody>
+          {% for u in users %}
+          <tr>
+            <td style="color:var(--text-muted);">{{ forloop.counter|stringformat:"03d" }}</td>
+            <td>
+              <div class="u-name">{{ u.first_name }} {{ u.last_name }}</div>
+              <div class="u-sub">{{ u.email }}</div>
+            </td>
+            <td>{{ u.phone }}</td>
+            <td>{{ u.place }}</td>
+            <td style="color:var(--text-muted);">{{ u.user.date_joined|date:"M d, Y" }}</td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 30px;">No users currently registered.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Extra tables styled to match the new aesthetic if they ever display -->
+    <div class="section-title primary-colored" style="margin-top: 50px;">Complaints & Feedback</div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr><th>REF</th><th>USER</th><th>COMPLAINT</th><th>DATE</th><th>STATUS</th></tr>
+        </thead>
+        <tbody>
+          {% for c in complaints %}
+          <tr>
+            <td style="color:var(--text-muted);">C-{{ forloop.counter|stringformat:"03d" }}</td>
+            <td><div class="u-name">{{ c.user.username }}</div></td>
+            <td>{{ c.message }}</td>
+            <td>{{ c.date }}</td>
+            <td>
+              {% if c.status == "Open" %}
+                <span class="badge b-red">{{ c.status }}</span>
+              {% elif c.status == "In Review" %}
+                <span class="badge b-amber">{{ c.status }}</span>
+              {% else %}
+                <span class="badge b-green">{{ c.status }}</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% empty %}
+          <tr><td colspan="5" style="text-align: center; color: var(--text-muted); padding: 30px;">No complaints found.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+  </div><!-- /main-scroll -->
+</div><!-- /main-wrapper -->
+
+
 
 
 

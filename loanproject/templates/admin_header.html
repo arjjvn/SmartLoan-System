@@ -4,20 +4,21 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Trustify Dashboard</title>
-<!-- Using Nunito to match the rounded, friendly modern typography of the provided image -->
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
 <style>
   :root {
-    /* Color Palette derived from the "Mentalthy" image */
-    --bg-body: #F3F6FC;
-    --sidebar-bg: #F3F6FC; /* Seamless with background */
+    /* Color Palette derived exactly from the provided image */
+    --bg-body: #F4F6F9;
+    --sidebar-bg: #2B52C3; /* Deep Royal Blue */
+    --sidebar-active: #4068D6; /* Lighter Blue for active state */
+    --header-bg: #FFFFFF;
     --card-bg: #FFFFFF;
-    --primary-blue: #3763EF;
-    --primary-hover: #294ddb;
-    --text-dark: #2C324B;
+
+    --primary-blue: #3158D3; /* Main Brand Blue */
+    --text-dark: #333333;
     --text-muted: #8E98B0;
     --text-light: #B4BCCD;
-    --border-light: #E8EDF5;
+    --border-light: #E5E9F2;
 
     --badge-green-bg: #E3F5EE;
     --badge-green-text: #219653;
@@ -26,9 +27,22 @@
     --badge-red-bg: #FDE8E8;
     --badge-red-text: #EB5757;
 
-    --radius-lg: 7px;
+    --radius-lg: 6px;
     --radius-md: 4px;
     --font-main: 'Nunito', sans-serif;
+  }
+
+  /* Dark mode overrides (keeping existing toggle functional) */
+  [data-theme="dark"] {
+    --bg-body: #121212;
+    --sidebar-bg: #1A1A1A;
+    --sidebar-active: #333333;
+    --header-bg: #1E1E1E;
+    --card-bg: #1E1E1E;
+    --primary-blue: #5C7CFA;
+    --text-dark: #E0E0E0;
+    --text-muted: #A0A0A0;
+    --border-light: #2C2C2C;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -44,234 +58,210 @@
 
   /* ══════════════════ SIDEBAR ══════════════════ */
   .sidebar {
-    width: 260px;
+    width: 250px;
     background-color: var(--sidebar-bg);
-    padding: 30px 20px;
+    padding: 25px 20px;
     display: flex;
     flex-direction: column;
     overflow-y: auto;
+    color: white;
+    box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+    z-index: 10;
   }
 
-  .sb-brand { margin-bottom: 40px; padding: 0 10px; display: flex; align-items: center; gap: 8px; }
-  .brand-icon { display: none; } /* Hidden to match clean text logo of the image */
-  .brand-name { font-size: 24px; font-weight: 800; color: var(--primary-blue); letter-spacing: -0.5px; }
-  .brand-name::after { content: '.'; }
-  .brand-sub { display: none; }
+  .sb-brand { margin-bottom: 35px; padding: 0 10px; display: flex; align-items: center; gap: 12px; }
+  .brand-icon {
+    display: flex; align-items: center; justify-content: center;
+    width: 36px; height: 36px; background: rgba(255,255,255,0.2);
+    border-radius: 50%; font-size: 16px;
+  }
+  .brand-text { display: flex; flex-direction: column; }
+  .brand-name { font-size: 18px; font-weight: 800; color: white; letter-spacing: 0.5px; }
+  .brand-sub { font-size: 11px; color: rgba(255,255,255,0.7); font-weight: 600; margin-top: 2px; }
 
   .sb-nav { flex: 1; display: flex; flex-direction: column; gap: 5px; }
-  .nav-group { margin-bottom: 15px; }
+  .nav-group { margin-bottom: 20px; }
   .nav-sep-label {
-    display: block; font-size: 12px; font-weight: 600; color: var(--text-light);
-    margin: 10px 0 10px 15px; text-transform: capitalize;
+    display: block; font-size: 10px; font-weight: 800; color: rgba(255,255,255,0.5);
+    margin: 10px 0 10px 15px; text-transform: uppercase; letter-spacing: 1px;
   }
 
   .nav-link {
     display: flex; align-items: center; gap: 12px;
-    padding: 14px 16px; color: var(--text-muted);
-    text-decoration: none; font-weight: 700; font-size: 14px;
+    padding: 12px 15px; color: rgba(255,255,255,0.75);
+    text-decoration: none; font-weight: 700; font-size: 13px;
     border-radius: var(--radius-md); transition: 0.2s ease;
   }
-  .nav-link:hover { color: var(--text-dark); background: rgba(55, 99, 239, 0.05); }
+  .nav-link:hover { color: white; background: rgba(255,255,255,0.05); }
   .nav-link.active {
-    background-color: rgba(55, 99, 239, 0.1);
-    color: var(--text-dark);
+    background-color: var(--sidebar-active);
+    color: white;
   }
-  .n-ico { font-size: 18px; opacity: 0.7; }
-  .nav-link.active .n-ico { opacity: 1; color: var(--primary-blue); }
+  .n-ico { font-size: 16px; opacity: 0.9; }
 
-  .sb-divider { display: none; } /* Clean look, no lines */
-
-  .sb-bottom { margin-top: auto; }
+  .sb-bottom { margin-top: auto; padding-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); }
   .logout-btn {
-    display: flex; align-items: center; gap: 12px;
-    padding: 14px 16px; color: var(--text-muted);
-    text-decoration: none; font-weight: 700; font-size: 14px;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    padding: 12px; color: white; background: rgba(255,255,255,0.1);
+    text-decoration: none; font-weight: 700; font-size: 13px;
+    border-radius: var(--radius-md); transition: 0.2s ease;
   }
+  .logout-btn:hover { background: rgba(255,255,255,0.2); }
 
   /* ══════════════════ MAIN CONTENT ══════════════════ */
-  .main {
-    flex: 1; padding: 40px 50px; overflow-y: auto;
+  .main-wrapper {
+    flex: 1; display: flex; flex-direction: column; overflow: hidden;
   }
 
-  .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
-  .pg-title { font-size: 32px; font-weight: 800; color: var(--text-dark); }
+  .topbar {
+    background: var(--header-bg); padding: 15px 40px;
+    display: flex; justify-content: space-between; align-items: center;
+    border-bottom: 1px solid var(--border-light);
+    z-index: 5;
+  }
+  .pg-title { font-size: 24px; font-weight: 600; color: var(--text-dark); }
 
-  .topbar-r { display: flex; align-items: center; gap: 16px; }
+  .topbar-r { display: flex; align-items: center; gap: 20px; }
+
+  /* Topbar Search with HTML5 Validation Styling */
+  .search-form {
+    display: flex; align-items: center;
+    border: 1px solid var(--border-light); border-radius: var(--radius-md);
+    overflow: hidden; background: var(--bg-body);
+  }
+  .search-form input {
+    border: none; background: transparent; padding: 10px 15px; width: 260px;
+    font-size: 13px; font-family: var(--font-main); color: var(--text-dark); outline: none;
+  }
+  /* Basic HTML5 Validation visual cue */
+  .search-form input:focus:invalid { box-shadow: inset 0 0 0 1px #EB5757; }
+  .search-form input:focus:valid { box-shadow: inset 0 0 0 1px var(--primary-blue); }
+  .search-form button {
+    background: var(--primary-blue); border: none; color: white;
+    padding: 0 15px; height: 100%; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: 0.2s;
+  }
+  .search-form button:hover { background: #264ac2; }
+
   .theme-btn {
-    display: flex; align-items: center; gap: 10px; cursor: pointer;
-    background: var(--card-bg); padding: 10px 15px; border-radius: 30px;
-    font-size: 13px; font-weight: 700; color: var(--text-dark);
-    box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+    display: flex; align-items: center; gap: 8px; cursor: pointer;
+    background: transparent; padding: 5px; border-radius: 30px;
+    font-size: 13px; font-weight: 600; color: var(--text-dark);
   }
-  .tgl { width: 30px; height: 16px; background: var(--border-light); border-radius: 10px; position: relative; }
-  .tgl-k { width: 12px; height: 12px; background: white; border-radius: 50%; position: absolute; top: 2px; left: 2px; }
+  .tgl { width: 34px; height: 20px; background: #D1D5DB; border-radius: 12px; position: relative; transition: 0.3s; }
+  .tgl-k { width: 14px; height: 14px; background: white; border-radius: 50%; position: absolute; top: 3px; left: 3px; transition: 0.3s; }
+  [data-theme="dark"] .tgl { background: var(--primary-blue); }
+  [data-theme="dark"] .tgl-k { left: 17px; }
 
-  .tabs { display: none; } /* Hide raw tabs to match image aesthetic */
+  .main-scroll {
+    flex: 1; padding: 25px 40px 60px; overflow-y: auto;
+  }
 
-  /* Validation UI added to match the image's top filter bar. Uses basic HTML5 validation. */
-  .filter-form {
-    background: var(--card-bg);
-    border-radius: var(--radius-lg);
-    padding: 10px 20px;
-    display: flex;
-    align-items: center;
-    gap: 20px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.02);
-    margin-bottom: 40px;
+  .tabs { display: flex; border-bottom: 2px solid var(--border-light); margin-bottom: 30px; }
+  .tab {
+    padding: 0 0 10px 0; margin-right: 30px; font-size: 12px; font-weight: 800;
+    color: var(--text-muted); cursor: pointer; text-transform: uppercase;
+    position: relative; top: 2px;
   }
-  .filter-group { flex: 1; display: flex; flex-direction: column; position: relative; }
-  .filter-group label { font-size: 11px; color: var(--text-light); font-weight: 600; margin-bottom: 4px; }
-  .filter-group select {
-    border: none; outline: none; font-family: var(--font-main);
-    font-size: 14px; font-weight: 700; color: var(--text-dark); background: transparent;
-    cursor: pointer; appearance: none;
-  }
-  .filter-group::after {
-    content: '⌄'; position: absolute; right: 10px; top: 18px; color: var(--text-dark); font-size: 16px; pointer-events: none;
-  }
-  /* HTML5 Validation styling */
-  .filter-group select:invalid { color: var(--text-muted); }
-  .filter-form-btn {
-    background: var(--bg-body); border: none; width: 45px; height: 45px;
-    border-radius: 14px; cursor: pointer; color: var(--text-dark);
-    display: flex; justify-content: center; align-items: center; font-size: 18px; transition: 0.2s;
-  }
-  .filter-form-btn:hover { background: #E0E6F3; }
+  .tab.active { color: var(--primary-blue); border-bottom: 2px solid var(--primary-blue); }
 
-  /* Stats row mapping to large summary display */
-  .stat-row { display: flex; gap: 20px; margin-bottom: 30px; }
+  /* Layout wrappers to align with picture exactly */
+  .stat-row { display: flex; gap: 25px; margin-bottom: 35px; }
   .stat-card {
-    flex: 1; background: var(--card-bg); padding: 25px; border-radius: var(--radius-lg);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.02);
+    flex: 1; background: var(--card-bg); padding: 25px 30px;
+    border-radius: var(--radius-md); border-left: 5px solid var(--primary-blue);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.02);
   }
-  .s-lbl { font-size: 13px; color: var(--text-muted); font-weight: 600; margin-bottom: 8px; }
-  .s-val, .s-change { font-size: 28px; font-weight: 800; color: var(--text-dark); }
+  .s-lbl { font-size: 11px; color: var(--primary-blue); font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
+  .s-val { font-size: 32px; font-weight: 800; color: var(--text-dark); }
 
   /* Section Headers */
-  .s-h-lbl {
-    font-size: 22px; font-weight: 800; color: var(--text-dark);
-    margin: 10px 0 20px 0; display: flex; align-items: center; gap: 15px;
+  .section-title {
+    font-size: 18px; font-weight: 800; color: var(--text-dark);
+    margin: 10px 0 20px 0;
   }
-  .s-h-lbl::after { /* Emulate the count pill in the image */
-    content: 'Total'; font-size: 12px; background: var(--border-light); color: var(--text-muted);
-    padding: 3px 10px; border-radius: 20px; font-weight: 700;
-  }
+  .section-title.primary-colored { color: var(--primary-blue); }
 
-  /* Grid mimicking "Best for you" section */
+  /* Grid matching image */
   .bank-grid {
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
     gap: 25px; margin-bottom: 40px;
   }
 
-  /* Bank Cards mimicking Doctor Cards */
+  /* Bank Cards */
   .bank-card {
-    background: var(--card-bg); border-radius: var(--radius-lg); padding: 25px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.03); display: flex; flex-direction: column;
-    position: relative;
+    background: var(--card-bg); border-radius: var(--radius-md); padding: 25px 30px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.02); display: flex; flex-direction: column;
+    border: 1px solid var(--border-light);
   }
-  .bk-name { font-size: 18px; font-weight: 800; color: var(--text-dark); margin-bottom: 6px; }
-  .bk-loc {
-    font-size: 12px; color: var(--text-muted); font-weight: 600; margin-bottom: 20px;
-    display: flex; align-items: center; gap: 5px;
-  }
-  .bk-loc::before { content: '◎'; font-size: 14px; }
+  .bk-name { font-size: 16px; font-weight: 800; color: var(--primary-blue); margin-bottom: 4px; }
+  .bk-loc { font-size: 13px; color: var(--text-muted); font-weight: 600; text-transform: lowercase; margin-bottom: 20px; }
 
-  /* Stats mimicking tags in the picture */
-  .bk-stats { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 25px; }
-  .bk-s {
-    background: var(--bg-body); padding: 6px 12px; border-radius: 20px;
-    display: flex; align-items: center; gap: 6px;
-  }
-  .bk-sl { font-size: 11px; color: var(--text-muted); font-weight: 600; }
-  .bk-sv { font-size: 11px; color: var(--text-dark); font-weight: 800; }
+  .bk-divider { border-top: 1px solid var(--border-light); margin: 0 -30px 20px; }
 
-  /* Button injected via CSS to match "Book Consultation" */
-  .bank-card::after {
-    content: 'Manage Bank'; display: block; margin-top: auto;
-    background: var(--primary-blue); color: white; text-align: center;
-    padding: 14px; border-radius: 12px; font-weight: 700; font-size: 13px;
-    cursor: pointer; transition: 0.2s;
-  }
-  .bank-card:hover::after { background: var(--primary-hover); }
+  .bk-stats { display: flex; gap: 40px; }
+  .bk-sl { font-size: 10px; color: var(--text-muted); font-weight: 800; text-transform: uppercase; margin-bottom: 6px; }
+  .bk-sv { font-size: 22px; color: var(--text-dark); font-weight: 800; }
 
-  /* Register Bank placeholder */
+  /* Register Bank dashed card */
   .bank-card.add-bank {
-    background: transparent; border: 2px dashed #D2D8E6; box-shadow: none;
-    justify-content: center; align-items: center; cursor: pointer;
+    background: transparent; border: 2px dashed #D1D5DB; box-shadow: none;
+    justify-content: center; align-items: center; cursor: pointer; transition: 0.2s;
   }
-  .bank-card.add-bank:hover { background: rgba(55, 99, 239, 0.03); border-color: var(--primary-blue); }
-  .bank-card.add-bank::after { display: none; }
+  .bank-card.add-bank:hover { border-color: var(--primary-blue); background: rgba(49, 88, 211, 0.02); }
+  .add-icon { font-size: 24px; color: var(--text-muted); margin-bottom: 10px; font-weight: 300; }
+  .add-text { font-size: 12px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; }
 
-  /* Tables styling for Users/Complaints to blend with modern aesthetic */
+  /* Tables styling matching image */
   .table-wrap {
-    background: var(--card-bg); border-radius: var(--radius-lg); padding: 25px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.03); margin-bottom: 40px;
+    background: var(--card-bg); border-radius: var(--radius-md);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.02); border: 1px solid var(--border-light);
+    margin-bottom: 40px; overflow-x: auto;
   }
-  .tw-header { margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; }
-  .tw-title { font-size: 18px; font-weight: 800; color: var(--text-dark); }
-
-  table { width: 100%; border-collapse: collapse; }
-  th { text-align: left; padding: 12px 10px; font-size: 12px; font-weight: 600; color: var(--text-light); border-bottom: 1px solid var(--border-light); }
-  td { padding: 16px 10px; font-size: 14px; font-weight: 600; color: var(--text-dark); border-bottom: 1px solid var(--bg-body); vertical-align: middle; }
+  table { width: 100%; border-collapse: collapse; text-align: left; }
+  th {
+    padding: 16px 25px; font-size: 10px; font-weight: 800; color: var(--text-muted);
+    text-transform: uppercase; border-bottom: 1px solid var(--border-light);
+  }
+  td {
+    padding: 18px 25px; font-size: 13px; font-weight: 700; color: var(--text-dark);
+    border-bottom: 1px solid var(--border-light); vertical-align: middle;
+  }
   tr:last-child td { border-bottom: none; }
 
   .u-name { font-weight: 800; color: var(--text-dark); }
-  .u-email, .c-text { font-size: 12px; color: var(--text-muted); font-weight: 600; margin-top: 4px; }
+  .u-sub { font-size: 11px; color: var(--text-muted); font-weight: 600; margin-top: 4px; }
 
-  /* Badges */
-  .badge { padding: 6px 12px; border-radius: 20px; font-size: 11px; font-weight: 800; }
+  /* Additional Badges */
+  .badge { padding: 5px 12px; border-radius: 20px; font-size: 10px; font-weight: 800; text-transform: uppercase; }
   .b-green { background: var(--badge-green-bg); color: var(--badge-green-text); }
   .b-amber { background: var(--badge-orange-bg); color: var(--badge-orange-text); }
   .b-red { background: var(--badge-red-bg); color: var(--badge-red-text); }
 
-  /* Feedback Grid & Two Column Layout */
-  .two-col { display: grid; grid-template-columns: 2fr 1fr; gap: 25px; }
-  .s-head { display: flex; justify-content: space-between; align-items: center; }
-  .fb-grid { display: grid; gap: 20px; }
-
-  .fb-card {
-    background: var(--card-bg); border-radius: var(--radius-lg); padding: 25px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.03);
-  }
-  .fb-q { font-size: 14px; font-weight: 600; color: var(--text-dark); line-height: 1.6; margin-bottom: 20px; }
-  .fb-from { display: flex; align-items: center; gap: 15px; }
-  .fb-av {
-    width: 45px; height: 45px; border-radius: 50%; background: var(--primary-blue);
-    color: white; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 14px;
-  }
-  .fb-name { font-weight: 800; font-size: 14px; color: var(--text-dark); }
-  .fb-date { font-size: 11px; color: var(--text-muted); font-weight: 600; margin-top: 2px; }
-
-  /* Side Column Cards */
-  .side-col { display: flex; flex-direction: column; gap: 25px; }
-  .side-card {
-    background: var(--card-bg); border-radius: var(--radius-lg); padding: 25px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.03); text-align: left !important;
-  }
-  .sc-title { font-size: 18px; font-weight: 800; color: var(--text-dark); margin-bottom: 20px; }
-
-  .cap-row { margin-bottom: 15px; padding-bottom: 15px; border-bottom: 1px solid var(--border-light); }
-  .cap-row:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
-  .cap-name { font-weight: 800; font-size: 14px; color: var(--text-dark); margin-bottom: 4px; }
 </style>
 </head>
 <body>
 
 <!-- ══════════════════ SIDEBAR ══════════════════ -->
 <aside class="sidebar">
-  <!-- Brand -->
   <div class="sb-brand">
     <div class="brand-icon">🏦</div>
-    <div class="brand-name">Trustify</div>
+    <div class="brand-text">
+      <div class="brand-name">TRUSTIFY</div>
+      <div class="brand-sub">Admin Portal</div>
+    </div>
   </div>
 
-  <!-- Nav -->
   <nav class="sb-nav">
     <div class="nav-group">
       <a class="nav-link active" href="/admin_home">
         <span class="n-ico">⊞</span>
         <span class="nav-link-text">Dashboard</span>
       </a>
+    </div>
+
+    <div class="nav-group">
+      <span class="nav-sep-label">Manage</span>
       <a class="nav-link" href="/admin_manage_bank">
         <span class="n-ico">🏦</span>
         <span class="nav-link-text">Manage Banks</span>
@@ -282,48 +272,24 @@
       </a>
     </div>
 
-    <div class="sb-divider"></div>
-
     <div class="nav-group">
-      <span class="nav-sep-label">Tools</span>
+      <span class="nav-sep-label">Support</span>
       <a class="nav-link" href="/admin_view_complaint">
         <span class="n-ico">📩</span>
-        <span class="nav-link-text">Complaints</span>
+        <span class="nav-link-text">View Complaints</span>
       </a>
       <a class="nav-link" href="/admin_view_feedback">
         <span class="n-ico">⭐</span>
-        <span class="nav-link-text">Feedback</span>
+        <span class="nav-link-text">View Feedback</span>
       </a>
     </div>
-
-    <div class="sb-divider"></div>
   </nav>
 
   <div class="sb-bottom">
     <a href="/logout_view" class="logout-btn">
       <span class="n-ico">🚪</span>
-      <span>Log out</span>
+      <span>Logout</span>
     </a>
   </div>
 </aside>
 
-<!-- ══════════════════ MAIN ══════════════════ -->
-<div class="main">
-
-  <div class="topbar">
-    <div class="pg-title" id="pgTitle">Welcome, Admin!</div>
-    <div class="topbar-r">
-      <div class="theme-btn" onclick="toggleTheme()">
-        <div class="tgl"><div class="tgl-k"></div></div>
-        <span id="tglLbl">Dark Mode</span>
-      </div>
-    </div>
-  </div>
-
-
-
-  <div class="tabs" id="tabBar">
-    <div class="tab active">Overview</div>
-  </div>
-
-  <div class="content">

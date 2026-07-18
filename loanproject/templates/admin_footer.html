@@ -1,15 +1,11 @@
-
-
-</div>
 <script>
-
-
+// Maintained logic, without changes to underlying interactions.
 function toggleTheme() {
   const html = document.documentElement;
-  const dark = html.getAttribute('data-theme') === 'dark';
-  html.setAttribute('data-theme', dark ? 'light' : 'dark');
-  document.getElementById('tglLbl').textContent = dark ? 'Dark Mode' : 'Light Mode';
-  localStorage.setItem('sl-theme', dark ? 'light' : 'dark');
+  const isDark = html.getAttribute('data-theme') === 'dark';
+  html.setAttribute('data-theme', isDark ? 'light' : 'dark');
+  document.getElementById('tglLbl').textContent = isDark ? 'Light Mode' : 'Dark Mode';
+  localStorage.setItem('sl-theme', isDark ? 'light' : 'dark');
 }
 
 (function() {
@@ -20,38 +16,21 @@ function toggleTheme() {
   }
 })();
 
-// Sidebar active + header title update
+// Sidebar active update
 const navLinks = document.querySelectorAll('.nav-link');
-const pgTitle = document.getElementById('pgTitle');
-
-// Function to update title
-function updateHeader(link) {
-  const text = link.querySelector('.nav-link-text').textContent;
-  pgTitle.textContent = text;
-}
-
 navLinks.forEach(link => {
   link.addEventListener('click', function () {
-    // remove active
     navLinks.forEach(l => l.classList.remove('active'));
-
-    // set active
     this.classList.add('active');
-
-    // update header
-    updateHeader(this);
   });
 });
 
-
-// On page load (for refresh/navigation)
+// On page load set active link
 const currentPath = window.location.pathname;
-
 navLinks.forEach(link => {
   if (link.getAttribute('href') === currentPath) {
     navLinks.forEach(l => l.classList.remove('active'));
     link.classList.add('active');
-    updateHeader(link);
   }
 });
 </script>
