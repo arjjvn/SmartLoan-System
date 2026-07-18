@@ -2,20 +2,14 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="89f6f21a-a509-42e5-9f78-095a510e2a4d" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/../.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/myapp/gemini_ai.py" beforeDir="false" afterPath="$PROJECT_DIR$/myapp/gemini_ai.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/admin_footer.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/admin_footer.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/admin_header.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/admin_header.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/admin_home.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/admin_home.html" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/templates/admin_manage_bank.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/admin_manage_bank.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/bank_footer.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/bank_footer.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/bank_home.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/bank_home.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/bank_loan_types.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/bank_loan_types.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/bank_send_feedback.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/bank_send_feedback.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/bank_user_loan_request.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/bank_user_loan_request.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/bank_view_reply.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/bank_view_reply.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/templates/public_home.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/public_home.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/admin_view_complaint.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/admin_view_complaint.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/admin_view_feedback.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/admin_view_feedback.html" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/templates/admin_view_user.html" beforeDir="false" afterPath="$PROJECT_DIR$/templates/admin_view_user.html" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
